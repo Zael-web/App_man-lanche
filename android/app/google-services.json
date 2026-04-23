@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "962981084599",
+    "project_id": "mana-lanches-6455e",
+    "storage_bucket": "mana-lanches-6455e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962981084599:android:130e9621117ace9a973c32",
+        "android_client_info": {
+          "package_name": "com.example.mana_lanche"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEqRB6_7z4vxiC8bxAjSSZcQ9Q3p81rZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

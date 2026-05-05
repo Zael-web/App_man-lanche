@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mana_lanche/screens/pedidos_admin_screens.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -12,7 +13,7 @@ class _AdminScreenState extends State<AdminScreen> {
   final nomeController = TextEditingController();
   final precoController = TextEditingController();
 
-  // 🔥 ADICIONAR PRODUTO (CORRIGIDO)
+  // 🔥 ADICIONAR PRODUTO
   Future<void> adicionarProduto() async {
     try {
       if (nomeController.text.trim().isEmpty ||
@@ -55,7 +56,7 @@ class _AdminScreenState extends State<AdminScreen> {
         .delete();
   }
 
-  // 🔥 EDITAR PRODUTO (CORRIGIDO)
+  // 🔥 EDITAR PRODUTO
   Future<void> editarProduto(
     String id,
     String nomeAtual,
@@ -139,6 +140,22 @@ class _AdminScreenState extends State<AdminScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("ADMIN - Produtos"),
+
+        // 🔥 BOTÃO VER PEDIDOS
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt),
+            tooltip: "Ver pedidos",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PedidosAdminScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
 
       body: Padding(

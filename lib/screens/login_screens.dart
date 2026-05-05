@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:mana_lanche/screens/client_screens.dart';
-import 'register_screens.dart';
+import 'package:mana_lanche/screens/admin_screens.dart';
+import 'package:mana_lanche/screens/register_screens.dart';
 import 'package:mana_lanche/main.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,20 +18,46 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final senhaController = TextEditingController();
 
+  // 🔥 LOGIN COM CONTROLE DE TIPO
   Future<void> login() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final cred = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: senhaController.text.trim(),
       );
 
-      Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(
-          builder: (_) => const ClientScreen(),
-        ),
-      );
+      final uid = cred.user!.uid;
+
+      final doc = await FirebaseFirestore.instance
+          .collection("usuarios")
+          .doc(uid)
+          .get();
+
+      if (!doc.exists) {
+        throw Exception("Usuário não encontrado no banco");
+      }
+
+      final tipo = doc["tipo"];
+
+      if (!mounted) return;
+
+      if (tipo == "admin") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const AdminScreen(),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ClientScreen(),
+          ),
+        );
+      }
+
     } on FirebaseAuthException catch (e) {
       String erro = "Erro ao entrar";
 
@@ -40,19 +69,26 @@ class _LoginScreenState extends State<LoginScreen> {
         erro = "Email inválido";
       }
 
-      // ignore: use_build_context_synchronously
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(erro)),
+      );
+
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Erro ao carregar usuário")),
       );
     }
   }
 
+  // 🔐 RECUPERAR SENHA
   Future<void> recuperarSenha(BuildContext context) async {
     if (emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Digite seu email primeiro"),
-        ),
+        const SnackBar(content: Text("Digite seu email primeiro")),
       );
       return;
     }
@@ -61,12 +97,18 @@ class _LoginScreenState extends State<LoginScreen> {
       email: emailController.text.trim(),
     );
 
-    // ignore: use_build_context_synchronously
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Email de recuperação enviado"),
-      ),
+      const SnackBar(content: Text("Email de recuperação enviado")),
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    senhaController.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,6 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
+
+                // 🌙 DARK MODE
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -98,13 +142,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 20),
 
-                // LOGO
+                // 🖼️ LOGO
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        // ignore: deprecated_member_use
                         color: Colors.black.withOpacity(0.35),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
@@ -134,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 25),
 
-                // CARD LOGIN
+                // 🔐 CARD LOGIN
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 25),
                   padding: const EdgeInsets.all(20),
@@ -144,6 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Column(
                     children: [
+
                       // EMAIL
                       TextField(
                         controller: emailController,
@@ -153,9 +197,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           filled: true,
                           fillColor:
                               Theme.of(context)
-                                  .inputDecorationTheme
-                                  .fillColor ??
-                              Theme.of(context).cardColor,
+                                      .inputDecorationTheme
+                                      .fillColor ??
+                                  Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
@@ -166,36 +210,36 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 15),
 
                       // SENHA
-                                 TextField(
-                       controller: senhaController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                       hintText: "Senha",
-                     prefixIcon: const Icon(Icons.lock),
+                      TextField(
+                        controller: senhaController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: "Senha",
+                          prefixIcon: const Icon(Icons.lock),
 
-                      suffixIcon: TextButton(
-                     onPressed: () {
-                       recuperarSenha(context);
-                                   },
-                      child: const Text(
-                          "Esqueceu?",
-                      style: TextStyle(fontSize: 12),
-                    ),
-                 ),
+                          suffixIcon: TextButton(
+                            onPressed: () {
+                              recuperarSenha(context);
+                            },
+                            child: const Text(
+                              "Esqueceu?",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
 
-                     filled: true,
-                     fillColor:
-                     Theme.of(context)
-                    .inputDecorationTheme
-                    .fillColor ??
-                      Theme.of(context).cardColor,
+                          filled: true,
+                          fillColor:
+                              Theme.of(context)
+                                      .inputDecorationTheme
+                                      .fillColor ??
+                                  Theme.of(context).cardColor,
 
-                     border: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(10),
-                     borderSide: BorderSide.none,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
                       ),
-                   ),
-                ),
 
                       const SizedBox(height: 20),
 
@@ -251,49 +295,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 15),
-
-                Row(
-                  children: const [
-                    Expanded(child: Divider(color: Colors.white)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "ou entre com",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.white)),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _socialButton(Icons.facebook, Colors.blue),
-                    SizedBox(width: 20),
-                    _socialButton(Icons.g_mobiledata, Colors.orange),
-                    SizedBox(width: 20),
-                    _socialButton(Icons.camera_alt, Colors.purple),
-                  ],
-                ),
-
                 const SizedBox(height: 30),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _socialButton(IconData icon, Color color) {
-    return CircleAvatar(
-      radius: 28,
-      backgroundColor: Colors.white,
-      child: Icon(icon, color: color, size: 30),
     );
   }
 }

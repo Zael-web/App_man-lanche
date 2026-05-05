@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
-import 'package:mana_lanche/screens/admin_screens.dart';
 
 class ClientScreen extends StatelessWidget {
   const ClientScreen({super.key});
@@ -23,21 +22,6 @@ class ClientScreen extends StatelessWidget {
             );
           },
         ),
-
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AdminScreen(),
-                ),
-              );
-            },
-          ),
-        ],
-
         title: const Text("MANÁ LANCHES"),
         centerTitle: true,
       ),
@@ -159,12 +143,12 @@ class ClientScreen extends StatelessWidget {
                 "status": "pendente",
                 "data": Timestamp.now(),
               });
-
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Pedido realizado!")),
               );
 
             } catch (e) {
+              
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Erro ao realizar pedido")),
               );

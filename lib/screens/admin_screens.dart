@@ -12,17 +12,39 @@ class _AdminScreenState extends State<AdminScreen> {
   final nomeController = TextEditingController();
   final precoController = TextEditingController();
 
-  // 🔥 ADICIONAR PRODUTO
+  // 🔥 ADICIONAR PRODUTO (CORRIGIDO)
   Future<void> adicionarProduto() async {
-    if (nomeController.text.isEmpty || precoController.text.isEmpty) return;
+    try {
+      if (nomeController.text.trim().isEmpty ||
+          precoController.text.trim().isEmpty) {
+        return;
+      }
 
-    await FirebaseFirestore.instance.collection("produtos").add({
-      "nome": nomeController.text,
-      "preco": double.parse(precoController.text),
-    });
+      final preco = double.parse(
+        precoController.text.replaceAll(",", "."),
+      );
 
-    nomeController.clear();
-    precoController.clear();
+      await FirebaseFirestore.instance.collection("produtos").add({
+        "nome": nomeController.text,
+        "preco": preco,
+      });
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Produto adicionado!")),
+      );
+
+      nomeController.clear();
+      precoController.clear();
+
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Erro ao adicionar produto")),
+      );
+    }
   }
 
   // 🔥 EXCLUIR PRODUTO
@@ -33,7 +55,7 @@ class _AdminScreenState extends State<AdminScreen> {
         .delete();
   }
 
-  // 🔥 EDITAR PRODUTO
+  // 🔥 EDITAR PRODUTO (CORRIGIDO)
   Future<void> editarProduto(
     String id,
     String nomeAtual,
@@ -44,7 +66,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (contextDialog) {
         return AlertDialog(
           title: const Text("Editar produto"),
           content: Column(
@@ -52,35 +74,50 @@ class _AdminScreenState extends State<AdminScreen> {
             children: [
               TextField(
                 controller: nomeEditController,
-                decoration: const InputDecoration(
-                  labelText: "Nome",
-                ),
+                decoration: const InputDecoration(labelText: "Nome"),
               ),
               TextField(
                 controller: precoEditController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Preço",
-                ),
+                decoration: const InputDecoration(labelText: "Preço"),
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(contextDialog),
               child: const Text("Cancelar"),
             ),
             ElevatedButton(
               onPressed: () async {
-                await FirebaseFirestore.instance
-                    .collection("produtos")
-                    .doc(id)
-                    .update({
-                  "nome": nomeEditController.text,
-                  "preco": double.parse(precoEditController.text),
-                });
+                try {
+                  final preco = double.parse(
+                    precoEditController.text.replaceAll(",", "."),
+                  );
 
-                Navigator.pop(context);
+                  await FirebaseFirestore.instance
+                      .collection("produtos")
+                      .doc(id)
+                      .update({
+                    "nome": nomeEditController.text,
+                    "preco": preco,
+                  });
+
+                  if (!mounted) return;
+
+                  Navigator.pop(contextDialog);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Produto atualizado!")),
+                  );
+
+                } catch (e) {
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Erro ao editar produto")),
+                  );
+                }
               },
               child: const Text("Salvar"),
             ),
@@ -88,6 +125,13 @@ class _AdminScreenState extends State<AdminScreen> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    nomeController.dispose();
+    precoController.dispose();
+    super.dispose();
   }
 
   @override
@@ -102,7 +146,6 @@ class _AdminScreenState extends State<AdminScreen> {
         child: Column(
           children: [
 
-            // 🔹 FORMULÁRIO
             TextField(
               controller: nomeController,
               decoration: const InputDecoration(
@@ -129,7 +172,6 @@ class _AdminScreenState extends State<AdminScreen> {
 
             const SizedBox(height: 20),
 
-            // 🔥 LISTA DE PRODUTOS
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
@@ -138,21 +180,29 @@ class _AdminScreenState extends State<AdminScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
 
-                  if (!snapshot.hasData) {
+                  if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
 
+                  if (!snapshot.hasData ||
+                      snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text("Nenhum produto encontrado"),
+                    );
+                  }
+
                   return ListView(
                     children: snapshot.data!.docs.map((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
+                      final data =
+                          doc.data() as Map<String, dynamic>;
 
                       return ListTile(
                         title: Text(data["nome"]),
                         subtitle: Text("R\$ ${data["preco"]}"),
 
-                        // 🔥 CLICAR = EDITAR
                         onTap: () {
                           editarProduto(
                             doc.id,
@@ -162,7 +212,8 @@ class _AdminScreenState extends State<AdminScreen> {
                         },
 
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete,
+                              color: Colors.red),
                           onPressed: () {
                             excluirProduto(doc.id);
                           },

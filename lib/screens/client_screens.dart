@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:mana_lanche/screens/login_screens.dart';
 import 'package:mana_lanche/screens/admin_screens.dart';
+
 class ClientScreen extends StatelessWidget {
   const ClientScreen({super.key});
 
@@ -20,19 +23,21 @@ class ClientScreen extends StatelessWidget {
             );
           },
         ),
+
         actions: [
-  IconButton(
-    icon: const Icon(Icons.admin_panel_settings),
-    onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const AdminScreen(),
-        ),
-      );
-    },
-  ),
-],
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+
         title: const Text("MANÁ LANCHES"),
         centerTitle: true,
       ),
@@ -61,7 +66,7 @@ class ClientScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // BANNER
+              // 🔥 BANNER
               Container(
                 height: 150,
                 width: double.infinity,
@@ -93,7 +98,7 @@ class ClientScreen extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              // 🔥 LISTA DINÂMICA DO FIREBASE
+              // 🔥 LISTA DE PRODUTOS
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection("produtos")
@@ -107,8 +112,7 @@ class ClientScreen extends StatelessWidget {
                     );
                   }
 
-                  if (!snapshot.hasData ||
-                      snapshot.data!.docs.isEmpty) {
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return const Text("Nenhum produto encontrado");
                   }
 
@@ -118,8 +122,9 @@ class ClientScreen extends StatelessWidget {
                           doc.data() as Map<String, dynamic>;
 
                       return foodItem(
+                        context,
                         data["nome"],
-                        "R\$ ${data["preco"]}",
+                        data["preco"],
                       );
                     }).toList(),
                   );
@@ -132,8 +137,8 @@ class ClientScreen extends StatelessWidget {
     );
   }
 
-  // 🔥 CARD DO PRODUTO
-  Widget foodItem(String nome, String preco) {
+  // 🔥 CARD DO PRODUTO COM PEDIDO
+  Widget foodItem(BuildContext context, String nome, dynamic preco) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -141,10 +146,29 @@ class ClientScreen extends StatelessWidget {
           child: Icon(Icons.fastfood),
         ),
         title: Text(nome),
-        subtitle: Text(preco),
+        subtitle: Text("R\$ ${preco.toString()}"),
+
         trailing: ElevatedButton(
-          onPressed: () {
-            // 👉 depois podemos colocar pedido WhatsApp aqui
+          onPressed: () async {
+            try {
+              await FirebaseFirestore.instance.collection("pedidos").add({
+                "nomeProduto": nome,
+                "preco": preco,
+                "usuarioId":
+                    FirebaseAuth.instance.currentUser!.uid,
+                "status": "pendente",
+                "data": Timestamp.now(),
+              });
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Pedido realizado!")),
+              );
+
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Erro ao realizar pedido")),
+              );
+            }
           },
           child: const Text("Pedir"),
         ),

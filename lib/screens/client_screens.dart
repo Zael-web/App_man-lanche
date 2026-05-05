@@ -13,6 +13,41 @@ class ClientScreen extends StatefulWidget {
 
 class _ClientScreenState extends State<ClientScreen> {
 
+  String nomeCliente = "";
+  bool carregando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    carregarNome();
+  }
+
+  // 🔥 BUSCAR NOME DO USUÁRIO
+  Future<void> carregarNome() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(user.uid)
+        .get();
+
+    if (!mounted) return;
+
+    if (doc.exists) {
+      setState(() {
+        nomeCliente = doc["nome"] ?? "Cliente";
+        carregando = false;
+      });
+    } else {
+      setState(() {
+        nomeCliente = "Cliente";
+        carregando = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +74,12 @@ class _ClientScreenState extends State<ClientScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              const Text(
-                "Olá, Cliente 👋",
-                style: TextStyle(
+              // 🔥 NOME DINÂMICO
+              Text(
+                carregando
+                    ? "Carregando..."
+                    : "Olá, $nomeCliente 👋",
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -143,6 +181,7 @@ class _ClientScreenState extends State<ClientScreen> {
                 "nomeProduto": nome,
                 "preco": preco,
                 "usuarioId": FirebaseAuth.instance.currentUser!.uid,
+                "nomeCliente": nomeCliente, // 🔥 NOVO
                 "status": "pendente",
                 "data": Timestamp.now(),
               });

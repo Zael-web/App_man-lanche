@@ -9,7 +9,6 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-
   final nomeController = TextEditingController();
   final precoController = TextEditingController();
 
@@ -32,6 +31,63 @@ class _AdminScreenState extends State<AdminScreen> {
         .collection("produtos")
         .doc(id)
         .delete();
+  }
+
+  // 🔥 EDITAR PRODUTO
+  Future<void> editarProduto(
+    String id,
+    String nomeAtual,
+    String precoAtual,
+  ) async {
+    final nomeEditController = TextEditingController(text: nomeAtual);
+    final precoEditController = TextEditingController(text: precoAtual);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Editar produto"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nomeEditController,
+                decoration: const InputDecoration(
+                  labelText: "Nome",
+                ),
+              ),
+              TextField(
+                controller: precoEditController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Preço",
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await FirebaseFirestore.instance
+                    .collection("produtos")
+                    .doc(id)
+                    .update({
+                  "nome": nomeEditController.text,
+                  "preco": double.parse(precoEditController.text),
+                });
+
+                Navigator.pop(context);
+              },
+              child: const Text("Salvar"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -95,6 +151,15 @@ class _AdminScreenState extends State<AdminScreen> {
                       return ListTile(
                         title: Text(data["nome"]),
                         subtitle: Text("R\$ ${data["preco"]}"),
+
+                        // 🔥 CLICAR = EDITAR
+                        onTap: () {
+                          editarProduto(
+                            doc.id,
+                            data["nome"],
+                            data["preco"].toString(),
+                          );
+                        },
 
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),

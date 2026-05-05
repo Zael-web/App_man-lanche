@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
+import 'package:mana_lanche/screens/carrinho_screen.dart'; // 🔥 NOVO
 
 class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
@@ -16,13 +17,15 @@ class _ClientScreenState extends State<ClientScreen> {
   String nomeCliente = "";
   bool carregando = true;
 
+  // 🛒 CARRINHO
+  List<Map<String, dynamic>> carrinho = [];
+
   @override
   void initState() {
     super.initState();
     carregarNome();
   }
 
-  // 🔥 BUSCAR NOME DO USUÁRIO
   Future<void> carregarNome() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -35,17 +38,10 @@ class _ClientScreenState extends State<ClientScreen> {
 
     if (!mounted) return;
 
-    if (doc.exists) {
-      setState(() {
-        nomeCliente = doc["nome"] ?? "Cliente";
-        carregando = false;
-      });
-    } else {
-      setState(() {
-        nomeCliente = "Cliente";
-        carregando = false;
-      });
-    }
+    setState(() {
+      nomeCliente = doc.exists ? doc["nome"] ?? "Cliente" : "Cliente";
+      carregando = false;
+    });
   }
 
   @override
@@ -63,6 +59,49 @@ class _ClientScreenState extends State<ClientScreen> {
             );
           },
         ),
+
+        // 🛒 BOTÃO DO CARRINHO
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CarrinhoScreen(
+                        carrinho: carrinho,
+                        nomeCliente: nomeCliente,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              if (carrinho.isNotEmpty)
+                Positioned(
+                  right: 5,
+                  top: 5,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      carrinho.length.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+
         title: const Text("MANÁ LANCHES"),
         centerTitle: true,
       ),
@@ -74,7 +113,6 @@ class _ClientScreenState extends State<ClientScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // 🔥 NOME DINÂMICO
               Text(
                 carregando
                     ? "Carregando..."
@@ -175,30 +213,17 @@ class _ClientScreenState extends State<ClientScreen> {
         subtitle: Text("R\$ ${preco.toString()}"),
 
         trailing: ElevatedButton(
-          onPressed: () async {
-            try {
-              await FirebaseFirestore.instance.collection("pedidos").add({
-                "nomeProduto": nome,
+          onPressed: () {
+            setState(() {
+              carrinho.add({
+                "nome": nome,
                 "preco": preco,
-                "usuarioId": FirebaseAuth.instance.currentUser!.uid,
-                "nomeCliente": nomeCliente, // 🔥 NOVO
-                "status": "pendente",
-                "data": Timestamp.now(),
               });
+            });
 
-              if (!mounted) return;
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Pedido realizado!")),
-              );
-
-            } catch (e) {
-              if (!mounted) return;
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Erro ao fazer pedido")),
-              );
-            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Adicionado ao carrinho")),
+            );
           },
           child: const Text("Pedir"),
         ),

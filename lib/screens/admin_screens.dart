@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mana_lanche/screens/pedidos_admin_screens.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -48,7 +47,7 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
-  // 🔥 EXCLUIR PRODUTO
+  // 🔥 EXCLUIR
   Future<void> excluirProduto(String id) async {
     await FirebaseFirestore.instance
         .collection("produtos")
@@ -56,31 +55,43 @@ class _AdminScreenState extends State<AdminScreen> {
         .delete();
   }
 
-  // 🔥 EDITAR PRODUTO
+  // 🔥 EDITAR
   Future<void> editarProduto(
-    String id,
-    String nomeAtual,
-    String precoAtual,
-  ) async {
+      String id, String nomeAtual, String precoAtual) async {
     final nomeEditController = TextEditingController(text: nomeAtual);
     final precoEditController = TextEditingController(text: precoAtual);
 
     showDialog(
       context: context,
       builder: (contextDialog) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
         return AlertDialog(
+          backgroundColor: isDark ? Colors.grey[900] : Colors.white,
           title: const Text("Editar produto"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nomeEditController,
-                decoration: const InputDecoration(labelText: "Nome"),
+                style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  labelText: "Nome",
+                  labelStyle: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54),
+                ),
               ),
               TextField(
                 controller: precoEditController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: "Preço"),
+                style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  labelText: "Preço",
+                  labelStyle: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54),
+                ),
               ),
             ],
           ),
@@ -91,34 +102,25 @@ class _AdminScreenState extends State<AdminScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                try {
-                  final preco = double.parse(
-                    precoEditController.text.replaceAll(",", "."),
-                  );
+                final preco = double.parse(
+                  precoEditController.text.replaceAll(",", "."),
+                );
 
-                  await FirebaseFirestore.instance
-                      .collection("produtos")
-                      .doc(id)
-                      .update({
-                    "nome": nomeEditController.text,
-                    "preco": preco,
-                  });
+                await FirebaseFirestore.instance
+                    .collection("produtos")
+                    .doc(id)
+                    .update({
+                  "nome": nomeEditController.text,
+                  "preco": preco,
+                });
 
-                  if (!mounted) return;
+                if (!mounted) return;
 
-                  Navigator.pop(contextDialog);
+                Navigator.pop(contextDialog);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Produto atualizado!")),
-                  );
-
-                } catch (e) {
-                  if (!mounted) return;
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Erro ao editar produto")),
-                  );
-                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Produto atualizado!")),
+                );
               },
               child: const Text("Salvar"),
             ),
@@ -129,119 +131,177 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   @override
-  void dispose() {
-    nomeController.dispose();
-    precoController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
+
       appBar: AppBar(
         title: const Text("ADMIN - Produtos"),
-
-        // 🔥 BOTÃO VER PEDIDOS
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.receipt),
-            tooltip: "Ver pedidos",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const PedidosAdminScreen(),
-                ),
-              );
-            },
-          ),
-        ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: [
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF1E1E1E), const Color(0xFF000000)]
+                : [const Color(0xFFB23A3A), const Color(0xFF7A1F1F)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
 
-            TextField(
-              controller: nomeController,
-              decoration: const InputDecoration(
-                labelText: "Nome do produto",
-              ),
-            ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: [
 
-            const SizedBox(height: 10),
+                // 🔥 FORMULÁRIO
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[900] : Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    children: [
 
-            TextField(
-              controller: precoController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Preço",
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            ElevatedButton(
-              onPressed: adicionarProduto,
-              child: const Text("Adicionar Produto"),
-            ),
-
-            const SizedBox(height: 20),
-
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection("produtos")
-                    .orderBy("nome")
-                    .snapshots(),
-                builder: (context, snapshot) {
-
-                  if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  if (!snapshot.hasData ||
-                      snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text("Nenhum produto encontrado"),
-                    );
-                  }
-
-                  return ListView(
-                    children: snapshot.data!.docs.map((doc) {
-                      final data =
-                          doc.data() as Map<String, dynamic>;
-
-                      return ListTile(
-                        title: Text(data["nome"]),
-                        subtitle: Text("R\$ ${data["preco"]}"),
-
-                        onTap: () {
-                          editarProduto(
-                            doc.id,
-                            data["nome"],
-                            data["preco"].toString(),
-                          );
-                        },
-
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete,
-                              color: Colors.red),
-                          onPressed: () {
-                            excluirProduto(doc.id);
-                          },
+                      // INPUT NOME
+                      TextField(
+                        controller: nomeController,
+                        style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black),
+                        decoration: InputDecoration(
+                          labelText: "Nome do produto",
+                          labelStyle: TextStyle(
+                              color: isDark
+                                  ? Colors.white70
+                                  : Colors.black54),
                         ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // INPUT PREÇO
+                      TextField(
+                        controller: precoController,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black),
+                        decoration: InputDecoration(
+                          labelText: "Preço",
+                          labelStyle: TextStyle(
+                              color: isDark
+                                  ? Colors.white70
+                                  : Colors.black54),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: adicionarProduto,
+                          child: const Text("Adicionar Produto"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 🔥 LISTA
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("produtos")
+                        .orderBy("nome")
+                        .snapshots(),
+                    builder: (context, snapshot) {
+
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      if (!snapshot.hasData ||
+                          snapshot.data!.docs.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "Nenhum produto encontrado",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      return ListView(
+                        children: snapshot.data!.docs.map((doc) {
+                          final data =
+                              doc.data() as Map<String, dynamic>;
+
+                          return Container(
+                            margin:
+                                const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.grey[900]
+                                  : Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
+
+                            child: ListTile(
+                              title: Text(
+                                data["nome"],
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
+                              subtitle: Text(
+                                "R\$ ${data["preco"]}",
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
+                              ),
+
+                              onTap: () {
+                                editarProduto(
+                                  doc.id,
+                                  data["nome"],
+                                  data["preco"].toString(),
+                                );
+                              },
+
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.red),
+                                onPressed: () {
+                                  excluirProduto(doc.id);
+                                },
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       );
-                    }).toList(),
-                  );
-                },
-              ),
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

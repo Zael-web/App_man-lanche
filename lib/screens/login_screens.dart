@@ -112,195 +112,220 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
-              : const Color(0xFFB23A3A),
+ Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: Theme.of(context).brightness == Brightness.dark
+              ? [
+                  const Color(0xFF1E1E1E),
+                  const Color(0xFF000000),
+                ]
+              : [
+                  const Color(0xFFB23A3A),
+                  const Color(0xFF7A1F1F),
+                ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
+      ),
 
-                // 🌙 DARK MODE
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.dark_mode),
-                      color: Colors.white,
-                      onPressed: () {
-                        MyApp.of(context)?.toggleTheme();
-                      },
-                    ),
-                  ],
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-
-                const SizedBox(height: 20),
-
-                // 🖼️ LOGO
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.35),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 140,
-                      height: 140,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                const Text(
-                  "Bem-vindo de volta!",
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // 🔐 CARD LOGIN
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 25),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+                child: IntrinsicHeight(
                   child: Column(
                     children: [
 
-                      // EMAIL
-                      TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          hintText: "E-mail",
-                          prefixIcon: const Icon(Icons.email),
-                          filled: true,
-                          fillColor:
-                              Theme.of(context)
-                                      .inputDecorationTheme
-                                      .fillColor ??
-                                  Theme.of(context).cardColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
+                      // 🌙 DARK MODE
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.dark_mode),
+                            color: Colors.white,
+                            onPressed: () {
+                              MyApp.of(context)?.toggleTheme();
+                            },
                           ),
-                        ),
+                        ],
                       ),
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 10),
 
-                      // SENHA
-                      TextField(
-                        controller: senhaController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "Senha",
-                          prefixIcon: const Icon(Icons.lock),
-
-                          suffixIcon: TextButton(
-                            onPressed: () {
-                              recuperarSenha(context);
-                            },
-                            child: const Text(
-                              "Esqueceu?",
-                              style: TextStyle(fontSize: 12),
+                      // 🔥 LOGO
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
                             ),
-                          ),
-
-                          filled: true,
-                          fillColor:
-                              Theme.of(context)
-                                      .inputDecorationTheme
-                                      .fillColor ??
-                                  Theme.of(context).cardColor,
-
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
 
                       const SizedBox(height: 20),
 
-                      // BOTÃO ENTRAR
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[700],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          onPressed: login,
-                          child: const Text(
-                            "Entrar",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // CADASTRO
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Não tem uma conta? ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Cadastre-se",
+                      const Text(
+                        "Bem-vindo ao Maná Lanches",
                         style: TextStyle(
-                          color: Colors.amber,
+                          fontSize: 20,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
 
-                const SizedBox(height: 30),
-              ],
-            ),
-          ),
+                      const SizedBox(height: 25),
+
+                      // 🔐 CARD LOGIN
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 25),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[900]
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+
+                            // EMAIL
+                            TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                hintText: "E-mail",
+                                prefixIcon: const Icon(Icons.email),
+                                filled: true,
+                                fillColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .fillColor ??
+                                    Theme.of(context).cardColor,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 15),
+
+                            // SENHA
+                            TextField(
+                              controller: senhaController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                hintText: "Senha",
+                                prefixIcon: const Icon(Icons.lock),
+                                suffixIcon: TextButton(
+                                  onPressed: () {
+                                    recuperarSenha(context);
+                                  },
+                                  child: const Text(
+                                    "Esqueceu?",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Theme.of(context)
+                                        .inputDecorationTheme
+                                        .fillColor ??
+                                    Theme.of(context).cardColor,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // BOTÃO
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: login,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green[700],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Entrar",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // CADASTRO
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Não tem uma conta? ",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const RegisterScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Cadastre-se",
+                              style: TextStyle(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
-    );
-  }
+    ),
+  );
+ }
 }

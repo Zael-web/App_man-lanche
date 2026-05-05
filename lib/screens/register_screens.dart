@@ -17,69 +17,77 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final confirmarSenhaController = TextEditingController();
 
   bool carregando = false;
+Future<void> cadastrar() async {
+  if (senhaController.text != confirmarSenhaController.text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("As senhas não coincidem")),
+    );
+    return;
+  }
 
-  Future<void> cadastrar() async {
-    if (senhaController.text != confirmarSenhaController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("As senhas não coincidem"),
-        ),
-      );
-      return;
+  if (senhaController.text.length < 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Senha deve ter no mínimo 6 caracteres")),
+    );
+    return;
+  }
+
+  try {
+    setState(() => carregando = true);
+
+    UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: senhaController.text.trim(),
+    );
+
+    await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(userCredential.user!.uid)
+        .set({
+      "nome": nomeController.text.trim(),
+      "email": emailController.text.trim(),
+      "telefone": telefoneController.text.trim(),
+      "tipo": "cliente", // 🔥 IMPORTANTE
+      "createdAt": Timestamp.now(),
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Cadastro realizado com sucesso!")),
+    );
+
+    Navigator.pop(context);
+
+  } on FirebaseAuthException catch (e) {
+    String mensagem = "Erro ao cadastrar";
+
+    if (e.code == 'email-already-in-use') {
+      mensagem = "Email já está em uso";
+    } else if (e.code == 'invalid-email') {
+      mensagem = "Email inválido";
+    } else if (e.code == 'weak-password') {
+      mensagem = "Senha muito fraca";
     }
 
-    try {
-      setState(() {
-        carregando = true;
-      });
+    if (!mounted) return;
 
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: senhaController.text.trim(),
-      );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
+  } catch (e) {
+    if (!mounted) return;
 
-      await FirebaseFirestore.instance
-          .collection("usuarios")
-          .doc(userCredential.user!.uid)
-          .set({
-        "nome": nomeController.text.trim(),
-        "email": emailController.text.trim(),
-        "telefone": telefoneController.text.trim(),
-        "uid": userCredential.user!.uid,
-        "criadoEm": DateTime.now(),
-      });
-
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Cadastro realizado com sucesso!"),
-        ),
-      );
-
-      // ignore: use_build_context_synchronously
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      String erro = "Erro ao cadastrar";
-
-      if (e.code == 'email-already-in-use') {
-        erro = "Email já cadastrado";
-      } else if (e.code == 'weak-password') {
-        erro = "Senha muito fraca";
-      } else if (e.code == 'invalid-email') {
-        erro = "Email inválido";
-      }
-
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro)),
-      );
-    } finally {
-      setState(() {
-        carregando = false;
-      });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro inesperado")),
+    );
+  } finally {
+    if (mounted) {
+      setState(() => carregando = false);
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> recuperarSenha() async {
+  Future<void> recuperarSenha(BuildContext context) async {
     if (emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -166,28 +166,36 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 15),
 
                       // SENHA
-                      TextField(
-                        controller: senhaController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "Senha",
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: TextButton(
-                            onPressed: recuperarSenha,
-                            child: const Text("Esqueceu?"),
-                          ),
-                          filled: true,
-                          fillColor:
-                              Theme.of(context)
-                                  .inputDecorationTheme
-                                  .fillColor ??
-                              Theme.of(context).cardColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                                 TextField(
+                       controller: senhaController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                       hintText: "Senha",
+                     prefixIcon: const Icon(Icons.lock),
+
+                      suffixIcon: TextButton(
+                     onPressed: () {
+                       recuperarSenha(context);
+                                   },
+                      child: const Text(
+                          "Esqueceu?",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                 ),
+
+                     filled: true,
+                     fillColor:
+                     Theme.of(context)
+                    .inputDecorationTheme
+                    .fillColor ??
+                      Theme.of(context).cardColor,
+
+                     border: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(10),
+                     borderSide: BorderSide.none,
                       ),
+                   ),
+                ),
 
                       const SizedBox(height: 20),
 

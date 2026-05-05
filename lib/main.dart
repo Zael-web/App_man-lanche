@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'firebase_options.dart';
 import 'screens/login_screens.dart';
 
@@ -17,16 +16,15 @@ void main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // ignore: library_private_types_in_public_api
-  static _MyAppState? of(BuildContext context) {
-    return context.findAncestorStateOfType<_MyAppState>();
+  static MyAppState? of(BuildContext context) {
+    return context.findAncestorStateOfType<MyAppState>();
   }
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MyApp> createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.light;
 
   void toggleTheme() {
@@ -43,35 +41,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
-
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.red,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.red,
-        scaffoldBackgroundColor: Colors.black,
-      ),
-
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       home: const LoginScreen(),
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mana_lanche/screens/login_screens.dart';
 
 class ClientScreen extends StatelessWidget {
@@ -7,22 +8,21 @@ class ClientScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-appBar: AppBar(
-  leading: IconButton(
-    icon: const Icon(Icons.logout),
-    onPressed: () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const LoginScreen(),
+              ),
+            );
+          },
         ),
-      );
-    },
-  ),
-
-  title: const Text("MANÁ LANCHES"),
-  centerTitle: true,
-),
+        title: const Text("MANÁ LANCHES"),
+        centerTitle: true,
+      ),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -80,10 +80,38 @@ appBar: AppBar(
 
               const SizedBox(height: 15),
 
-              foodItem("X-Burguer", "R\$ 15,00"),
-              foodItem("X-Bacon", "R\$ 20,00"),
-              foodItem("X-Tudo", "R\$ 25,00"),
-              foodItem("Batata Frita", "R\$ 12,00"),
+              // 🔥 LISTA DINÂMICA DO FIREBASE
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection("produtos")
+                    .orderBy("nome")
+                    .snapshots(),
+                builder: (context, snapshot) {
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  if (!snapshot.hasData ||
+                      snapshot.data!.docs.isEmpty) {
+                    return const Text("Nenhum produto encontrado");
+                  }
+
+                  return Column(
+                    children: snapshot.data!.docs.map((doc) {
+                      final data =
+                          doc.data() as Map<String, dynamic>;
+
+                      return foodItem(
+                        data["nome"],
+                        "R\$ ${data["preco"]}",
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -91,6 +119,7 @@ appBar: AppBar(
     );
   }
 
+  // 🔥 CARD DO PRODUTO
   Widget foodItem(String nome, String preco) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -101,7 +130,9 @@ appBar: AppBar(
         title: Text(nome),
         subtitle: Text(preco),
         trailing: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            // 👉 depois podemos colocar pedido WhatsApp aqui
+          },
           child: const Text("Pedir"),
         ),
       ),

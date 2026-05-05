@@ -4,8 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
 
-class ClientScreen extends StatelessWidget {
+class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
+
+  @override
+  State<ClientScreen> createState() => _ClientScreenState();
+}
+
+class _ClientScreenState extends State<ClientScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +56,6 @@ class ClientScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 🔥 BANNER
               Container(
                 height: 150,
                 width: double.infinity,
@@ -106,7 +111,6 @@ class ClientScreen extends StatelessWidget {
                           doc.data() as Map<String, dynamic>;
 
                       return foodItem(
-                        context,
                         data["nome"],
                         data["preco"],
                       );
@@ -121,8 +125,8 @@ class ClientScreen extends StatelessWidget {
     );
   }
 
-  // 🔥 CARD DO PRODUTO COM PEDIDO
-  Widget foodItem(BuildContext context, String nome, dynamic preco) {
+  // 🔥 CARD DO PRODUTO
+  Widget foodItem(String nome, dynamic preco) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -138,19 +142,22 @@ class ClientScreen extends StatelessWidget {
               await FirebaseFirestore.instance.collection("pedidos").add({
                 "nomeProduto": nome,
                 "preco": preco,
-                "usuarioId":
-                    FirebaseAuth.instance.currentUser!.uid,
+                "usuarioId": FirebaseAuth.instance.currentUser!.uid,
                 "status": "pendente",
                 "data": Timestamp.now(),
               });
+
+              if (!mounted) return;
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Pedido realizado!")),
               );
 
             } catch (e) {
-              
+              if (!mounted) return;
+
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Erro ao realizar pedido")),
+                const SnackBar(content: Text("Erro ao fazer pedido")),
               );
             }
           },

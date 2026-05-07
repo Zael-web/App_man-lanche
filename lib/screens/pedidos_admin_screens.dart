@@ -142,9 +142,9 @@ class _PedidosAdminScreenState
 
                     color: isDark
                         ? Colors.white
-                            .withOpacity(0.05)
+                            .withValues(alpha: 0.05)
                         : Colors.white
-                            .withOpacity(0.12),
+                            .withValues(alpha: 0.12),
 
                     borderRadius:
                         BorderRadius.circular(
@@ -154,9 +154,7 @@ class _PedidosAdminScreenState
                     border: Border.all(
                       color:
                           Colors.white
-                              .withOpacity(
-                                0.08,
-                              ),
+                              .withValues(alpha: 0.08),
                     ),
                   ),
 
@@ -189,7 +187,7 @@ class _PedidosAdminScreenState
                       // 🍔 PRODUTO
                       Text(
 
-                        "Produto: ${data["nomeProduto"]}",
+                        "Produto: ${data["nome"]}",
 
                         style: const TextStyle(
                           color: Colors.white70,
@@ -202,7 +200,7 @@ class _PedidosAdminScreenState
                       // 🔢 QUANTIDADE
                       Text(
 
-                        "Quantidade: ${data["quantidade"]}",
+                        "Quantidade: ${data["qtd"]}",
 
                         style: const TextStyle(
                           color: Colors.white70,

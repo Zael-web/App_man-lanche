@@ -237,9 +237,7 @@ class _RegisterScreenState
 
                       BoxShadow(
                         color:
-                            Colors.black.withOpacity(
-                              0.35,
-                            ),
+                            Colors.black.withValues(alpha: 0.35),
 
                         blurRadius: 25,
 
@@ -290,9 +288,7 @@ class _RegisterScreenState
                   style: TextStyle(
 
                     color:
-                        Colors.white.withOpacity(
-                          0.78,
-                        ),
+                        Colors.white.withValues(alpha: 0.78),
 
                     fontSize: 15,
                   ),
@@ -430,9 +426,7 @@ class _RegisterScreenState
                     style: TextStyle(
 
                       color:
-                          Colors.white.withOpacity(
-                            0.92,
-                          ),
+                          Colors.white.withValues(alpha: 0.92),
 
                       fontWeight:
                           FontWeight.bold,
@@ -486,9 +480,7 @@ Widget campoInput({
 
       hintStyle: TextStyle(
         color:
-            Colors.white.withOpacity(
-              0.60,
-            ),
+            Colors.white.withValues(alpha: 0.60),
       ),
 
       prefixIcon: Icon(
@@ -502,12 +494,8 @@ Widget campoInput({
 
       fillColor:
           isDark
-              ? Colors.white.withOpacity(
-                  0.06,
-                )
-              : Colors.white.withOpacity(
-                  0.12,
-                ),
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.white.withValues(alpha: 0.12),
 
       contentPadding:
           const EdgeInsets.symmetric(
@@ -534,9 +522,7 @@ Widget campoInput({
         borderSide: BorderSide(
 
           color:
-              Colors.white.withOpacity(
-                0.08,
-              ),
+              Colors.white.withValues(alpha: 0.08),
         ),
       ),
 

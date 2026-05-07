@@ -241,10 +241,7 @@ class _LoginScreenState
 
                             color:
                                 Colors.white
-                                    .withOpacity(
-                                      0.12,
-                                    ),
-
+                                    .withValues(alpha: 0.12),
                             borderRadius:
                                 BorderRadius.circular(
                                   15,
@@ -292,10 +289,7 @@ class _LoginScreenState
                           BoxShadow(
                             color:
                                 Colors.black
-                                    .withOpacity(
-                                      0.30,
-                                    ),
-
+                                    .withValues(alpha: 0.30),
                             blurRadius: 30,
 
                             offset:
@@ -351,9 +345,7 @@ class _LoginScreenState
 
                     color:
                         Colors.white
-                            .withOpacity(
-                              0.85,
-                            ),
+                            .withValues(alpha: 0.85),
 
                     fontSize: 16,
                   ),
@@ -377,13 +369,9 @@ class _LoginScreenState
                         // 🔥 GLASS EFFECT
                         color: isDark
                             ? Colors.white
-                                .withOpacity(
-                                  0.06,
-                                )
+                                .withValues(alpha: 0.06)
                             : Colors.white
-                                .withOpacity(
-                                  0.18,
-                                ),
+                                .withValues(alpha: 0.18),
 
                         borderRadius:
                             BorderRadius.circular(
@@ -394,9 +382,7 @@ class _LoginScreenState
 
                           color:
                               Colors.white
-                                  .withOpacity(
-                                    0.15,
-                                  ),
+                                  .withValues(alpha: 0.15),
 
                           width: 1.2,
                         ),
@@ -407,10 +393,7 @@ class _LoginScreenState
 
                             color:
                                 Colors.black
-                                    .withOpacity(
-                                      0.18,
-                                    ),
-
+                                    .withValues(alpha: 0.18),
                             blurRadius: 25,
 
                             spreadRadius: 2,
@@ -468,13 +451,9 @@ class _LoginScreenState
 
                               fillColor: isDark
                                   ? Colors.white
-                                      .withOpacity(
-                                        0.04,
-                                      )
+                                      .withValues(alpha: 0.04)
                                   : Colors.white
-                                      .withOpacity(
-                                        0.92,
-                                      ),
+                                      .withValues(alpha: 0.92),
 
                               border:
                                   OutlineInputBorder(
@@ -548,13 +527,9 @@ class _LoginScreenState
 
                               fillColor: isDark
                                   ? Colors.white
-                                      .withOpacity(
-                                        0.04,
-                                      )
+                                      .withValues(alpha: 0.04)
                                   : Colors.white
-                                      .withOpacity(
-                                        0.92,
-                                      ),
+                                      .withValues(alpha: 0.92),
 
                               border:
                                   OutlineInputBorder(

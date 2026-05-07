@@ -17,7 +17,6 @@ class CarrinhoScreen extends StatefulWidget {
 }
 
 class _CarrinhoScreenState extends State<CarrinhoScreen> {
-
   double converterPreco(dynamic preco) {
     if (preco is String) {
       return double.tryParse(preco.replaceAll(",", ".")) ?? 0;
@@ -29,8 +28,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   double get total {
     return widget.carrinho.fold(0.0, (total, item) {
-      return total +
-          (converterPreco(item["preco"]) * item["quantidade"]);
+      return total + (converterPreco(item["preco"]) * item["quantidade"]);
     });
   }
 
@@ -75,19 +73,19 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Seu carrinho"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Seu carrinho"), centerTitle: true),
 
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: Theme.of(context).brightness == Brightness.dark
-                ? [const Color(0xFF1E1E1E), const Color(0xFF000000)]
-                : [const Color(0xFFB23A3A), const Color(0xFF7A1F1F)],
+            colors: isDark
+                ? [const Color(0xFF121212), const Color(0xFF0D0D0D)]
+                : [const Color(0xFFDB1F26), const Color(0xFFB70F1D)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -103,7 +101,6 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                 )
               : Column(
                   children: [
-
                     // 🔥 LISTA DE ITENS
                     Expanded(
                       child: ListView.builder(
@@ -115,28 +112,27 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey[900]
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 6,
-                                )
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
+                                ),
                               ],
                             ),
 
                             child: Row(
                               children: [
-
-                                const CircleAvatar(
-                                  backgroundColor: Colors.red,
-                                  child: Icon(Icons.fastfood,
-                                      color: Colors.white),
+                                CircleAvatar(
+                                  backgroundColor: theme.colorScheme.primary,
+                                  child: const Icon(
+                                    Icons.fastfood,
+                                    color: Colors.white,
+                                  ),
                                 ),
 
                                 const SizedBox(width: 10),
@@ -158,7 +154,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                       Text(
                                         "R\$ ${preco.toStringAsFixed(2)}",
                                         style: const TextStyle(
-                                            color: Colors.grey),
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -167,16 +164,15 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                 // 🔥 CONTROLE DE QUANTIDADE
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).brightness ==
+                                    color:
+                                        Theme.of(context).brightness ==
                                             Brightness.dark
                                         ? Colors.grey[800]
                                         : Colors.grey[200],
-                                    borderRadius:
-                                        BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Row(
                                     children: [
-
                                       IconButton(
                                         icon: const Icon(Icons.remove),
                                         onPressed: () => diminuir(i),
@@ -184,8 +180,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                                       Text(
                                         item["quantidade"].toString(),
-                                        style:
-                                            const TextStyle(fontSize: 16),
+                                        style: const TextStyle(fontSize: 16),
                                       ),
 
                                       IconButton(
@@ -194,7 +189,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                       ),
                                     ],
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           );
@@ -204,23 +199,25 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                     // 🔥 TOTAL + BOTÃO FINALIZAR
                     Container(
-                      padding: const EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness ==
-                                Brightness.dark
-                            ? Colors.grey[900]
-                            : Colors.white,
+                        color: theme.cardColor,
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(20),
+                          top: Radius.circular(24),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 12,
+                            offset: const Offset(0, -4),
+                          ),
+                        ],
                       ),
 
                       child: Column(
                         children: [
-
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
                                 "Total",
@@ -228,10 +225,10 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                               ),
                               Text(
                                 "R\$ ${total.toStringAsFixed(2)}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                             ],
@@ -244,10 +241,9 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                             height: 50,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
+                                backgroundColor: theme.colorScheme.primary,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                               onPressed: finalizar,

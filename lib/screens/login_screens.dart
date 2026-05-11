@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:mana_lanche/screens/client_screens.dart';
 import 'package:mana_lanche/screens/admin_screens.dart';
@@ -41,19 +42,34 @@ class _LoginScreenState
                         .trim(),
               );
 
-      final uid = cred.user!.uid;
+final user = cred.user;
 
-      final doc =
-          await FirebaseFirestore.instance
-              .collection("usuarios")
-              .doc(uid)
-              .get();
+final uid = user!.uid;
 
-      if (!doc.exists) {
-        throw Exception(
-          "Usuário não encontrado",
-        );
-      }
+var doc =
+    await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(uid)
+        .get();
+
+if (!doc.exists) {
+
+  await FirebaseFirestore.instance
+      .collection("usuarios")
+      .doc(uid)
+      .set({
+
+    "nome": "Usuário",
+    "email": user.email,
+    "tipo": "cliente",
+  });
+
+  doc =
+      await FirebaseFirestore.instance
+          .collection("usuarios")
+          .doc(uid)
+          .get();
+}
 
       final tipo = doc["tipo"];
 
@@ -166,6 +182,91 @@ class _LoginScreenState
 
     super.dispose();
   }
+                      Future<void> loginGoogle() async {
+
+  try {
+
+   final GoogleSignIn googleSignIn =
+    GoogleSignIn(
+
+  clientId:
+  "962981084599-isekijibn1be2rsk1cerhsoq204dmml4.apps.googleusercontent.com",
+
+);
+
+final GoogleSignInAccount? googleUser =
+    await googleSignIn.signIn();
+
+    if (googleUser == null) return;
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final credential =
+        GoogleAuthProvider.credential(
+
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential =
+        await FirebaseAuth.instance
+            .signInWithCredential(
+              credential,
+            );
+
+    final user = userCredential.user;
+
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(user.uid)
+        .get();
+
+    // 🔥 cria usuário automaticamente
+    if (!doc.exists) {
+
+      await FirebaseFirestore.instance
+          .collection("usuarios")
+          .doc(user.uid)
+          .set({
+
+        "nome":
+            user.displayName ??
+            "Usuário",
+
+        "email": user.email,
+
+        "tipo": "cliente",
+      });
+    }
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+
+      context,
+
+      MaterialPageRoute(
+        builder: (_) =>
+            const ClientScreen(),
+      ),
+    );
+
+  } catch (e) {
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+
+      SnackBar(
+        content: Text(
+          "Erro Google Login: $e",
+        ),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -729,9 +830,14 @@ class _LoginScreenState
                     ),
 
                     socialButton(
-                      Icons.g_mobiledata,
-                      Colors.orange,
-                    ),
+                    Icons.g_mobiledata,
+                  Colors.orange,
+
+                   onTap: () async {
+
+                  await loginGoogle();
+                     },
+                     ),
 
                     const SizedBox(
                       width: 18,
@@ -757,43 +863,38 @@ class _LoginScreenState
 
   // 🔥 BOTÃO SOCIAL
   Widget socialButton(
-    IconData icon,
-    Color color,
-  ) {
+  IconData icon,
+  Color color, {
+  VoidCallback? onTap,
+}) {
 
-    return Container(
+  return GestureDetector(
 
-      width: 70,
-      height: 70,
+    onTap: onTap,
+
+    child: Container(
+
+      width: 58,
+      height: 58,
 
       decoration: BoxDecoration(
 
-        color: Colors.white,
+        color: Colors.white.withValues(alpha: 0.10),
 
-        shape: BoxShape.circle,
+        borderRadius:
+            BorderRadius.circular(18),
 
-        boxShadow: [
-
-          BoxShadow(
-            color:
-                Colors.black26,
-
-            blurRadius: 10,
-
-            offset:
-                const Offset(
-                  0,
-                  5,
-                ),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.white24,
+        ),
       ),
 
       child: Icon(
         icon,
         color: color,
-        size: 40,
+        size: 34,
       ),
-    );
+    ),
+   );
   }
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "962981084599",
+    "firebase_url": "https://mana-lanches-6455e-default-rtdb.firebaseio.com",
+    "project_id": "mana-lanches-6455e",
+    "storage_bucket": "mana-lanches-6455e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962981084599:android:130e9621117ace9a973c32",
+        "android_client_info": {
+          "package_name": "com.example.mana_lanche"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962981084599-80083i8sa8qhfcb3n4ohvn3d3qp1njak.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mana_lanche",
+            "certificate_hash": "f3e218e4d3efa8772c8894cfba6e9db6a36e63e2"
+          }
+        },
+        {
+          "client_id": "962981084599-isekijibn1be2rsk1cerhsoq204dmml4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEqRB6_7z4vxiC8bxAjSSZcQ9Q3p81rZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "962981084599-isekijibn1be2rsk1cerhsoq204dmml4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "962981084599-28g379ifrg6nmn8lit8r1gstdhvduqn4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.manaLanche"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

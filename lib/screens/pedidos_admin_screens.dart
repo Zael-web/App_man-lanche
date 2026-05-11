@@ -185,41 +185,65 @@ class _PedidosAdminScreenState
                       const SizedBox(height: 10),
 
                       // 🍔 PRODUTO
-                      Text(
+                      Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: List.generate(
 
-                        "Produto: ${data["nome"]}",
+                     (data["itens"] as List).length,
+
+                     (index) {
+
+                     final item = data["itens"][index];
+
+                     return Padding(
+
+                    padding: const EdgeInsets.only(bottom: 12),
+
+                     child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                   Text(
+                      "Produto: ${item["nomeProduto"]}",
+
+                       style: const TextStyle(
+                      color: Colors.white70,
+                     fontSize: 16,
+                    ),
+                    ),
+
+                   const SizedBox(height: 4),
+
+                  Text(
+                "Quantidade: ${item["quantidade"]}",
+ 
+                style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+                  Text(
+                  "Preço: R\$ ${item["preco"]}",
 
                         style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
-                      ),
+                           color: Colors.white70,
+                            fontSize: 16,
+                            ),
+                           ),
 
-                      const SizedBox(height: 6),
-
-                      // 🔢 QUANTIDADE
-                      Text(
-
-                        "Quantidade: ${data["qtd"]}",
-
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      // 💰 PREÇO
-                      Text(
-
-                        "Preço: R\$ ${data["preco"]}",
-
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
-                      ),
+                      const Divider(
+                      color: Colors.white24,
+                       height: 20,
+                    ),
+                   ],
+                ),
+              );
+            },
+          ),
+        ),
 
                       const SizedBox(height: 14),
 

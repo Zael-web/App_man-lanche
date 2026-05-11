@@ -63,7 +63,7 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
-  // ðŸ”¥ EXCLUIR PRODUTO
+  // EXCLUIR PRODUTO
   Future<void> excluirProduto(String id) async {
 
     await FirebaseFirestore.instance
@@ -82,7 +82,7 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
 
-// ðŸ”¥ EDITAR PRODUTO PREMIUM
+  //EDITAR PRODUTO PREMIUM
 Future<void> editarProduto(
   String id,
   String nomeAtual,
@@ -169,7 +169,7 @@ Future<void> editarProduto(
 
             children: [
 
-              // ðŸ”¥ ÃCONE
+              // iCONE
               Container(
 
                 padding: const EdgeInsets.all(16),
@@ -216,7 +216,7 @@ Future<void> editarProduto(
 
               Text(
 
-                "Atualize as informaÃ§Ãµes do produto",
+                "Atualize as informaçoes do produto",
 
                 style: TextStyle(
 
@@ -542,7 +542,7 @@ Future<void> editarProduto(
   );
 }
 
-  // ðŸ”¥ LOGOUT
+  // LOGOUT
   Future<void> logout() async {
 
     await FirebaseAuth.instance.signOut();
@@ -596,7 +596,7 @@ Future<void> editarProduto(
 
         actions: [
 
-          // ðŸ”¥ PEDIDOS
+          // PEDIDOS
           IconButton(
 
             icon: const Icon(
@@ -618,7 +618,7 @@ Future<void> editarProduto(
             },
           ),
 
-          // ðŸ”¥ SAIR
+          // SAIR
           IconButton(
 
             icon: const Icon(
@@ -923,7 +923,7 @@ Future<void> editarProduto(
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.10),
+                                color: const Color(0xFF000000).withValues(alpha: 0.12),
                                 blurRadius: 14,
                                 offset: const Offset(0, 6),
                               ),
@@ -959,7 +959,7 @@ Future<void> editarProduto(
                                       style: TextStyle(
                                         color: isDark
                                             ? Colors.white
-                                            : Colors.black87,
+                                            : const Color.fromARGB(255, 255, 255, 255),
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -971,14 +971,14 @@ Future<void> editarProduto(
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFD2691E)
+                                        color: const Color.fromARGB(255, 255, 255, 255)
                                             .withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         "R\$ ${data["preco"]}",
                                         style: const TextStyle(
-                                          color: Color(0xFFD2691E),
+                                          color: Color.fromARGB(255, 202, 202, 202),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
                                         ),
@@ -999,7 +999,7 @@ Future<void> editarProduto(
                                     child: IconButton(
                                       icon: const Icon(
                                         Icons.edit_rounded,
-                                        color: Colors.orange,
+                                        color: Color.fromARGB(255, 255, 153, 0),
                                         size: 22,
                                       ),
                                       onPressed: () {

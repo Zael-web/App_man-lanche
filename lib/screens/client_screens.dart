@@ -13,125 +13,116 @@ class ClientScreen extends StatefulWidget {
 }
 
 class _ClientScreenState extends State<ClientScreen> {
-
   String nomeCliente = "";
   bool carregando = true;
 
-  // 🛒 CARRINHO
   List<Map<String, dynamic>> carrinho = [];
+
+  String categoriaSelecionada = "todos";
+
+  int animatingIndex = -1;
+  int fraseIndex = 0;
+
+  final List<String> frases = [
+    "🔥 Impossível resistir",
+    "🍔 Fome bateu? a gente resolve!",
+    "😋 Sabor que conquista no primeiro pedaço",
+    "🚀 Peça agora e mate sua fome!",
+    "💥 Promoções que você não pode perder",
+    "🍟 Combos que valem a pena!",
+    "🥤 Complete sua refeição com estilo",
+  ];
 
   @override
   void initState() {
     super.initState();
     carregarNome();
+    iniciarFrases();
+  }
+
+  void iniciarFrases() {
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 4));
+
+      if (!mounted) return false;
+
+      setState(() {
+        fraseIndex = (fraseIndex + 1) % frases.length;
+      });
+
+      return true;
+    });
   }
 
   Future<void> carregarNome() async {
-
-    final user =
-        FirebaseAuth.instance.currentUser;
-
+    final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final doc =
-        await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(user.uid)
-            .get();
+    final doc = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(user.uid)
+        .get();
 
     if (!mounted) return;
 
     setState(() {
-
-      nomeCliente =
-          doc.exists
-              ? doc["nome"] ?? "Cliente"
-              : "Cliente";
-
+      nomeCliente = doc.exists ? doc["nome"] ?? "Cliente" : "Cliente";
       carregando = false;
     });
   }
 
-  // 🛒 ADICIONAR AO CARRINHO
-  void adicionarAoCarrinho(
-    String nome,
-    dynamic preco,
-  ) {
+  void adicionarAoCarrinho(String nome, dynamic preco, int index) async {
+    setState(() {
+      animatingIndex = index;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 200));
 
     setState(() {
+      final i = carrinho.indexWhere((item) => item["nomeProduto"] == nome);
 
-      final index =
-          carrinho.indexWhere(
-            (item) =>
-                item["nomeProduto"] == nome,
-          );
-
-      if (index >= 0) {
-
-        carrinho[index]["quantidade"]++;
-
+      if (i >= 0) {
+        carrinho[i]["quantidade"]++;
       } else {
-
         carrinho.add({
-
           "nomeProduto": nome,
           "preco": preco,
           "quantidade": 1,
         });
       }
+
+      animatingIndex = -1;
     });
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-
-      const SnackBar(
-        content: Text(
-          "Adicionado ao carrinho 🛒",
-        ),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF7A2323),
+        content: Text("🍔 $nome adicionado ao carrinho"),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-
       appBar: AppBar(
-
-        backgroundColor:
-            Colors.transparent,
-
+        backgroundColor: Colors.transparent,
         elevation: 0,
 
         leading: IconButton(
-
-          icon: const Icon(
-            Icons.logout,
-            color: Colors.white,
-          ),
-
+          icon: const Icon(Icons.logout, color: Colors.white),
           onPressed: () {
-
             Navigator.pushReplacement(
               context,
-
-              MaterialPageRoute(
-                builder:
-                    (_) =>
-                        const LoginScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
             );
           },
         ),
 
         title: const Text(
           "MANÁ LANCHES",
-
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -141,76 +132,39 @@ class _ClientScreenState extends State<ClientScreen> {
         centerTitle: true,
 
         actions: [
-
           Stack(
-
             children: [
-
               IconButton(
-
-                icon: const Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                ),
-
+                icon: const Icon(Icons.shopping_cart,
+                    color: Colors.white),
                 onPressed: () {
-
                   Navigator.push(
-
                     context,
-
                     MaterialPageRoute(
-
-                      builder:
-                          (_) =>
-                              CarrinhoScreen(
-
-                                carrinho:
-                                    carrinho,
-
-                                nomeCliente:
-                                    nomeCliente,
-                              ),
+                      builder: (_) => CarrinhoScreen(
+                        carrinho: carrinho,
+                        nomeCliente: nomeCliente,
+                      ),
                     ),
                   );
                 },
               ),
 
               if (carrinho.isNotEmpty)
-
                 Positioned(
-
                   right: 5,
                   top: 5,
-
                   child: Container(
-
-                    padding:
-                        const EdgeInsets.all(5),
-
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-
                       color: Colors.red,
-
-                      borderRadius:
-                          BorderRadius.circular(
-                            20,
-                          ),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-
                     child: Text(
-
-                      carrinho.length
-                          .toString(),
-
+                      carrinho.length.toString(),
                       style: const TextStyle(
-
                         color: Colors.white,
-
                         fontSize: 12,
-
-                        fontWeight:
-                            FontWeight.bold,
                       ),
                     ),
                   ),
@@ -223,317 +177,133 @@ class _ClientScreenState extends State<ClientScreen> {
       extendBodyBehindAppBar: true,
 
       body: Container(
-
         width: double.infinity,
-
         decoration: BoxDecoration(
-
-          // 🪵 FUNDO AMADEIRADO
           gradient: LinearGradient(
-
             colors: isDark
                 ? [
-
-                    // 🌑 DARK MODE
-                    const Color(
-                      0xFF111111,
-                    ),
-
-                    const Color(
-                      0xFF1B1B1B,
-                    ),
-
-                    const Color(
-                      0xFF252525,
-                    ),
-
+                    const Color(0xFF111111),
+                    const Color(0xFF1B1B1B),
+                    const Color(0xFF252525),
                   ]
                 : [
-
-                    // 🪵 VERMELHO AMADEIRADO
-                    const Color(
-                      0xFF5C1A1B,
-                    ),
-
-                    const Color(
-                      0xFF7A2323,
-                    ),
-
-                    const Color(
-                      0xFF9B2C2C,
-                    ),
-
-                    const Color(
-                      0xFFB33939,
-                    ),
+                    const Color(0xFF5C1A1B),
+                    const Color(0xFF7A2323),
+                    const Color(0xFFB33939),
                   ],
-
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
         ),
 
         child: SafeArea(
-
           child: Padding(
-
-            padding:
-                const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(18),
 
             child: Column(
-
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-
-                const SizedBox(
-                  height: 10,
-                ),
-
-                // 👋 NOME
                 Text(
-
                   carregando
                       ? "Carregando..."
                       : "Olá, $nomeCliente 👋",
-
                   style: const TextStyle(
-
                     fontSize: 28,
-
-                    fontWeight:
-                        FontWeight.bold,
-
+                    fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 6),
 
-                const Text(
-
-                  "Escolha seu lanche favorito",
-
-                  style: TextStyle(
-
-                    color: Colors.white70,
-
-                    fontSize: 15,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: Text(
+                    frases[fraseIndex],
+                    key: ValueKey(frases[fraseIndex]),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ),
 
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 20),
 
-                // 🍔 BANNER PREMIUM
-                Container(
-
-                  height: 170,
-                  width: double.infinity,
-
-                  decoration: BoxDecoration(
-
-                    borderRadius:
-                        BorderRadius.circular(
-                          28,
-                        ),
-
-                    gradient: LinearGradient(
-
-                      colors: isDark
-                          ? [
-
-                              const Color(
-                                0xFF2B2B2B,
-                              ),
-
-                              const Color(
-                                0xFF1E1E1E,
-                              ),
-                            ]
-                          : [
-
-                              const Color(
-                                0xFF6D1F1F,
-                              ),
-
-                              const Color(
-                                0xFF9B2C2C,
-                              ),
-                            ],
-
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-
-                    boxShadow: [
-
-                      BoxShadow(
-
-                        color:
-                            Colors.black26,
-
-                        blurRadius: 20,
-
-                        offset:
-                            const Offset(
-                              0,
-                              10,
-                            ),
-                      ),
+                SizedBox(
+                  height: 45,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      categoriaChip("Todos"),
+                      categoriaChip("Hamburguer"),
+                      categoriaChip("Pizza"),
+                      categoriaChip("Bebida"),
+                      categoriaChip("Combos"),
+                      categoriaChip("Batatas"),
                     ],
                   ),
-
-                  child: Padding(
-
-                    padding:
-                        const EdgeInsets.all(
-                          22,
-                        ),
-
-                    child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
-
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
-
-                      children: const [
-
-                        Text(
-                          "🍔 Promoção Especial",
-
-                          style: TextStyle(
-
-                            color:
-                                Colors.white,
-
-                            fontSize: 28,
-
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-
-                        SizedBox(
-                          height: 10,
-                        ),
-
-                        Text(
-
-                          "Os melhores lanches com sabor artesanal.",
-
-                          style: TextStyle(
-
-                            color:
-                                Colors.white70,
-
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
 
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 20),
 
                 const Text(
-
-                  "Mais pedidos",
-
+                  "Produtos",
                   style: TextStyle(
-
                     fontSize: 22,
-
-                    fontWeight:
-                        FontWeight.bold,
-
+                    fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
 
-                // 🔥 LISTA
                 Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("produtos")
+                        .orderBy("nome")
+                        .snapshots(),
 
-                  child:
-                      StreamBuilder<QuerySnapshot>(
-
-                    stream:
-                        FirebaseFirestore.instance
-                            .collection(
-                              "produtos",
-                            )
-                            .orderBy("nome")
-                            .snapshots(),
-
-                    builder:
-                        (context, snapshot) {
-
-                      if (snapshot
-                              .connectionState ==
-                          ConnectionState
-                              .waiting) {
-
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
                         return const Center(
-                          child:
-                              CircularProgressIndicator(),
+                          child: CircularProgressIndicator(),
                         );
                       }
 
-                      if (!snapshot
-                              .hasData ||
-                          snapshot.data!.docs
-                              .isEmpty) {
+                      final docs = snapshot.data!.docs;
 
-                        return const Center(
+                      final filtrados = docs.where((doc) {
+                        final data =
+                            doc.data() as Map<String, dynamic>;
 
-                          child: Text(
+                        final categoria =
+                            (data["categoria"] ?? "")
+                                .toString()
+                                .toLowerCase();
 
-                            "Nenhum produto encontrado",
+                        if (categoriaSelecionada == "todos") {
+                          return true;
+                        }
 
-                            style: TextStyle(
-                              color:
-                                  Colors.white,
-                            ),
-                          ),
-                        );
-                      }
+                        return categoria ==
+                            categoriaSelecionada.toLowerCase();
+                      }).toList();
 
-                      return ListView(
+                      return ListView.builder(
+                        itemCount: filtrados.length,
+                        itemBuilder: (context, index) {
+                          final doc = filtrados[index];
+                          final data =
+                              doc.data() as Map<String, dynamic>;
 
-                        children:
-                            snapshot.data!.docs.map(
-                          (doc) {
-
-                            final data =
-                                doc.data()
-                                    as Map<String,
-                                        dynamic>;
-
-                            return foodItem(
-
-                              data["nome"] ??
-                                  "",
-
-                              data["preco"] ??
-                                  0,
-                            );
-                          },
-                        ).toList(),
+                          return foodItem(
+                            data["nome"] ?? "",
+                            data["preco"] ?? 0,
+                            index,
+                          );
+                        },
                       );
                     },
                   ),
@@ -546,154 +316,73 @@ class _ClientScreenState extends State<ClientScreen> {
     );
   }
 
-  // 🍔 CARD PRODUTO
-  Widget foodItem(
-    String nome,
-    dynamic preco,
-  ) {
+  // 🍔 CATEGORIA CHIP
+  Widget categoriaChip(String titulo) {
+    final selecionado =
+        categoriaSelecionada.toLowerCase() ==
+        titulo.toLowerCase();
 
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
-
-    return Container(
-
-      margin:
-          const EdgeInsets.only(
-            bottom: 16,
-          ),
-
-      decoration: BoxDecoration(
-
-        color: isDark
-    ? const Color(0xFF232323)
-    : const Color(0xFFFFFBF7),
-
-        borderRadius:
-            BorderRadius.circular(22),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color: Colors.black12,
-
-            blurRadius: 15,
-
-            offset: const Offset(
-              0,
-              8,
-            ),
-          ),
-        ],
-      ),
-
-      child: ListTile(
-
-        contentPadding:
-            const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 12,
-            ),
-
-        leading: CircleAvatar(
-
-          radius: 28,
-
-          backgroundColor:
-              const Color(
-                0xFF7A2323,
-              ),
-
-          child: const Icon(
-            Icons.fastfood,
-            color: Colors.white,
-          ),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          categoriaSelecionada = titulo.toLowerCase();
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 10),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        decoration: BoxDecoration(
+          color: selecionado
+              ? const Color(0xFFFFD166)
+              : Colors.white24,
+          borderRadius: BorderRadius.circular(20),
         ),
-
-        title: Text(
-
-          nome,
-
+        child: Text(
+          titulo,
           style: TextStyle(
-
-            fontWeight:
-                FontWeight.bold,
-
-            fontSize: 18,
-
-            color: isDark
-                ? Colors.white
-                : Colors.black87,
+            color: selecionado ? Colors.black : Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
+      ),
+    );
+  }
 
-        subtitle: Padding(
+  // 🍔 CARD PRODUTO
+  Widget foodItem(String nome, dynamic preco, int index) {
+    final isAnimating = animatingIndex == index;
 
-          padding:
-              const EdgeInsets.only(
-                top: 6,
-              ),
-
-          child: Text(
-
-            "R\$ ${preco.toString()}",
-
-            style: const TextStyle(
-
-              color: Color(
-                0xFF7A2323,
-              ),
-
-              fontWeight:
-                  FontWeight.bold,
-
-              fontSize: 16,
-            ),
-          ),
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 200),
+      scale: isAnimating ? 0.97 : 1.0,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
         ),
-
-        trailing: ElevatedButton(
-
-          style:
-              ElevatedButton.styleFrom(
-
-            backgroundColor:
-           const Color(0xFF8B0000),
-            shape:
-                RoundedRectangleBorder(
-
-              borderRadius:
-                  BorderRadius.circular(
-                    14,
-                  ),
-            ),
-
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 10,
-            ),
+        child: ListTile(
+          leading: const CircleAvatar(
+            backgroundColor: Color(0xFF7A2323),
+            child: Icon(Icons.fastfood, color: Colors.white),
           ),
 
-          onPressed: () {
+          title: Text(nome),
 
-            adicionarAoCarrinho(
-              nome,
-              preco,
-            );
-          },
+          subtitle: Text("R\$ $preco"),
 
-          child: const Text(
-
-            "Pedir",
-
-            style: TextStyle(
-
-              color: Colors.white,
-
-              fontWeight:
-                  FontWeight.bold,
+          trailing: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  isAnimating ? Colors.green : const Color(0xFF8B0000),
+            ),
+            onPressed: () {
+              adicionarAoCarrinho(nome, preco, index);
+            },
+            child: Text(
+              isAnimating ? "✔" : "Adicionar",
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ),

@@ -1,9 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
-import 'package:mana_lanche/screens/pedidos_admin_screens.dart';
+import 'package:mana_lanche/screens/produtos_admin_screens.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -14,533 +14,19 @@ class AdminScreen extends StatefulWidget {
 
 class _AdminScreenState extends State<AdminScreen> {
 
-  final nomeController = TextEditingController();
-  final precoController = TextEditingController();
-
-  // ðŸ”¥ ADICIONAR PRODUTO
-  Future<void> adicionarProduto() async {
-
-    try {
-
-      if (nomeController.text.trim().isEmpty ||
-          precoController.text.trim().isEmpty) {
-        return;
-      }
-
-      final preco = double.parse(
-        precoController.text.replaceAll(",", "."),
-      );
-
-      await FirebaseFirestore.instance
-          .collection("produtos")
-          .add({
-
-        "nome": nomeController.text.trim(),
-        "preco": preco,
-
-      });
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text("Produto adicionado!"),
-        ),
-      );
-
-      nomeController.clear();
-      precoController.clear();
-
-    } catch (e) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text("Erro ao adicionar produto"),
-        ),
-      );
-    }
-  }
-
-  // EXCLUIR PRODUTO
-  Future<void> excluirProduto(String id) async {
+  // 🔥 ALTERAR STATUS
+  Future<void> atualizarStatus(
+    String id,
+    String status,
+  ) async {
 
     await FirebaseFirestore.instance
-        .collection("produtos")
+        .collection("pedidos")
         .doc(id)
-        .delete();
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-
-      const SnackBar(
-        content: Text("Produto removido"),
-      ),
-    );
+        .update({
+          "status": status,
+        });
   }
-
-
-  //EDITAR PRODUTO PREMIUM
-Future<void> editarProduto(
-  String id,
-  String nomeAtual,
-  String precoAtual,
-) async {
-
-  final nomeEditController =
-      TextEditingController(text: nomeAtual);
-
-  final precoEditController =
-      TextEditingController(text: precoAtual);
-
-  final isDark =
-      Theme.of(context).brightness ==
-          Brightness.dark;
-
-  showDialog(
-
-    context: context,
-
-    barrierColor: Colors.black54,
-
-    builder: (_) {
-
-      return Dialog(
-
-        backgroundColor: const Color.fromARGB(0, 221, 4, 4),
-        insetPadding: const EdgeInsets.all(20),
-
-        child: Container(
-
-          padding: const EdgeInsets.all(28),
-
-          decoration: BoxDecoration(
-
-            gradient: LinearGradient(
-
-              colors: isDark
-                  ? [
-
-                      const Color(0xFF1A1A1A),
-                      const Color(0xFF232323),
-                      const Color(0xFF2B2B2B),
-
-                    ]
-                  : [
-
-                      const Color(0xFFFFFBF7),
-                      const Color(0xFFF8EFEA),
-                      const Color(0xFFF3E4DE),
-
-                    ],
-
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-
-            borderRadius:
-                BorderRadius.circular(32),
-
-            border: Border.all(
-
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.white.withValues(alpha: 0.7),
-            ),
-
-            boxShadow: [
-
-              BoxShadow(
-
-                color: Colors.black.withValues(alpha: 0.25),
-
-                blurRadius: 30,
-
-                offset: const Offset(0, 15),
-              ),
-            ],
-          ),
-
-          child: Column(
-
-            mainAxisSize: MainAxisSize.min,
-
-            children: [
-
-              // iCONE
-              Container(
-
-                padding: const EdgeInsets.all(16),
-
-                decoration: BoxDecoration(
-
-                  color: const Color(0xFF8B0000)
-                      .withValues(alpha: 0.12),
-
-                  borderRadius:
-                      BorderRadius.circular(22),
-                ),
-
-                child: const Icon(
-
-                  Icons.edit_rounded,
-
-                  color: Color(0xFF8B0000),
-
-                  size: 34,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // ðŸ”¥ TÃTULO
-              Text(
-
-                "Editar Produto",
-
-                style: TextStyle(
-
-                  color: isDark
-                      ? Colors.white
-                      : Colors.black87,
-
-                  fontSize: 24,
-
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-
-                "Atualize as informaçoes do produto",
-
-                style: TextStyle(
-
-                  color: isDark
-                      ? Colors.white60
-                      : Colors.black54,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // CAMPO NOME
-              TextField(
-
-                controller: nomeEditController,
-
-                style: TextStyle(
-                  color: isDark
-                      ? Colors.white
-                      : Colors.black,
-                ),
-
-                decoration: InputDecoration(
-
-                  hintText: "Nome do produto",
-
-                  hintStyle: TextStyle(
-
-                    color: isDark
-                        ? Colors.white38
-                        : Colors.grey.shade600,
-                  ),
-
-                  prefixIcon: const Icon(
-
-                    Icons.fastfood_rounded,
-
-                    color: Color(0xFF8B0000),
-                  ),
-
-                  filled: true,
-
-                  fillColor: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white,
-
-                  contentPadding:
-                      const EdgeInsets.symmetric(
-
-                    vertical: 20,
-                    horizontal: 18,
-                  ),
-
-                  border: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide.none,
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide(
-
-                      color: Colors.white
-                          .withValues(alpha: 0.08),
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: const BorderSide(
-
-                      color: Color(0xFFD2691E),
-
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // ðŸ”¥ CAMPO PREÃ‡O
-              TextField(
-
-                controller: precoEditController,
-
-                keyboardType:
-                    TextInputType.number,
-
-                style: TextStyle(
-
-                  color: isDark
-                      ? Colors.white
-                      : Colors.black,
-                ),
-
-                decoration: InputDecoration(
-
-                  hintText: "PreÃ§o",
-
-                  hintStyle: TextStyle(
-
-                    color: isDark
-                        ? Colors.white38
-                        : Colors.grey.shade600,
-                  ),
-
-                  prefixIcon: const Icon(
-
-                    Icons.attach_money_rounded,
-
-                    color: Color(0xFFD2691E),
-                  ),
-
-                  filled: true,
-
-                  fillColor: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white,
-
-                  contentPadding:
-                      const EdgeInsets.symmetric(
-
-                    vertical: 20,
-                    horizontal: 18,
-                  ),
-
-                  border: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide.none,
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide(
-
-                      color: Colors.white
-                          .withValues(alpha: 0.08),
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: const BorderSide(
-
-                      color: Color(0xFFD2691E),
-
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // ðŸ”¥ BOTÃ•ES
-              Row(
-
-                children: [
-
-                  // CANCELAR
-                  Expanded(
-
-                    child: OutlinedButton(
-
-                      style:
-                          OutlinedButton.styleFrom(
-
-                        side: BorderSide(
-
-                          color: isDark
-                              ? Colors.white24
-                              : Colors.black12,
-                        ),
-
-                        padding:
-                            const EdgeInsets.symmetric(
-                          vertical: 18,
-                        ),
-
-                        shape:
-                            RoundedRectangleBorder(
-
-                          borderRadius:
-                              BorderRadius.circular(
-                                18,
-                              ),
-                        ),
-                      ),
-
-                      onPressed: () {
-
-                        Navigator.pop(context);
-                      },
-
-                      child: Text(
-
-                        "Cancelar",
-
-                        style: TextStyle(
-
-                          color: isDark
-                              ? Colors.white70
-                              : Colors.black87,
-
-                          fontWeight:
-                              FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 14),
-
-                  // SALVAR
-                  Expanded(
-
-                    child: ElevatedButton(
-
-                      style:
-                          ElevatedButton.styleFrom(
-
-                        elevation: 0,
-
-                        backgroundColor:
-                            const Color(
-                              0xFF8B0000,
-                            ),
-
-                        padding:
-                            const EdgeInsets.symmetric(
-                          vertical: 18,
-                        ),
-
-                        shape:
-                            RoundedRectangleBorder(
-
-                          borderRadius:
-                              BorderRadius.circular(
-                                18,
-                              ),
-                        ),
-                      ),
-
-                      onPressed: () async {
-
-                        final preco =
-                            double.parse(
-
-                          precoEditController.text
-                              .replaceAll(",", "."),
-                        );
-
-                        await FirebaseFirestore
-                            .instance
-                            .collection("produtos")
-                            .doc(id)
-                            .update({
-
-                          "nome":
-                              nomeEditController.text
-                                  .trim(),
-
-                          "preco": preco,
-                        });
-
-                        if (!mounted) return;
-
-                        Navigator.pop(context);
-
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(
-
-                          const SnackBar(
-
-                            content: Text(
-                              "Produto atualizado!",
-                            ),
-                          ),
-                        );
-                      },
-
-                      child: const Text(
-
-                        "Salvar",
-
-                        style: TextStyle(
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
 
   // LOGOUT
   Future<void> logout() async {
@@ -557,13 +43,6 @@ Future<void> editarProduto(
         builder: (_) => const LoginScreen(),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    nomeController.dispose();
-    precoController.dispose();
-    super.dispose();
   }
 
   @override
@@ -596,11 +75,11 @@ Future<void> editarProduto(
 
         actions: [
 
-          // PEDIDOS
+          // PRODUTOS
           IconButton(
 
             icon: const Icon(
-              Icons.receipt_long,
+              Icons.fastfood_rounded,
               color: Colors.white,
             ),
 
@@ -612,7 +91,7 @@ Future<void> editarProduto(
 
                 MaterialPageRoute(
                   builder: (_) =>
-                      const PedidosAdminScreen(),
+                      const ProdutosAdminScreen(),
                 ),
               );
             },
@@ -634,7 +113,6 @@ Future<void> editarProduto(
       body: Container(
 
         width: double.infinity,
-        height: double.infinity,
 
         decoration: BoxDecoration(
 
@@ -644,9 +122,8 @@ Future<void> editarProduto(
                 ? [
 
                     const Color(0xFF111111),
-                    const Color(0xFF1A1A1A),
-                    const Color(0xFF222222),
-                    const Color(0xFF2C2C2C),
+                    const Color(0xFF1B1B1B),
+                    const Color(0xFF252525),
 
                   ]
                 : [
@@ -663,387 +140,282 @@ Future<void> editarProduto(
           ),
         ),
 
-        child: SafeArea(
+        child: StreamBuilder<QuerySnapshot>(
 
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 28,
-              vertical: 30,
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
+          stream: FirebaseFirestore.instance
+              .collection("pedidos")
+              .orderBy(
+                "data",
+                descending: true,
+              )
+              .snapshots(),
 
-                // ðŸ”¥ LOGO
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.35),
-                        blurRadius: 25,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      "assets/images/logo.png",
-                      width: 140,
-                      height: 140,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+          builder: (context, snapshot) {
 
-                const SizedBox(height: 28),
+            if (snapshot.connectionState ==
+                ConnectionState.waiting) {
 
-                
+              return const Center(
+                child:
+                    CircularProgressIndicator(),
+              );
+            }
 
-                const SizedBox(height: 8),
+            if (!snapshot.hasData ||
+                snapshot.data!.docs.isEmpty) {
 
-                Text(
-                  "Cadastre novos produtos e gerencie o estoque", 
-                  textAlign: TextAlign.center,
+              return const Center(
+
+                child: Text(
+
+                  "Nenhum pedido encontrado",
+
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.78),
-                    fontSize: 15,
+                    color: Colors.white,
+                    fontSize: 18,
                   ),
                 ),
+              );
+            }
 
-                const SizedBox(height: 35),
+            return ListView.builder(
 
-                Container(
-                  padding: const EdgeInsets.all(24),
+              padding:
+                  const EdgeInsets.all(15),
+
+              itemCount:
+                  snapshot.data!.docs.length,
+
+              itemBuilder: (context, index) {
+
+                final doc =
+                    snapshot.data!.docs[index];
+
+                final data =
+                    doc.data()
+                        as Map<String, dynamic>;
+
+                return Container(
+
+                  margin:
+                      const EdgeInsets.only(
+                        bottom: 15,
+                      ),
+
+                  padding:
+                      const EdgeInsets.all(
+                        18,
+                      ),
+
                   decoration: BoxDecoration(
+
                     color: isDark
-                        ? Colors.white.withValues(alpha: 0.06)
-                        : Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(30),
+                        ? Colors.white
+                            .withValues(alpha: 0.05)
+                        : Colors.white
+                            .withValues(alpha: 0.12),
+
+                    borderRadius:
+                        BorderRadius.circular(
+                          22,
+                        ),
+
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      width: 1.2,
+                      color:
+                          Colors.white
+                              .withValues(alpha: 0.08),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.18),
-                        blurRadius: 25,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
                   ),
+
                   child: Column(
+
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
                     children: [
-                      TextField(
-                        controller: nomeController,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "Nome do produto",
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.54)
-                                : Colors.grey.shade600,
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.fastfood,
-                            color: Color(0xFF8B0000),
-                          ),
-                          filled: true,
-                          fillColor: isDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.white.withValues(alpha: 0.96),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18,
-                            horizontal: 18,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.08),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD2691E),
-                              width: 2,
-                            ),
-                          ),
+
+                      // 👤 CLIENTE
+                      Text(
+
+                        data["nomeCliente"] ??
+                            "Cliente",
+
+                        style: const TextStyle(
+
+                          color: Colors.white,
+
+                          fontSize: 20,
+
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 10),
 
-                      TextField(
-                        controller: precoController,
-                        keyboardType: TextInputType.number,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "Preço",
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white54
-                                : Colors.grey.shade600,
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.attach_money,
-                            color: Color(0xFFD2691E),
-                          ),
-                          filled: true,
-                          fillColor: isDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.white.withValues(alpha: 0.96),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18,
-                            horizontal: 18,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.08),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD2691E),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      ),
+                      // 🍔 PRODUTO
+                      Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: List.generate(
 
-                      const SizedBox(height: 30),
+                     (data["itens"] as List).length,
 
-                      SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            backgroundColor: const Color(0xFFD4A017),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                          ),
-                          onPressed: adicionarProduto,
-                          child: const Text(
-                            "Adicionar Produto",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                     (index) {
 
-                const SizedBox(height: 35),
+                     final item = data["itens"][index];
 
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Produtos cadastrados",
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.92),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                     return Padding(
+
+                    padding: const EdgeInsets.only(bottom: 12),
+
+                     child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                   Text(
+                      "Produto: ${item["nomeProduto"]}",
+
+                       style: const TextStyle(
+                      color: Colors.white70,
+                     fontSize: 16,
                     ),
-                  ),
-                ),
+                    ),
 
-                const SizedBox(height: 18),
+                   const SizedBox(height: 4),
 
-                StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection("produtos")
-                      .orderBy("nome")
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-
-                    if (!snapshot.hasData ||
-                        snapshot.data!.docs.isEmpty) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 40,
-                        ),
-                        alignment: Alignment.center,
-                        child: const Text(
-                          "Nenhum produto encontrado",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        final doc = snapshot.data!.docs[index];
-                        final data = doc.data() as Map<String, dynamic>;
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 14),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              width: 1.2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF000000).withValues(alpha: 0.12),
-                                blurRadius: 14,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFF8B0000),
-                                      Color(0xFFB22222),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: const Icon(
-                                  Icons.fastfood_rounded,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      data["nome"],
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white
-                                            : const Color.fromARGB(255, 255, 255, 255),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(255, 255, 255, 255)
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        "R\$ ${data["preco"]}",
-                                        style: const TextStyle(
-                                          color: Color.fromARGB(255, 202, 202, 202),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: IconButton(
-                                      icon: const Icon(
-                                        Icons.edit_rounded,
-                                        color: Color.fromARGB(255, 255, 153, 0),
-                                        size: 22,
-                                      ),
-                                      onPressed: () {
-                                        editarProduto(
-                                          doc.id,
-                                          data["nome"],
-                                          data["preco"].toString(),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_rounded,
-                                        color: Colors.red,
-                                        size: 22,
-                                      ),
-                                      onPressed: () {
-                                        excluirProduto(doc.id);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+                  Text(
+                "Quantidade: ${item["quantidade"]}",
+ 
+                style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
             ),
+
+            const SizedBox(height: 4),
+
+                  Text(
+                  "Preço: R\$ ${item["preco"]}",
+
+                        style: const TextStyle(
+                           color: Colors.white70,
+                            fontSize: 16,
+                            ),
+                           ),
+
+                      const Divider(
+                      color: Colors.white24,
+                       height: 20,
+                    ),
+                   ],
+                ),
+              );
+            },
           ),
         ),
+
+                      const SizedBox(height: 14),
+
+                      // 🚚 STATUS
+                      Row(
+
+                        children: [
+
+                          const Text(
+
+                            "Status: ",
+
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
+                          ),
+
+                          Container(
+
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+
+                            decoration: BoxDecoration(
+
+                              color: Colors.green,
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                    20,
+                                  ),
+                            ),
+
+                            child: Text(
+
+                              data["status"],
+
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      // 🔥 ALTERAR STATUS
+                      Wrap(
+
+                        spacing: 8,
+
+                        children: [
+
+                          statusButton(
+                            doc.id,
+                            "Preparando",
+                          ),
+
+                          statusButton(
+                            doc.id,
+                            "Saiu entrega",
+                          ),
+
+                          statusButton(
+                            doc.id,
+                            "Entregue",
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
+    );
+  }
+
+  // 🔥 BOTÃO STATUS
+  Widget statusButton(
+    String id,
+    String status,
+  ) {
+
+    return ElevatedButton(
+
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            const Color(0xFFD4A017),
+      ),
+
+      onPressed: () {
+        atualizarStatus(id, status);
+      },
+
+      child: Text(status),
     );
   }
 }

@@ -173,49 +173,45 @@ class _ClientScreenState
 
   // 🔥 CARRINHO
   void adicionarAoCarrinho(
+  String nome,
+  dynamic preco,
+  int index,
+  String imagem,
+) async {
 
-    String nome,
+  setState(() {
+    animatingIndex = index;
+  });
 
-    dynamic preco,
+  await Future.delayed(
+    const Duration(milliseconds: 200),
+  );
 
-    int index,
-  ) async {
+  setState(() {
 
-    setState(() {
-      animatingIndex = index;
-    });
-
-    await Future.delayed(
-      const Duration(milliseconds: 200),
+    final i = carrinho.indexWhere(
+      (item) => item["nomeProduto"] == nome,
     );
 
-    setState(() {
+    if (i >= 0) {
 
-      final i = carrinho.indexWhere(
+      carrinho[i]["quantidade"]++;
 
-        (item) =>
-            item["nomeProduto"] ==
-            nome,
-      );
+    } else {
 
-      if (i >= 0) {
+      carrinho.add({
+        "nomeProduto": nome,
+        "preco": preco,
+        "quantidade": 1,
 
-        carrinho[i]["quantidade"]++;
+        // 🔥 ISSO É O MAIS IMPORTANTE
+        "imagem": imagem,
+      });
+    }
 
-      } else {
+    animatingIndex = -1;
+  });
 
-        carrinho.add({
-
-          "nomeProduto": nome,
-
-          "preco": preco,
-
-          "quantidade": 1,
-        });
-      }
-
-      animatingIndex = -1;
-    });
 
     ScaffoldMessenger.of(context)
         .showSnackBar(
@@ -791,22 +787,22 @@ class _ClientScreenState
                     children: [
 
                       categoriaChip(
-                          "Todos"),
+                          "todos"),
 
                       categoriaChip(
                           "Hamburguer"),
 
                       categoriaChip(
-                          "Pizza"),
+                          "pizza"),
 
                       categoriaChip(
-                          "Bebida"),
+                          "bebida"),
 
                       categoriaChip(
-                          "Combos"),
+                          "combos"),
 
                       categoriaChip(
-                          "Batatas"),
+                          "batatas"),
                     ],
                   ),
                 ),
@@ -887,8 +883,7 @@ class _ClientScreenState
                             categoriaSelecionada ==
                                     "todos"
                                 ? true
-                                : categoria ==
-                                    categoriaSelecionada;
+                                : categoria == categoriaSelecionada.toLowerCase();
 
                         final pesquisaOk =
                             nome.contains(
@@ -1276,8 +1271,11 @@ class _ClientScreenState
                             nome,
 
                             preco,
-
+                            
                             index,
+
+                            imagem,
+
                           );
                         },
 

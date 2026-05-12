@@ -24,6 +24,7 @@ class _LoginScreenState
 
   final senhaController =
       TextEditingController();
+      bool mostrarSenha = false;
 
   // 🔥 LOGIN
   Future<void> login() async {
@@ -310,151 +311,148 @@ final GoogleSignInAccount? googleUser =
         
         ),
 
-        child: SafeArea(
+         child: SafeArea(
 
-          child: SingleChildScrollView(
+  child: Center(
 
-            padding:
-                const EdgeInsets.all(
-                  24,
+    child: Padding(
+
+      padding: const EdgeInsets.symmetric(
+        horizontal: 22,
+        vertical: 12,
+      ),
+
+      child: Column(
+
+        mainAxisAlignment:
+            MainAxisAlignment.center,
+
+        children: [
+
+          // 🔥 DARK MODE
+          Row(
+            mainAxisAlignment:
+                MainAxisAlignment.end,
+
+            children: [
+
+              Container(
+
+                decoration:
+                    BoxDecoration(
+
+                      color:
+                          Colors.white
+                              .withValues(alpha: 0.12),
+
+                      borderRadius:
+                          BorderRadius.circular(15),
+                    ),
+
+                child: IconButton(
+
+                  icon: Icon(
+
+                    isDark
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+
+                    color: Colors.white,
+                  ),
+
+                  onPressed: () {
+
+                    MyApp.of(
+                      context,
+                    )?.toggleTheme();
+                  },
                 ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // 🔥 CONTEÚDO
+          Expanded(
 
             child: Column(
 
+              mainAxisAlignment:
+                  MainAxisAlignment.center,
+
               children: [
-
-                const SizedBox(
-                  height: 25,
-                ),
-
-                // 🔥 DARK MODE
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment
-                          .end,
-
-                  children: [
-
-                    Container(
-
-                      decoration:
-                          BoxDecoration(
-
-                            color:
-                                Colors.white
-                                    .withValues(alpha: 0.12),
-                            borderRadius:
-                                BorderRadius.circular(
-                                  15,
-                                ),
-                          ),
-
-                      child: IconButton(
-
-                        icon: Icon(
-
-                          isDark
-                              ? Icons.light_mode
-                              : Icons.dark_mode,
-
-                          color:
-                              Colors.white,
-                        ),
-
-                        onPressed: () {
-
-                          MyApp.of(
-                            context,
-                          )?.toggleTheme();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(
-                  height: 20,
-                ),
 
                 // 🔥 LOGO
                 Container(
 
-                  decoration:
-                      BoxDecoration(
+                  decoration: BoxDecoration(
 
-                        shape:
-                            BoxShape.circle,
+                    shape: BoxShape.circle,
 
-                        boxShadow: [
+                    boxShadow: [
 
-                          BoxShadow(
-                            color:
-                                Colors.black
-                                    .withValues(alpha: 0.30),
-                            blurRadius: 30,
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: 0.30),
 
-                            offset:
-                                const Offset(
-                                  0,
-                                  15,
-                                ),
-                          ),
-                        ],
+                        blurRadius: 30,
+
+                        offset:
+                            const Offset(0, 15),
                       ),
+                    ],
+                  ),
 
                   child: ClipOval(
 
                     child: Image.asset(
                       "assets/images/logo.png",
 
-                      width: 150,
-                      height: 150,
+                      width: 115,
+                      height: 115,
 
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
 
-                const SizedBox(
-                  height: 35,
-                ),
+                const SizedBox(height: 22),
 
                 // 🔥 TÍTULO
                 const Text(
+
                   "Bem-vindo de volta!",
 
                   style: TextStyle(
 
-                    color:
-                        Colors.white,
+                    color: Colors.white,
 
-                    fontSize: 32,
+                    fontSize: 26,
 
                     fontWeight:
                         FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 6),
 
                 Text(
+
                   "Entre para continuar",
 
                   style: TextStyle(
 
                     color:
-                        Colors.white
-                            .withValues(alpha: 0.85),
+                        Colors.white.withValues(
+                          alpha: 0.85,
+                        ),
 
-                    fontSize: 16,
+                    fontSize: 15,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 22),
 
                 // 🔥 CARD LOGIN
                 Container(
@@ -580,7 +578,7 @@ final GoogleSignInAccount? googleUser =
                         controller:
                             senhaController,
 
-                        obscureText: true,
+                        obscureText: !mostrarSenha,
 
                         style: TextStyle(
                           color: isDark
@@ -612,18 +610,45 @@ final GoogleSignInAccount? googleUser =
                                     ),
                                   ),
 
-                              suffixIcon:
-                                  TextButton(
+                              suffixIcon: Row(
 
-                                    onPressed:
-                                        recuperarSenha,
+  mainAxisSize: MainAxisSize.min,
 
-                                    child:
-                                        const Text(
-                                          "Esqueceu?",
-                                        ),
-                                  ),
+  children: [
 
+    IconButton(
+
+      icon: Icon(
+
+        mostrarSenha
+            ? Icons.visibility_off
+            : Icons.visibility,
+
+        color: Colors.grey,
+      ),
+
+      onPressed: () {
+
+        setState(() {
+
+          mostrarSenha =
+              !mostrarSenha;
+        });
+      },
+    ),
+
+    TextButton(
+
+      onPressed:
+          recuperarSenha,
+
+      child:
+          const Text(
+            "Esqueceu?",
+          ),
+    ),
+  ],
+),
                               filled: true,
 
                               fillColor: isDark
@@ -853,13 +878,21 @@ final GoogleSignInAccount? googleUser =
                 const SizedBox(
                   height: 30,
                 ),
-              ],
-            ),
-          ),
+               
+                        ]
+                      ),
+                    ),
+                  ],
+               ),
+             ),
+           ),
         ),
       ),
     );
   }
+}
+
+
 
   // 🔥 BOTÃO SOCIAL
   Widget socialButton(
@@ -895,6 +928,5 @@ final GoogleSignInAccount? googleUser =
         size: 34,
       ),
     ),
-   );
-  }
+  );
 }

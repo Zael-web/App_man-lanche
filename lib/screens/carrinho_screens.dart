@@ -46,30 +46,52 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
     });
   }
 
-  // 🔥 FINALIZAR PEDIDO (CORRETO)
-  Future<void> finalizar() async {
-    final user = FirebaseAuth.instance.currentUser;
+Future<void> finalizar() async {
 
-    if (widget.carrinho.isEmpty) return;
+  final user = FirebaseAuth.instance.currentUser;
 
-    await FirebaseFirestore.instance.collection("pedidos").add({
-      "itens": widget.carrinho,
-      "usuarioId": user!.uid,
-      "nomeCliente": widget.nomeCliente,
-      "status": "pendente",
-      "total": total,
-      "data": Timestamp.now(),
+  if (widget.carrinho.isEmpty) return;
+
+  // 🔥 USA DIRETO O CARRINHO (SEM CONSULTA EXTRA)
+  List<Map<String, dynamic>> itensPedido = [];
+
+  for (var item in widget.carrinho) {
+
+    itensPedido.add({
+      "nomeProduto": item["nomeProduto"],
+      "preco": item["preco"],
+      "quantidade": item["quantidade"],
+
+      // 🔥 AGORA GARANTIDO
+      "imagem": item["imagem"] ?? "",
     });
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Pedido enviado com sucesso!")),
-    );
-
-    setState(() => widget.carrinho.clear());
-    Navigator.pop(context);
   }
+
+  await FirebaseFirestore.instance
+      .collection("pedidos")
+      .add({
+    "itens": itensPedido,
+    "usuarioId": user!.uid,
+    "nomeCliente": widget.nomeCliente,
+    "status": "Pendente",
+    "total": total,
+    "data": FieldValue.serverTimestamp(),
+  });
+
+  if (!mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Pedido enviado com sucesso!"),
+    ),
+  );
+
+  setState(() {
+    widget.carrinho.clear();
+  });
+
+  Navigator.pop(context);
+}
 
   @override
   Widget build(BuildContext context) {

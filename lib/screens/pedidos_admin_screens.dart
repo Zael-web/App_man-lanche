@@ -22,8 +22,41 @@ class _PedidosAdminScreenState
         .collection("pedidos")
         .doc(id)
         .update({
-          "status": status,
-        });
+      "status": status,
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+
+      SnackBar(
+
+        backgroundColor: Colors.green,
+
+        content: Text(
+          "Pedido atualizado para $status",
+        ),
+      ),
+    );
+  }
+
+  // 🔥 COR STATUS
+  Color corStatus(String status) {
+
+    switch (status) {
+
+      case "Preparando":
+        return Colors.orange;
+
+      case "Saiu entrega":
+        return Colors.blue;
+
+      case "Entregue":
+        return Colors.green;
+
+      default:
+        return Colors.grey;
+    }
   }
 
   @override
@@ -35,15 +68,34 @@ class _PedidosAdminScreenState
 
     return Scaffold(
 
+      extendBodyBehindAppBar: true,
+
       appBar: AppBar(
+
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+
+        centerTitle: true,
+
         title: const Text(
-          "Pedidos dos Clientes",
+
+          "PEDIDOS",
+
+          style: TextStyle(
+
+            color: Colors.white,
+
+            fontWeight: FontWeight.bold,
+
+            letterSpacing: 1,
+          ),
         ),
       ),
 
       body: Container(
 
         width: double.infinity,
+        height: double.infinity,
 
         decoration: BoxDecoration(
 
@@ -71,259 +123,526 @@ class _PedidosAdminScreenState
           ),
         ),
 
-        child: StreamBuilder<QuerySnapshot>(
+        child: SafeArea(
 
-          stream: FirebaseFirestore.instance
-              .collection("pedidos")
-              .orderBy(
-                "data",
-                descending: true,
-              )
-              .snapshots(),
+          child: StreamBuilder<QuerySnapshot>(
 
-          builder: (context, snapshot) {
+            stream: FirebaseFirestore.instance
+                .collection("pedidos")
+                .orderBy(
+                  "data",
+                  descending: true,
+                )
+                .snapshots(),
 
-            if (snapshot.connectionState ==
-                ConnectionState.waiting) {
+            builder: (context, snapshot) {
 
-              return const Center(
-                child:
-                    CircularProgressIndicator(),
-              );
-            }
+              // 🔥 LOADING
+              if (snapshot.connectionState ==
+                  ConnectionState.waiting) {
 
-            if (!snapshot.hasData ||
-                snapshot.data!.docs.isEmpty) {
+                return const Center(
 
-              return const Center(
-
-                child: Text(
-
-                  "Nenhum pedido encontrado",
-
-                  style: TextStyle(
+                  child:
+                      CircularProgressIndicator(
                     color: Colors.white,
-                    fontSize: 18,
                   ),
-                ),
-              );
-            }
+                );
+              }
 
-            return ListView.builder(
+              // 🔥 SEM PEDIDOS
+              if (!snapshot.hasData ||
+                  snapshot.data!.docs.isEmpty) {
 
-              padding:
-                  const EdgeInsets.all(15),
+                return const Center(
 
-              itemCount:
-                  snapshot.data!.docs.length,
+                  child: Text(
 
-              itemBuilder: (context, index) {
+                    "Nenhum pedido encontrado",
 
-                final doc =
-                    snapshot.data!.docs[index];
+                    style: TextStyle(
 
-                final data =
-                    doc.data()
-                        as Map<String, dynamic>;
+                      color: Colors.white,
 
-                return Container(
+                      fontSize: 20,
 
-                  margin:
-                      const EdgeInsets.only(
-                        bottom: 15,
-                      ),
-
-                  padding:
-                      const EdgeInsets.all(
-                        18,
-                      ),
-
-                  decoration: BoxDecoration(
-
-                    color: isDark
-                        ? Colors.white
-                            .withValues(alpha: 0.05)
-                        : Colors.white
-                            .withValues(alpha: 0.12),
-
-                    borderRadius:
-                        BorderRadius.circular(
-                          22,
-                        ),
-
-                    border: Border.all(
-                      color:
-                          Colors.white
-                              .withValues(alpha: 0.08),
+                      fontWeight:
+                          FontWeight.bold,
                     ),
                   ),
+                );
+              }
 
-                  child: Column(
+              return ListView.builder(
 
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                padding:
+                    const EdgeInsets.all(18),
 
-                    children: [
+                itemCount:
+                    snapshot.data!.docs.length,
 
-                      // 👤 CLIENTE
-                      Text(
+                itemBuilder: (context, index) {
 
-                        data["nomeCliente"] ??
-                            "Cliente",
+                  final doc =
+                      snapshot.data!.docs[index];
 
-                        style: const TextStyle(
+                  final data =
+                      doc.data()
+                          as Map<String, dynamic>;
 
-                          color: Colors.white,
+                  final itens =
+                      data["itens"] as List;
 
-                          fontSize: 20,
+                  double total = 0;
 
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
+                  for (var item in itens) {
+
+                    total +=
+                        (item["preco"] ?? 0) *
+                        (item["quantidade"] ?? 1);
+                  }
+
+                  return Container(
+
+                    margin:
+                        const EdgeInsets.only(
+                      bottom: 22,
+                    ),
+
+                    padding:
+                        const EdgeInsets.all(20),
+
+                    decoration: BoxDecoration(
+
+                      color: isDark
+                          ? Colors.white
+                              .withValues(alpha: 0.05)
+                          : Colors.white
+                              .withValues(alpha: 0.12),
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        28,
                       ),
 
-                      const SizedBox(height: 10),
+                      border: Border.all(
 
-                      // 🍔 PRODUTO
-                      Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: List.generate(
+                        color: Colors.white
+                            .withValues(alpha: 0.08),
+                      ),
 
-                     (data["itens"] as List).length,
+                      boxShadow: [
 
-                     (index) {
+                        BoxShadow(
 
-                     final item = data["itens"][index];
+                          color: Colors.black
+                              .withValues(alpha: 0.18),
 
-                     return Padding(
+                          blurRadius: 20,
 
-                    padding: const EdgeInsets.only(bottom: 12),
-
-                     child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                   Text(
-                      "Produto: ${item["nomeProduto"]}",
-
-                       style: const TextStyle(
-                      color: Colors.white70,
-                     fontSize: 16,
-                    ),
+                          offset:
+                              const Offset(0, 10),
+                        ),
+                      ],
                     ),
 
-                   const SizedBox(height: 4),
+                    child: Column(
 
-                  Text(
-                "Quantidade: ${item["quantidade"]}",
- 
-                style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-            ),
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
 
-            const SizedBox(height: 4),
+                      children: [
 
-                  Text(
-                  "Preço: R\$ ${item["preco"]}",
+                        // 🔥 TOPO CLIENTE
+                        Row(
 
-                        style: const TextStyle(
-                           color: Colors.white70,
-                            fontSize: 16,
+                          children: [
+
+                            Container(
+
+                              width: 60,
+                              height: 60,
+
+                              decoration:
+                                  BoxDecoration(
+
+                                gradient:
+                                    const LinearGradient(
+
+                                  colors: [
+
+                                    Color(0xFFD2691E),
+                                    Color(0xFFFF9800),
+
+                                  ],
+                                ),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  18,
+                                ),
+                              ),
+
+                              child: const Icon(
+
+                                Icons.person,
+
+                                color: Colors.white,
+
+                                size: 30,
+                              ),
                             ),
-                           ),
 
-                      const Divider(
-                      color: Colors.white24,
-                       height: 20,
-                    ),
-                   ],
-                ),
-              );
-            },
-          ),
-        ),
+                            const SizedBox(width: 14),
 
-                      const SizedBox(height: 14),
+                            Expanded(
 
-                      // 🚚 STATUS
-                      Row(
+                              child: Column(
 
-                        children: [
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
 
-                          const Text(
+                                children: [
 
-                            "Status: ",
+                                  Text(
 
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight:
-                                  FontWeight.bold,
+                                    data["nomeCliente"] ??
+                                        "Cliente",
+
+                                    style:
+                                        const TextStyle(
+
+                                      color:
+                                          Colors.white,
+
+                                      fontSize: 20,
+
+                                      fontWeight:
+                                          FontWeight.bold,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                      height: 5),
+
+                                  Text(
+
+                                    "${itens.length} item(ns)",
+
+                                    style:
+                                        const TextStyle(
+
+                                      color:
+                                          Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
 
-                          Container(
+                            // 🔥 STATUS
+                            Container(
+
+                              padding:
+                                  const EdgeInsets.symmetric(
+
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color: corStatus(
+                                  data["status"],
+                                ),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  20,
+                                ),
+                              ),
+
+                              child: Text(
+
+                                data["status"],
+
+                                style:
+                                    const TextStyle(
+
+                                  color: Colors.white,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 22),
+
+                        // 🔥 LISTA PRODUTOS
+                        ...List.generate(
+
+                          itens.length,
+
+                          (i) {
+
+                            final item =
+                                itens[i];
+
+                            final imagem = (item["imagem"] ?? "").toString();
+
+                            return Container(
+
+                              margin:
+                                  const EdgeInsets.only(
+                                bottom: 15,
+                              ),
+
+                              padding:
+                                  const EdgeInsets.all(
+                                14,
+                              ),
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color: Colors.black
+                                    .withValues(
+                                        alpha: 0.12),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  22,
+                                ),
+                              ),
+
+                              child: Row(
+
+                                children: [
+
+                                  // 🔥 IMAGEM
+                                  ClipRRect(
+
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      18,
+                                    ),
+
+                                    child:
+                                        imagem.isNotEmpty
+
+                                            ? Image.network(
+
+                                                imagem,
+
+                                                width: 85,
+                                                height: 85,
+
+                                                fit: BoxFit.cover,
+
+                                                errorBuilder:
+                                                    (_, __, ___) {
+
+                                                  return Container(
+
+                                                    width: 85,
+                                                    height: 85,
+
+                                                    color:
+                                                        Colors.grey,
+
+                                                    child:
+                                                        const Icon(
+
+                                                      Icons.fastfood,
+
+                                                      color:
+                                                          Colors.white,
+                                                    ),
+                                                  );
+                                                },
+                                              )
+
+                                            : Container(
+
+                                                width: 85,
+                                                height: 85,
+
+                                                color: Colors.grey,
+
+                                                child:
+                                                    const Icon(
+
+                                                  Icons.fastfood,
+
+                                                  color:
+                                                      Colors.white,
+                                                ),
+                                              ),
+                                  ),
+
+                                  const SizedBox(
+                                      width: 16),
+
+                                  // 🔥 INFO PRODUTO
+                                  Expanded(
+
+                                    child: Column(
+
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment
+                                              .start,
+
+                                      children: [
+
+                                        Text(
+
+                                          item["nomeProduto"],
+
+                                          style:
+                                              const TextStyle(
+
+                                            color:
+                                                Colors.white,
+
+                                            fontSize:
+                                                18,
+
+                                            fontWeight:
+                                                FontWeight.bold,
+                                          ),
+                                        ),
+
+                                        const SizedBox(
+                                            height: 8),
+
+                                        Text(
+
+                                          "Quantidade: ${item["quantidade"]}",
+
+                                          style:
+                                              const TextStyle(
+
+                                            color:
+                                                Colors.white70,
+                                          ),
+                                        ),
+
+                                        const SizedBox(
+                                            height: 6),
+
+                                        Text(
+
+                                          "Preço: R\$ ${item["preco"]}",
+
+                                          style:
+                                              const TextStyle(
+
+                                            color: Color(
+                                                0xFFFFD54F),
+
+                                            fontWeight:
+                                                FontWeight.bold,
+
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // 🔥 TOTAL
+                        Align(
+
+                          alignment:
+                              Alignment.centerRight,
+
+                          child: Container(
 
                             padding:
                                 const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
+
+                              horizontal: 18,
+                              vertical: 10,
+                            ),
 
                             decoration: BoxDecoration(
 
-                              color: Colors.green,
+                              color: const Color(
+                                0xFFD4A017,
+                              ),
 
                               borderRadius:
                                   BorderRadius.circular(
-                                    20,
-                                  ),
+                                18,
+                              ),
                             ),
 
                             child: Text(
 
-                              data["status"],
+                              "Total: R\$ ${total.toStringAsFixed(2)}",
 
-                              style: const TextStyle(
+                              style:
+                                  const TextStyle(
+
                                 color: Colors.white,
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize: 17,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
 
-                      const SizedBox(height: 15),
+                        const SizedBox(height: 22),
 
-                      // 🔥 ALTERAR STATUS
-                      Wrap(
+                        // 🔥 BOTÕES STATUS
+                        Wrap(
 
-                        spacing: 8,
+                          spacing: 10,
+                          runSpacing: 10,
 
-                        children: [
+                          children: [
 
-                          statusButton(
-                            doc.id,
-                            "Preparando",
-                          ),
+                            statusButton(
+                              doc.id,
+                              "Preparando",
+                              Colors.orange,
+                            ),
 
-                          statusButton(
-                            doc.id,
-                            "Saiu entrega",
-                          ),
+                            statusButton(
+                              doc.id,
+                              "Saiu entrega",
+                              Colors.blue,
+                            ),
 
-                          statusButton(
-                            doc.id,
-                            "Entregue",
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
+                            statusButton(
+                              doc.id,
+                              "Entregue",
+                              Colors.green,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -333,20 +652,47 @@ class _PedidosAdminScreenState
   Widget statusButton(
     String id,
     String status,
+    Color cor,
   ) {
 
     return ElevatedButton(
 
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            const Color(0xFFD4A017),
+
+        backgroundColor: cor,
+
+        elevation: 5,
+
+        padding:
+            const EdgeInsets.symmetric(
+
+          horizontal: 18,
+          vertical: 14,
+        ),
+
+        shape: RoundedRectangleBorder(
+
+          borderRadius:
+              BorderRadius.circular(16),
+        ),
       ),
 
       onPressed: () {
+
         atualizarStatus(id, status);
       },
 
-      child: Text(status),
+      child: Text(
+
+        status,
+
+        style: const TextStyle(
+
+          color: Colors.white,
+
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

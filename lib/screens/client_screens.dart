@@ -9,84 +9,207 @@ class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
 
   @override
-  State<ClientScreen> createState() => _ClientScreenState();
+  State<ClientScreen> createState() =>
+      _ClientScreenState();
 }
 
-class _ClientScreenState extends State<ClientScreen> {
+class _ClientScreenState
+    extends State<ClientScreen> {
+
   String nomeCliente = "";
   bool carregando = true;
 
-  List<Map<String, dynamic>> carrinho = [];
+  List<Map<String, dynamic>>
+      carrinho = [];
 
-  String categoriaSelecionada = "todos";
+  String categoriaSelecionada =
+      "todos";
 
   int animatingIndex = -1;
+
   int fraseIndex = 0;
 
+  final pesquisaController =
+      TextEditingController();
+
+  String pesquisa = "";
+
+  final PageController
+      bannerController =
+      PageController();
+
+  int bannerAtual = 0;
+
+  final List<String> banners = [
+    
+     
+    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+
+    "https://images.unsplash.com/photo-1513104890138-7c749659a591",
+
+    "https://images.unsplash.com/photo-1550547660-d9450f859349",
+    
+  ];
+
   final List<String> frases = [
+
     "🔥 Impossível resistir",
-    "🍔 Fome bateu? a gente resolve!",
+
+    "🍔 Fome bateu? A gente resolve!",
+
     "😋 Sabor que conquista no primeiro pedaço",
+
     "🚀 Peça agora e mate sua fome!",
-    "💥 Promoções que você não pode perder",
-    "🍟 Combos que valem a pena!",
-    "🥤 Complete sua refeição com estilo",
+
+    "💥 Promoções imperdíveis",
+
+    "🍟 Combos que valem a pena",
   ];
 
   @override
   void initState() {
+
     super.initState();
+
     carregarNome();
+
     iniciarFrases();
+
+    iniciarBanner();
   }
 
+  @override
+  void dispose() {
+
+    pesquisaController.dispose();
+
+    bannerController.dispose();
+
+    super.dispose();
+  }
+
+  // 🔥 FRASES
   void iniciarFrases() {
+
     Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 4));
+
+      await Future.delayed(
+        const Duration(seconds: 4),
+      );
 
       if (!mounted) return false;
 
       setState(() {
-        fraseIndex = (fraseIndex + 1) % frases.length;
+
+        fraseIndex =
+            (fraseIndex + 1) %
+                frases.length;
       });
 
       return true;
     });
   }
 
+  // 🔥 BANNER AUTO
+  void iniciarBanner() {
+
+    Future.doWhile(() async {
+
+      await Future.delayed(
+        const Duration(seconds: 4),
+      );
+
+      if (!mounted) return false;
+
+      bannerAtual++;
+
+      if (bannerAtual >=
+          banners.length) {
+
+        bannerAtual = 0;
+      }
+
+      bannerController.animateToPage(
+
+        bannerAtual,
+
+        duration:
+            const Duration(
+          milliseconds: 600,
+        ),
+
+        curve: Curves.easeInOut,
+      );
+
+      return true;
+    });
+  }
+
+  // 🔥 NOME USUÁRIO
   Future<void> carregarNome() async {
-    final user = FirebaseAuth.instance.currentUser;
+
+    final user =
+        FirebaseAuth.instance.currentUser;
+
     if (user == null) return;
 
-    final doc = await FirebaseFirestore.instance
-        .collection("usuarios")
-        .doc(user.uid)
-        .get();
+    final doc =
+        await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(user.uid)
+            .get();
 
     if (!mounted) return;
 
     setState(() {
-      nomeCliente = doc.exists ? doc["nome"] ?? "Cliente" : "Cliente";
+
+      nomeCliente = doc.exists
+          ? doc["nome"] ?? "Cliente"
+          : "Cliente";
+
       carregando = false;
     });
   }
 
-  void adicionarAoCarrinho(String nome, dynamic preco, int index) async {
+  // 🔥 CARRINHO
+  void adicionarAoCarrinho(
+
+    String nome,
+
+    dynamic preco,
+
+    int index,
+  ) async {
+
     setState(() {
       animatingIndex = index;
     });
 
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(
+      const Duration(milliseconds: 200),
+    );
 
     setState(() {
-      final i = carrinho.indexWhere((item) => item["nomeProduto"] == nome);
+
+      final i = carrinho.indexWhere(
+
+        (item) =>
+            item["nomeProduto"] ==
+            nome,
+      );
 
       if (i >= 0) {
+
         carrinho[i]["quantidade"]++;
+
       } else {
+
         carrinho.add({
+
           "nomeProduto": nome,
+
           "preco": preco,
+
           "quantidade": 1,
         });
       }
@@ -94,213 +217,716 @@ class _ClientScreenState extends State<ClientScreen> {
       animatingIndex = -1;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+
       SnackBar(
-        backgroundColor: const Color(0xFF7A2323),
-        content: Text("🍔 $nome adicionado ao carrinho"),
+
+        backgroundColor:
+            const Color(0xFF7A2323),
+
+        content: Text(
+          "🍔 $nome adicionado ao carrinho",
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final isDark =
+        Theme.of(context).brightness ==
+            Brightness.dark;
 
     return Scaffold(
+
+      extendBodyBehindAppBar: true,
+
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+
+        backgroundColor:
+            Colors.transparent,
+
         elevation: 0,
-
-        leading: IconButton(
-          icon: const Icon(Icons.logout, color: Colors.white),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-            );
-          },
-        ),
-
-        title: const Text(
-          "MANÁ LANCHES",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
 
         centerTitle: true,
 
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.shopping_cart,
-                    color: Colors.white),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CarrinhoScreen(
-                        carrinho: carrinho,
-                        nomeCliente: nomeCliente,
-                      ),
-                    ),
-                  );
-                },
+        title: const Text(
+
+          "MANÁ LANCHES",
+
+          style: TextStyle(
+
+            color: Colors.white,
+
+            fontWeight:
+                FontWeight.bold,
+
+            letterSpacing: 1,
+          ),
+        ),
+
+        leading: Padding(
+
+          padding:
+              const EdgeInsets.only(
+            left: 12,
+          ),
+
+          child: Container(
+
+            decoration:
+                BoxDecoration(
+
+              color: Colors.white
+                  .withValues(alpha: 0.10),
+
+              borderRadius:
+                  BorderRadius.circular(
+                14,
+              ),
+            ),
+
+            child: IconButton(
+
+              icon: const Icon(
+
+                Icons.logout,
+
+                color: Colors.white,
               ),
 
-              if (carrinho.isNotEmpty)
-                Positioned(
-                  right: 5,
-                  top: 5,
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(20),
+              onPressed: () {
+
+                Navigator.pushReplacement(
+
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const LoginScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+
+        actions: [
+
+          Padding(
+
+            padding:
+                const EdgeInsets.only(
+              right: 12,
+            ),
+
+            child: Stack(
+
+              children: [
+
+                Container(
+
+                  decoration:
+                      BoxDecoration(
+
+                    color: Colors.white
+                        .withValues(
+                            alpha: 0.10),
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      14,
                     ),
-                    child: Text(
-                      carrinho.length.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                  ),
+
+                  child: IconButton(
+
+                    icon: const Icon(
+
+                      Icons.shopping_cart,
+
+                      color: Colors.white,
+                    ),
+
+                    onPressed: () {
+
+                      Navigator.push(
+
+                        context,
+
+                        MaterialPageRoute(
+
+                          builder: (_) =>
+                              CarrinhoScreen(
+
+                            carrinho:
+                                carrinho,
+
+                            nomeCliente:
+                                nomeCliente,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                if (carrinho.isNotEmpty)
+
+                  Positioned(
+
+                    right: 2,
+                    top: 2,
+
+                    child: Container(
+
+                      padding:
+                          const EdgeInsets.all(
+                        5,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color: Colors.red,
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          20,
+                        ),
+                      ),
+
+                      child: Text(
+
+                        carrinho.length
+                            .toString(),
+
+                        style:
+                            const TextStyle(
+
+                          color:
+                              Colors.white,
+
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
 
-      extendBodyBehindAppBar: true,
-
       body: Container(
+
         width: double.infinity,
+
         decoration: BoxDecoration(
+
           gradient: LinearGradient(
+
             colors: isDark
                 ? [
-                    const Color(0xFF111111),
-                    const Color(0xFF1B1B1B),
-                    const Color(0xFF252525),
+
+                    const Color(
+                        0xFF111111),
+
+                    const Color(
+                        0xFF1B1B1B),
+
+                    const Color(
+                        0xFF252525),
                   ]
                 : [
-                    const Color(0xFF5C1A1B),
-                    const Color(0xFF7A2323),
-                    const Color(0xFFB33939),
+
+                    const Color(
+                        0xFF5C1A1B),
+
+                    const Color(
+                        0xFF7A2323),
+
+                    const Color(
+                        0xFF9B2C2C),
+
+                    const Color(
+                        0xFFB33939),
                   ],
+
+            begin: Alignment.topLeft,
+
+            end:
+                Alignment.bottomRight,
           ),
         ),
 
         child: SafeArea(
+
           child: Padding(
-            padding: const EdgeInsets.all(18),
+
+            padding:
+                const EdgeInsets.all(
+              20,
+            ),
 
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
 
               children: [
+
                 Text(
+
                   carregando
                       ? "Carregando..."
                       : "Olá, $nomeCliente 👋",
+
                   style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+
+                    fontSize: 30,
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                    color:
+                        Colors.white,
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
 
                 AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
+
+                  duration:
+                      const Duration(
+                    milliseconds: 500,
+                  ),
+
                   child: Text(
+
                     frases[fraseIndex],
-                    key: ValueKey(frases[fraseIndex]),
-                    style: const TextStyle(
-                      color: Colors.white70,
+
+                    key: ValueKey(
+                      frases[fraseIndex],
+                    ),
+
+                    style:
+                        const TextStyle(
+
+                      color:
+                          Colors.white70,
+
                       fontSize: 16,
-                      fontStyle: FontStyle.italic,
+
+                      fontStyle:
+                          FontStyle.italic,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
 
+                // 🔥 CARROSSEL
                 SizedBox(
-                  height: 45,
+
+                  height: 220,
+
+                  child:
+                      PageView.builder(
+
+                    controller:
+                        bannerController,
+
+                    itemCount:
+                        banners.length,
+
+                    itemBuilder:
+                        (_, index) {
+
+                      return Container(
+
+                        margin:
+                            const EdgeInsets.only(
+                          right: 8,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            30,
+                          ),
+
+                          boxShadow: [
+
+                            BoxShadow(
+
+                              color: Colors
+                                  .black
+                                  .withValues(
+                                      alpha:
+                                          0.30),
+
+                              blurRadius:
+                                  20,
+
+                              offset:
+                                  const Offset(
+                                0,
+                                10,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        child: ClipRRect(
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            30,
+                          ),
+
+                          child: Stack(
+
+                            children: [
+
+                              Positioned.fill(
+
+                                child:
+                                    Image.network(
+
+                                  banners[
+                                      index],
+
+                                  fit:
+                                      BoxFit.cover,
+                                ),
+                              ),
+
+                              Positioned.fill(
+
+                                child:
+                                    Container(
+
+                                  decoration:
+                                      BoxDecoration(
+
+                                    gradient:
+                                        LinearGradient(
+
+                                      begin:
+                                          Alignment.topCenter,
+
+                                      end:
+                                          Alignment.bottomCenter,
+
+                                      colors: [
+
+                                        Colors.black.withValues(
+                                            alpha:
+                                                0.15),
+
+                                        Colors.black.withValues(
+                                            alpha:
+                                                0.80),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              Positioned(
+
+                                left: 24,
+                                bottom: 24,
+
+                                child: Column(
+
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+
+                                  children: [
+
+                                    const Text(
+
+                                      "MANÁ LANCHES 🍔",
+
+                                      style:
+                                          TextStyle(
+
+                                        color:
+                                            Colors.white,
+
+                                        fontSize:
+                                            28,
+
+                                        fontWeight:
+                                            FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    const SizedBox(
+                                        height:
+                                            8),
+
+                                    Text(
+
+                                      "Peça agora e receba rápido",
+
+                                      style:
+                                          TextStyle(
+
+                                        color: Colors
+                                            .white
+                                            .withValues(
+                                                alpha:
+                                                    0.80),
+
+                                        fontSize:
+                                            15,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // 🔥 PESQUISA
+                Container(
+
+                  decoration:
+                      BoxDecoration(
+
+                    color: Colors.white
+                        .withValues(
+                            alpha: 0.10),
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      20,
+                    ),
+
+                    border: Border.all(
+                      color:
+                          Colors.white24,
+                    ),
+                  ),
+
+                  child: TextField(
+
+                    controller:
+                        pesquisaController,
+
+                    onChanged: (value) {
+
+                      setState(() {
+
+                        pesquisa = value
+                            .toLowerCase();
+                      });
+                    },
+
+                    style:
+                        const TextStyle(
+                      color:
+                          Colors.white,
+                    ),
+
+                    decoration:
+                        const InputDecoration(
+
+                      hintText:
+                          "Pesquisar produto...",
+
+                      hintStyle:
+                          TextStyle(
+                        color:
+                            Colors.white60,
+                      ),
+
+                      prefixIcon:
+                          Icon(
+
+                        Icons.search,
+
+                        color:
+                            Colors.white70,
+                      ),
+
+                      border:
+                          InputBorder.none,
+
+                      contentPadding:
+                          EdgeInsets.symmetric(
+                        vertical: 16,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 22),
+
+                // 🔥 CATEGORIAS
+                SizedBox(
+
+                  height: 52,
+
                   child: ListView(
-                    scrollDirection: Axis.horizontal,
+
+                    scrollDirection:
+                        Axis.horizontal,
+
                     children: [
-                      categoriaChip("Todos"),
-                      categoriaChip("Hamburguer"),
-                      categoriaChip("Pizza"),
-                      categoriaChip("Bebida"),
-                      categoriaChip("Combos"),
-                      categoriaChip("Batatas"),
+
+                      categoriaChip(
+                          "Todos"),
+
+                      categoriaChip(
+                          "Hamburguer"),
+
+                      categoriaChip(
+                          "Pizza"),
+
+                      categoriaChip(
+                          "Bebida"),
+
+                      categoriaChip(
+                          "Combos"),
+
+                      categoriaChip(
+                          "Batatas"),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
 
                 const Text(
+
                   "Produtos",
+
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+
+                    fontSize: 24,
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                    color:
+                        Colors.white,
                   ),
                 ),
 
-                const SizedBox(height: 15),
+                const SizedBox(height: 18),
 
                 Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection("produtos")
-                        .orderBy("nome")
-                        .snapshots(),
 
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
+                  child: StreamBuilder<
+                      QuerySnapshot>(
+
+                    stream:
+                        FirebaseFirestore
+                            .instance
+                            .collection(
+                                "produtos")
+                            .orderBy(
+                                "nome")
+                            .snapshots(),
+
+                    builder:
+                        (context, snapshot) {
+
+                      if (!snapshot
+                          .hasData) {
+
                         return const Center(
-                          child: CircularProgressIndicator(),
+                          child:
+                              CircularProgressIndicator(),
                         );
                       }
 
-                      final docs = snapshot.data!.docs;
+                      final docs =
+                          snapshot
+                              .data!
+                              .docs;
 
-                      final filtrados = docs.where((doc) {
+                      final filtrados =
+                          docs.where((doc) {
+
                         final data =
-                            doc.data() as Map<String, dynamic>;
+                            doc.data()
+                                as Map<
+                                    String,
+                                    dynamic>;
 
                         final categoria =
-                            (data["categoria"] ?? "")
+                            (data["categoria"] ??
+                                    "")
                                 .toString()
                                 .toLowerCase();
 
-                        if (categoriaSelecionada == "todos") {
-                          return true;
-                        }
+                        final nome =
+                            (data["nome"] ??
+                                    "")
+                                .toString()
+                                .toLowerCase();
 
-                        return categoria ==
-                            categoriaSelecionada.toLowerCase();
+                        final categoriaOk =
+                            categoriaSelecionada ==
+                                    "todos"
+                                ? true
+                                : categoria ==
+                                    categoriaSelecionada;
+
+                        final pesquisaOk =
+                            nome.contains(
+                                pesquisa);
+
+                        return categoriaOk &&
+                            pesquisaOk;
+
                       }).toList();
 
                       return ListView.builder(
-                        itemCount: filtrados.length,
-                        itemBuilder: (context, index) {
-                          final doc = filtrados[index];
+
+                        itemCount:
+                            filtrados.length,
+
+                        itemBuilder:
+                            (context, index) {
+
+                          final doc =
+                              filtrados[index];
+
                           final data =
-                              doc.data() as Map<String, dynamic>;
+                              doc.data()
+                                  as Map<
+                                      String,
+                                      dynamic>;
 
                           return foodItem(
-                            data["nome"] ?? "",
-                            data["preco"] ?? 0,
+
+                            data["nome"] ??
+                                "",
+
+                            data["preco"] ??
+                                0,
+
+                            data["imagem"] ??
+                                "",
+
                             index,
                           );
                         },
@@ -316,75 +942,370 @@ class _ClientScreenState extends State<ClientScreen> {
     );
   }
 
-  // 🍔 CATEGORIA CHIP
-  Widget categoriaChip(String titulo) {
+  // 🔥 CHIP CATEGORIA
+  Widget categoriaChip(
+      String titulo) {
+
     final selecionado =
-        categoriaSelecionada.toLowerCase() ==
-        titulo.toLowerCase();
+        categoriaSelecionada
+                .toLowerCase() ==
+            titulo.toLowerCase();
 
     return GestureDetector(
+
       onTap: () {
+
         setState(() {
-          categoriaSelecionada = titulo.toLowerCase();
+
+          categoriaSelecionada =
+              titulo.toLowerCase();
         });
       },
-      child: Container(
-        margin: const EdgeInsets.only(right: 10),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-        decoration: BoxDecoration(
-          color: selecionado
-              ? const Color(0xFFFFD166)
-              : Colors.white24,
-          borderRadius: BorderRadius.circular(20),
+
+      child: AnimatedContainer(
+
+        duration:
+            const Duration(
+          milliseconds: 250,
         ),
+
+        margin:
+            const EdgeInsets.only(
+          right: 12,
+        ),
+
+        padding:
+            const EdgeInsets.symmetric(
+
+          horizontal: 22,
+          vertical: 12,
+        ),
+
+        decoration: BoxDecoration(
+
+          gradient: selecionado
+              ? const LinearGradient(
+
+                  colors: [
+
+                    Color(
+                        0xFFFFD166),
+
+                    Color(
+                        0xFFFFB703),
+                  ],
+                )
+              : null,
+
+          color: selecionado
+              ? null
+              : Colors.white
+                  .withValues(
+                      alpha: 0.10),
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          border: Border.all(
+
+            color: Colors.white
+                .withValues(
+                    alpha: 0.12),
+          ),
+        ),
+
         child: Text(
+
           titulo,
+
           style: TextStyle(
-            color: selecionado ? Colors.black : Colors.white,
-            fontWeight: FontWeight.bold,
+
+            color: selecionado
+                ? Colors.black
+                : Colors.white,
+
+            fontWeight:
+                FontWeight.bold,
           ),
         ),
       ),
     );
   }
 
-  // 🍔 CARD PRODUTO
-  Widget foodItem(String nome, dynamic preco, int index) {
-    final isAnimating = animatingIndex == index;
+  // 🔥 CARD PRODUTO
+  Widget foodItem(
+
+    String nome,
+
+    dynamic preco,
+
+    String imagem,
+
+    int index,
+  ) {
+
+    final isAnimating =
+        animatingIndex == index;
 
     return AnimatedScale(
-      duration: const Duration(milliseconds: 200),
-      scale: isAnimating ? 0.97 : 1.0,
+
+      duration:
+          const Duration(
+        milliseconds: 200,
+      ),
+
+      scale:
+          isAnimating ? 0.97 : 1,
+
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+
+        margin:
+            const EdgeInsets.only(
+          bottom: 20,
         ),
-        child: ListTile(
-          leading: const CircleAvatar(
-            backgroundColor: Color(0xFF7A2323),
-            child: Icon(Icons.fastfood, color: Colors.white),
+
+        decoration: BoxDecoration(
+
+          color: Colors.white
+              .withValues(
+                  alpha: 0.10),
+
+          borderRadius:
+              BorderRadius.circular(
+            28,
           ),
 
-          title: Text(nome),
+          border: Border.all(
 
-          subtitle: Text("R\$ $preco"),
-
-          trailing: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  isAnimating ? Colors.green : const Color(0xFF8B0000),
-            ),
-            onPressed: () {
-              adicionarAoCarrinho(nome, preco, index);
-            },
-            child: Text(
-              isAnimating ? "✔" : "Adicionar",
-              style: const TextStyle(color: Colors.white),
-            ),
+            color: Colors.white
+                .withValues(
+                    alpha: 0.12),
           ),
+
+          boxShadow: [
+
+            BoxShadow(
+
+              color: Colors.black
+                  .withValues(
+                      alpha: 0.18),
+
+              blurRadius: 18,
+
+              offset:
+                  const Offset(
+                0,
+                8,
+              ),
+            ),
+          ],
+        ),
+
+        child: Row(
+
+          children: [
+
+            ClipRRect(
+
+              borderRadius:
+                  const BorderRadius.only(
+
+                topLeft:
+                    Radius.circular(
+                        28),
+
+                bottomLeft:
+                    Radius.circular(
+                        28),
+              ),
+
+              child: Image.network(
+
+                imagem,
+
+                width: 120,
+                height: 120,
+
+                fit: BoxFit.cover,
+
+                errorBuilder:
+                    (_, __, ___) {
+
+                  return Container(
+
+                    width: 120,
+                    height: 120,
+
+                    color:
+                        Colors.black12,
+
+                    child: const Icon(
+
+                      Icons.fastfood,
+
+                      color:
+                          Colors.white,
+
+                      size: 40,
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            Expanded(
+
+              child: Padding(
+
+                padding:
+                    const EdgeInsets.all(
+                  16,
+                ),
+
+                child: Column(
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+
+                    Text(
+
+                      nome,
+
+                      style:
+                          const TextStyle(
+
+                        color:
+                            Colors.white,
+
+                        fontSize:
+                            20,
+
+                        fontWeight:
+                            FontWeight
+                                .bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                        height: 10),
+
+                    Container(
+
+                      padding:
+                          const EdgeInsets.symmetric(
+
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color: const Color(
+                          0xFFFFD166,
+                        ).withValues(
+                            alpha:
+                                0.18),
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          12,
+                        ),
+                      ),
+
+                      child: Text(
+
+                        "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
+
+                        style:
+                            const TextStyle(
+
+                          color: Color(
+                              0xFFFFD166),
+
+                          fontWeight:
+                              FontWeight.bold,
+
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(
+                        height: 16),
+
+                    SizedBox(
+
+                      width:
+                          double.infinity,
+
+                      height: 46,
+
+                      child:
+                          ElevatedButton(
+
+                        style:
+                            ElevatedButton.styleFrom(
+
+                          backgroundColor:
+                              const Color(
+                            0xFF7A2323,
+                          ),
+
+                          elevation: 6,
+
+                          shape:
+                              RoundedRectangleBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              16,
+                            ),
+                          ),
+                        ),
+
+                        onPressed: () {
+
+                          adicionarAoCarrinho(
+
+                            nome,
+
+                            preco,
+
+                            index,
+                          );
+                        },
+
+                        child: Text(
+
+                          isAnimating
+                              ? "✔ Adicionado"
+                              : "Adicionar",
+
+                          style:
+                              const TextStyle(
+
+                            color:
+                                Colors.white,
+
+                            fontWeight:
+                                FontWeight.bold,
+
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

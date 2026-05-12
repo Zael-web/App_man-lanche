@@ -316,7 +316,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
                       const SizedBox(height: 14),
 
-                      // 🚚 STATUS
+                      // STATUS
                       Row(
 
                         children: [
@@ -364,7 +364,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
                       const SizedBox(height: 15),
 
-                      // 🔥 ALTERAR STATUS
+                      // ALTERAR STATUS
                       Wrap(
 
                         spacing: 8,

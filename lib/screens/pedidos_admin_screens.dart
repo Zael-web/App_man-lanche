@@ -29,16 +29,118 @@ class _PedidosAdminScreenState
 
     ScaffoldMessenger.of(context).showSnackBar(
 
-      SnackBar(
+  SnackBar(
 
-        backgroundColor: Colors.green,
+    behavior: SnackBarBehavior.floating,
 
-        content: Text(
-          "Pedido atualizado para $status",
+    backgroundColor: Colors.transparent,
+
+    elevation: 0,
+
+    duration: const Duration(seconds: 3),
+
+    content: Container(
+
+      padding: const EdgeInsets.all(16),
+
+      decoration: BoxDecoration(
+
+        gradient: const LinearGradient(
+
+          colors: [
+
+            Color(0xFF7A2323),
+            Color(0xFFB33939),
+
+          ],
         ),
+
+        borderRadius: BorderRadius.circular(20),
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color: Colors.black.withValues(alpha: 0.25),
+
+            blurRadius: 10,
+
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-    );
-  }
+
+      child: Row(
+
+        children: [
+
+          Container(
+
+            padding: const EdgeInsets.all(10),
+
+            decoration: BoxDecoration(
+
+              color: Colors.white.withValues(alpha: 0.15),
+
+              borderRadius: BorderRadius.circular(14),
+            ),
+
+            child: const Icon(
+
+              Icons.delivery_dining,
+
+              color: Colors.white,
+
+              size: 28,
+            ),
+          ),
+
+          const SizedBox(width: 14),
+
+          Expanded(
+
+            child: Column(
+
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              mainAxisSize: MainAxisSize.min,
+
+              children: [
+
+                const Text(
+
+                  "Pedido Atualizado",
+
+                  style: TextStyle(
+
+                    color: Colors.white,
+
+                    fontWeight: FontWeight.bold,
+
+                    fontSize: 16,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+
+                  "Seu pedido agora está: $status",
+
+                  style: const TextStyle(
+
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+ );
+}
 
   // 🔥 COR STATUS
   Color corStatus(String status) {

@@ -67,18 +67,21 @@ Future<void> finalizar() async {
     });
   }
 
-  await FirebaseFirestore.instance
-      .collection("pedidos")
-      .add({
-    "itens": itensPedido,
-    "usuarioId": user!.uid,
-    "nomeCliente": widget.nomeCliente,
-    "status": "Pendente",
-    "total": total,
-    "data": FieldValue.serverTimestamp(),
-  });
+final pedidoRef = await FirebaseFirestore.instance
+    .collection("pedidos")
+    .add({
+  "itens": itensPedido,
+  "usuarioId": user!.uid,
+  "nomeCliente": widget.nomeCliente,
+  "status": "Pendente",
+  "total": total,
+  "data": FieldValue.serverTimestamp(),
+});
 
-  if (!mounted) return;
+final pedidoId = pedidoRef.id;
+
+// 🔥 VOLTA PARA CLIENTSCREEN
+ if (!mounted) return;
 
   ScaffoldMessenger.of(context).showSnackBar(
     const SnackBar(
@@ -90,7 +93,7 @@ Future<void> finalizar() async {
     widget.carrinho.clear();
   });
 
-  Navigator.pop(context);
+  Navigator.pop(context, pedidoId);
 }
 
   @override

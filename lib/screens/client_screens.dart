@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
 import 'package:mana_lanche/screens/carrinho_screens.dart';
-
+import 'dart:async';
 class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
 
@@ -13,81 +13,210 @@ class ClientScreen extends StatefulWidget {
       _ClientScreenState();
 }
 
-class _ClientScreenState
-    extends State<ClientScreen> {
+
+
+class _ClientScreenState extends State<ClientScreen> {
 
   String nomeCliente = "";
   bool carregando = true;
 
-  List<Map<String, dynamic>>
-      carrinho = [];
+  List<Map<String, dynamic>> carrinho = [];
 
-  String categoriaSelecionada =
-      "todos";
+  String categoriaSelecionada = "todos";
 
   int animatingIndex = -1;
 
   int fraseIndex = 0;
 
-  final pesquisaController =
-      TextEditingController();
+  final pesquisaController = TextEditingController();
 
   String pesquisa = "";
 
-  final PageController
-      bannerController =
-      PageController();
+  final PageController bannerController = PageController();
 
   int bannerAtual = 0;
 
+  StreamSubscription? pedidosSub; // ✅ CORRIGIDO (com espaço)
+
+  String? ultimoStatus;
+
+  String? pedidoIdAtual;
+
   final List<String> banners = [
-    
-     
     "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
-
     "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-
     "https://images.unsplash.com/photo-1550547660-d9450f859349",
-    
   ];
 
   final List<String> frases = [
-
     "🔥 Impossível resistir",
-
     "🍔 Fome bateu? A gente resolve!",
-
     "😋 Sabor que conquista no primeiro pedaço",
-
     "🚀 Peça agora e mate sua fome!",
-
     "💥 Promoções imperdíveis",
-
     "🍟 Combos que valem a pena",
   ];
 
   @override
   void initState() {
-
     super.initState();
 
     carregarNome();
-
     iniciarFrases();
-
     iniciarBanner();
+    
   }
 
   @override
   void dispose() {
-
     pesquisaController.dispose();
-
     bannerController.dispose();
+
+    pedidosSub?.cancel(); // 🔥 IMPORTANTE
 
     super.dispose();
   }
 
+  // 🔥 ESCUTAR MUDANÇA DO PEDIDO
+  void escutarPedidoUnico() {
+  if (pedidoIdAtual == null) return;
+
+  pedidosSub = FirebaseFirestore.instance
+      .collection("pedidos")
+      .doc(pedidoIdAtual)
+      .snapshots()
+      .listen((doc) {
+
+    final data = doc.data();
+    if (data == null) return;
+
+    final status = data["status"];
+
+    if (ultimoStatus != status) {
+      ultimoStatus = status;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+
+  SnackBar(
+
+    behavior: SnackBarBehavior.floating,
+
+    backgroundColor: Colors.transparent,
+
+    elevation: 0,
+
+    duration: const Duration(seconds: 3),
+
+    content: Container(
+
+      padding: const EdgeInsets.all(16),
+
+      decoration: BoxDecoration(
+
+        gradient: const LinearGradient(
+
+          colors: [
+
+            Color(0xFF7A2323),
+            Color(0xFFB33939),
+
+          ],
+        ),
+
+        borderRadius: BorderRadius.circular(20),
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color: Colors.black.withValues(alpha: 0.25),
+
+            blurRadius: 10,
+
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+
+      child: Row(
+
+        children: [
+
+          Container(
+
+            padding: const EdgeInsets.all(10),
+
+            decoration: BoxDecoration(
+
+              color: Colors.white.withValues(alpha: 0.15),
+
+              borderRadius: BorderRadius.circular(14),
+            ),
+
+            child: Icon(
+
+              status == "Entregue"
+                  ? Icons.check_circle
+                  : status == "Saiu entrega"
+                      ? Icons.delivery_dining
+                      : Icons.restaurant,
+
+              color: Colors.white,
+
+              size: 28,
+            ),
+          ),
+
+          const SizedBox(width: 14),
+
+          Expanded(
+
+            child: Column(
+
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              mainAxisSize: MainAxisSize.min,
+
+              children: [
+
+                const Text(
+
+                  "Pedido Atualizado",
+
+                  style: TextStyle(
+
+                    color: Colors.white,
+
+                    fontWeight: FontWeight.bold,
+
+                    fontSize: 16,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+
+                  "Seu pedido agora está: $status",
+
+                  style: const TextStyle(
+
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+);
+      }
+    }
+  });
+}
   // 🔥 FRASES
   void iniciarFrases() {
 
@@ -346,9 +475,9 @@ class _ClientScreenState
                       color: Colors.white,
                     ),
 
-                    onPressed: () {
+                    onPressed: () async {
 
-                      Navigator.push(
+                    final pedidoId = await Navigator.push(
 
                         context,
 
@@ -360,11 +489,16 @@ class _ClientScreenState
                             carrinho:
                                 carrinho,
 
-                            nomeCliente:
-                                nomeCliente,
+                            nomeCliente: nomeCliente,
                           ),
                         ),
                       );
+                      if (pedidoId != null) {
+
+                        pedidoIdAtual = pedidoId;
+
+                        escutarPedidoUnico();
+                      }
                     },
                   ),
                 ),

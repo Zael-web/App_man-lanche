@@ -5,18 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mana_lanche/screens/login_screens.dart';
 import 'package:mana_lanche/screens/carrinho_screens.dart';
 import 'dart:async';
+
 class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
 
   @override
-  State<ClientScreen> createState() =>
-      _ClientScreenState();
+  State<ClientScreen> createState() => _ClientScreenState();
 }
 
-
-
 class _ClientScreenState extends State<ClientScreen> {
-
   String nomeCliente = "";
   bool carregando = true;
 
@@ -64,7 +61,6 @@ class _ClientScreenState extends State<ClientScreen> {
     carregarNome();
     iniciarFrases();
     iniciarBanner();
-    
   }
 
   @override
@@ -79,160 +75,127 @@ class _ClientScreenState extends State<ClientScreen> {
 
   // 🔥 ESCUTAR MUDANÇA DO PEDIDO
   void escutarPedidoUnico() {
-  if (pedidoIdAtual == null) return;
+    if (pedidoIdAtual == null) return;
 
-  pedidosSub = FirebaseFirestore.instance
-      .collection("pedidos")
-      .doc(pedidoIdAtual)
-      .snapshots()
-      .listen((doc) {
+    pedidosSub = FirebaseFirestore.instance
+        .collection("pedidos")
+        .doc(pedidoIdAtual)
+        .snapshots()
+        .listen((doc) {
+          final data = doc.data();
+          if (data == null) return;
 
-    final data = doc.data();
-    if (data == null) return;
+          final status = data["status"];
 
-    final status = data["status"];
+          if (ultimoStatus != status) {
+            ultimoStatus = status;
 
-    if (ultimoStatus != status) {
-      ultimoStatus = status;
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+                  backgroundColor: Colors.transparent,
 
-  SnackBar(
+                  elevation: 0,
 
-    behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 3),
 
-    backgroundColor: Colors.transparent,
+                  content: Container(
+                    padding: const EdgeInsets.all(16),
 
-    elevation: 0,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF7A2323), Color(0xFFB33939)],
+                      ),
 
-    duration: const Duration(seconds: 3),
+                      borderRadius: BorderRadius.circular(20),
 
-    content: Container(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
 
-      padding: const EdgeInsets.all(16),
+                          blurRadius: 10,
 
-      decoration: BoxDecoration(
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
 
-        gradient: const LinearGradient(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
 
-          colors: [
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
 
-            Color(0xFF7A2323),
-            Color(0xFFB33939),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
 
-          ],
-        ),
+                          child: Icon(
+                            status == "Entregue"
+                                ? Icons.check_circle
+                                : status == "Saiu entrega"
+                                ? Icons.delivery_dining
+                                : Icons.restaurant,
 
-        borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
 
-        boxShadow: [
+                            size: 28,
+                          ),
+                        ),
 
-          BoxShadow(
+                        const SizedBox(width: 14),
 
-            color: Colors.black.withValues(alpha: 0.25),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
 
-            blurRadius: 10,
+                            mainAxisSize: MainAxisSize.min,
 
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+                            children: [
+                              const Text(
+                                "Pedido Atualizado",
 
-      child: Row(
+                                style: TextStyle(
+                                  color: Colors.white,
 
-        children: [
+                                  fontWeight: FontWeight.bold,
 
-          Container(
+                                  fontSize: 16,
+                                ),
+                              ),
 
-            padding: const EdgeInsets.all(10),
+                              const SizedBox(height: 4),
 
-            decoration: BoxDecoration(
+                              Text(
+                                "Seu pedido agora está: $status",
 
-              color: Colors.white.withValues(alpha: 0.15),
-
-              borderRadius: BorderRadius.circular(14),
-            ),
-
-            child: Icon(
-
-              status == "Entregue"
-                  ? Icons.check_circle
-                  : status == "Saiu entrega"
-                      ? Icons.delivery_dining
-                      : Icons.restaurant,
-
-              color: Colors.white,
-
-              size: 28,
-            ),
-          ),
-
-          const SizedBox(width: 14),
-
-          Expanded(
-
-            child: Column(
-
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              mainAxisSize: MainAxisSize.min,
-
-              children: [
-
-                const Text(
-
-                  "Pedido Atualizado",
-
-                  style: TextStyle(
-
-                    color: Colors.white,
-
-                    fontWeight: FontWeight.bold,
-
-                    fontSize: 16,
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+              );
+            }
+          }
+        });
+  }
 
-                const SizedBox(height: 4),
-
-                Text(
-
-                  "Seu pedido agora está: $status",
-
-                  style: const TextStyle(
-
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-  ),
-);
-      }
-    }
-  });
-}
   // 🔥 FRASES
   void iniciarFrases() {
-
     Future.doWhile(() async {
-
-      await Future.delayed(
-        const Duration(seconds: 4),
-      );
+      await Future.delayed(const Duration(seconds: 4));
 
       if (!mounted) return false;
 
       setState(() {
-
-        fraseIndex =
-            (fraseIndex + 1) %
-                frases.length;
+        fraseIndex = (fraseIndex + 1) % frases.length;
       });
 
       return true;
@@ -241,31 +204,21 @@ class _ClientScreenState extends State<ClientScreen> {
 
   // 🔥 BANNER AUTO
   void iniciarBanner() {
-
     Future.doWhile(() async {
-
-      await Future.delayed(
-        const Duration(seconds: 4),
-      );
+      await Future.delayed(const Duration(seconds: 4));
 
       if (!mounted) return false;
 
       bannerAtual++;
 
-      if (bannerAtual >=
-          banners.length) {
-
+      if (bannerAtual >= banners.length) {
         bannerAtual = 0;
       }
 
       bannerController.animateToPage(
-
         bannerAtual,
 
-        duration:
-            const Duration(
-          milliseconds: 600,
-        ),
+        duration: const Duration(milliseconds: 600),
 
         curve: Curves.easeInOut,
       );
@@ -276,25 +229,19 @@ class _ClientScreenState extends State<ClientScreen> {
 
   // 🔥 NOME USUÁRIO
   Future<void> carregarNome() async {
-
-    final user =
-        FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
 
-    final doc =
-        await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(user.uid)
-            .get();
+    final doc = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(user.uid)
+        .get();
 
     if (!mounted) return;
 
     setState(() {
-
-      nomeCliente = doc.exists
-          ? doc["nome"] ?? "Cliente"
-          : "Cliente";
+      nomeCliente = doc.exists ? doc["nome"] ?? "Cliente" : "Cliente";
 
       carregando = false;
     });
@@ -302,136 +249,89 @@ class _ClientScreenState extends State<ClientScreen> {
 
   // 🔥 CARRINHO
   void adicionarAoCarrinho(
-  String nome,
-  dynamic preco,
-  int index,
-  String imagem,
-) async {
+    String nome,
+    dynamic preco,
+    int index,
+    String imagem,
+  ) async {
+    setState(() {
+      animatingIndex = index;
+    });
 
-  setState(() {
-    animatingIndex = index;
-  });
+    await Future.delayed(const Duration(milliseconds: 200));
 
-  await Future.delayed(
-    const Duration(milliseconds: 200),
-  );
+    setState(() {
+      final i = carrinho.indexWhere((item) => item["nomeProduto"] == nome);
 
-  setState(() {
+      if (i >= 0) {
+        carrinho[i]["quantidade"]++;
+      } else {
+        carrinho.add({
+          "nomeProduto": nome,
+          "preco": preco,
+          "quantidade": 1,
 
-    final i = carrinho.indexWhere(
-      (item) => item["nomeProduto"] == nome,
-    );
+          // 🔥 ISSO É O MAIS IMPORTANTE
+          "imagem": imagem,
+        });
+      }
 
-    if (i >= 0) {
+      animatingIndex = -1;
+    });
 
-      carrinho[i]["quantidade"]++;
-
-    } else {
-
-      carrinho.add({
-        "nomeProduto": nome,
-        "preco": preco,
-        "quantidade": 1,
-
-        // 🔥 ISSO É O MAIS IMPORTANTE
-        "imagem": imagem,
-      });
-    }
-
-    animatingIndex = -1;
-  });
-
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor: const Color(0xFF7A2323),
 
-        backgroundColor:
-            const Color(0xFF7A2323),
-
-        content: Text(
-          "🍔 $nome adicionado ao carrinho",
-        ),
+        content: Text("🍔 $nome adicionado ao carrinho"),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-
       extendBodyBehindAppBar: true,
 
       appBar: AppBar(
-
-        backgroundColor:
-            Colors.transparent,
+        backgroundColor: Colors.transparent,
 
         elevation: 0,
 
         centerTitle: true,
 
         title: const Text(
-
           "MANÁ LANCHES",
 
           style: TextStyle(
-
             color: Colors.white,
 
-            fontWeight:
-                FontWeight.bold,
+            fontWeight: FontWeight.bold,
 
             letterSpacing: 1,
           ),
         ),
 
         leading: Padding(
-
-          padding:
-              const EdgeInsets.only(
-            left: 12,
-          ),
+          padding: const EdgeInsets.only(left: 12),
 
           child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.10),
 
-            decoration:
-                BoxDecoration(
-
-              color: Colors.white
-                  .withValues(alpha: 0.10),
-
-              borderRadius:
-                  BorderRadius.circular(
-                14,
-              ),
+              borderRadius: BorderRadius.circular(14),
             ),
 
             child: IconButton(
-
-              icon: const Icon(
-
-                Icons.logout,
-
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.logout, color: Colors.white),
 
               onPressed: () {
-
                 Navigator.pushReplacement(
-
                   context,
 
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        const LoginScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
                 );
               },
             ),
@@ -439,62 +339,34 @@ class _ClientScreenState extends State<ClientScreen> {
         ),
 
         actions: [
-
           Padding(
-
-            padding:
-                const EdgeInsets.only(
-              right: 12,
-            ),
+            padding: const EdgeInsets.only(right: 12),
 
             child: Stack(
-
               children: [
-
                 Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.10),
 
-                  decoration:
-                      BoxDecoration(
-
-                    color: Colors.white
-                        .withValues(
-                            alpha: 0.10),
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      14,
-                    ),
+                    borderRadius: BorderRadius.circular(14),
                   ),
 
                   child: IconButton(
-
-                    icon: const Icon(
-
-                      Icons.shopping_cart,
-
-                      color: Colors.white,
-                    ),
+                    icon: const Icon(Icons.shopping_cart, color: Colors.white),
 
                     onPressed: () async {
-
-                    final pedidoId = await Navigator.push(
-
+                      final pedidoId = await Navigator.push(
                         context,
 
                         MaterialPageRoute(
-
-                          builder: (_) =>
-                              CarrinhoScreen(
-
-                            carrinho:
-                                carrinho,
+                          builder: (_) => CarrinhoScreen(
+                            carrinho: carrinho,
 
                             nomeCliente: nomeCliente,
                           ),
                         ),
                       );
                       if (pedidoId != null) {
-
                         pedidoIdAtual = pedidoId;
 
                         escutarPedidoUnico();
@@ -504,40 +376,24 @@ class _ClientScreenState extends State<ClientScreen> {
                 ),
 
                 if (carrinho.isNotEmpty)
-
                   Positioned(
-
                     right: 2,
                     top: 2,
 
                     child: Container(
+                      padding: const EdgeInsets.all(5),
 
-                      padding:
-                          const EdgeInsets.all(
-                        5,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-
+                      decoration: BoxDecoration(
                         color: Colors.red,
 
-                        borderRadius:
-                            BorderRadius.circular(
-                          20,
-                        ),
+                        borderRadius: BorderRadius.circular(20),
                       ),
 
                       child: Text(
+                        carrinho.length.toString(),
 
-                        carrinho.length
-                            .toString(),
-
-                        style:
-                            const TextStyle(
-
-                          color:
-                              Colors.white,
+                        style: const TextStyle(
+                          color: Colors.white,
 
                           fontSize: 11,
                         ),
@@ -549,276 +405,125 @@ class _ClientScreenState extends State<ClientScreen> {
           ),
         ],
       ),
-
       body: Container(
-
         width: double.infinity,
-
         decoration: BoxDecoration(
-
           gradient: LinearGradient(
-
             colors: isDark
                 ? [
-
-                    const Color(
-                        0xFF111111),
-
-                    const Color(
-                        0xFF1B1B1B),
-
-                    const Color(
-                        0xFF252525),
+                    const Color(0xFF111111),
+                    const Color(0xFF1B1B1B),
+                    const Color(0xFF252525),
                   ]
                 : [
-
-                    const Color(
-                        0xFF5C1A1B),
-
-                    const Color(
-                        0xFF7A2323),
-
-                    const Color(
-                        0xFF9B2C2C),
-
-                    const Color(
-                        0xFFB33939),
+                    const Color(0xFF5C1A1B),
+                    const Color(0xFF7A2323),
+                    const Color(0xFF9B2C2C),
+                    const Color(0xFFB33939),
                   ],
-
             begin: Alignment.topLeft,
-
-            end:
-                Alignment.bottomRight,
+            end: Alignment.bottomRight,
           ),
         ),
 
         child: SafeArea(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
 
-          child: Padding(
-
-            padding:
-                const EdgeInsets.all(
-              20,
-            ),
-
-            child: Column(
-
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-
-              children: [
-
-                Text(
-
-                  carregando
-                      ? "Carregando..."
-                      : "Olá, $nomeCliente 👋",
-
-                  style: const TextStyle(
-
-                    fontSize: 30,
-
-                    fontWeight:
-                        FontWeight.bold,
-
-                    color:
-                        Colors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                AnimatedSwitcher(
-
-                  duration:
-                      const Duration(
-                    milliseconds: 500,
-                  ),
-
-                  child: Text(
-
-                    frases[fraseIndex],
-
-                    key: ValueKey(
-                      frases[fraseIndex],
-                    ),
-
-                    style:
-                        const TextStyle(
-
-                      color:
-                          Colors.white70,
-
-                      fontSize: 16,
-
-                      fontStyle:
-                          FontStyle.italic,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // 🔥 CARROSSEL
-                SizedBox(
-
-                  height: 220,
-
-                  child:
-                      PageView.builder(
-
-                    controller:
-                        bannerController,
-
-                    itemCount:
-                        banners.length,
-
-                    itemBuilder:
-                        (_, index) {
-
-                      return Container(
-
-                        margin:
-                            const EdgeInsets.only(
-                          right: 8,
+            slivers: [
+              // 🔥 NOME + FRASES
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        carregando ? "Carregando..." : "Olá, $nomeCliente 👋",
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
+                      ),
 
-                        decoration:
-                            BoxDecoration(
+                      const SizedBox(height: 8),
 
-                          borderRadius:
-                              BorderRadius.circular(
-                            30,
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        child: Text(
+                          frases[fraseIndex],
+                          key: ValueKey(frases[fraseIndex]),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
                           ),
+                        ),
+                      ),
 
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 🔥 BANNER
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 220,
+                  child: PageView.builder(
+                    controller: bannerController,
+                    itemCount: banners.length,
+                    itemBuilder: (_, index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
                           boxShadow: [
-
                             BoxShadow(
-
-                              color: Colors
-                                  .black
-                                  .withValues(
-                                      alpha:
-                                          0.30),
-
-                              blurRadius:
-                                  20,
-
-                              offset:
-                                  const Offset(
-                                0,
-                                10,
-                              ),
+                              color: Colors.black.withValues(alpha: 0.30),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
                           ],
                         ),
-
                         child: ClipRRect(
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            30,
-                          ),
-
+                          borderRadius: BorderRadius.circular(30),
                           child: Stack(
-
+                            fit: StackFit.expand,
                             children: [
-
-                              Positioned.fill(
-
-                                child:
-                                    Image.network(
-
-                                  banners[
-                                      index],
-
-                                  fit:
-                                      BoxFit.cover,
-                                ),
-                              ),
-
-                              Positioned.fill(
-
-                                child:
-                                    Container(
-
-                                  decoration:
-                                      BoxDecoration(
-
-                                    gradient:
-                                        LinearGradient(
-
-                                      begin:
-                                          Alignment.topCenter,
-
-                                      end:
-                                          Alignment.bottomCenter,
-
-                                      colors: [
-
-                                        Colors.black.withValues(
-                                            alpha:
-                                                0.15),
-
-                                        Colors.black.withValues(
-                                            alpha:
-                                                0.80),
-                                      ],
-                                    ),
+                              Image.network(banners[index], fit: BoxFit.cover),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.15),
+                                      Colors.black.withValues(alpha: 0.80),
+                                    ],
                                   ),
                                 ),
                               ),
-
-                              Positioned(
-
-                                left: 24,
-                                bottom: 24,
-
+                              const Positioned(
+                                left: 20,
+                                bottom: 20,
                                 child: Column(
-
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-
-                                    const Text(
-
+                                    Text(
                                       "MANÁ LANCHES 🍔",
-
-                                      style:
-                                          TextStyle(
-
-                                        color:
-                                            Colors.white,
-
-                                        fontSize:
-                                            28,
-
-                                        fontWeight:
-                                            FontWeight.bold,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-
-                                    const SizedBox(
-                                        height:
-                                            8),
-
+                                    SizedBox(height: 6),
                                     Text(
-
                                       "Peça agora e receba rápido",
-
-                                      style:
-                                          TextStyle(
-
-                                        color: Colors
-                                            .white
-                                            .withValues(
-                                                alpha:
-                                                    0.80),
-
-                                        fontSize:
-                                            15,
-                                      ),
+                                      style: TextStyle(color: Colors.white70),
                                     ),
                                   ],
                                 ),
@@ -830,241 +535,157 @@ class _ClientScreenState extends State<ClientScreen> {
                     },
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 25),
+              const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-                // 🔥 PESQUISA
-                Container(
-
-                  decoration:
-                      BoxDecoration(
-
-                    color: Colors.white
-                        .withValues(
-                            alpha: 0.10),
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      20,
+              // 🔥 PESQUISA
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.20), // 🔥 fix principal
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.white24),
                     ),
 
-                    border: Border.all(
-                      color:
-                          Colors.white24,
-                    ),
-                  ),
+                    child: TextField(
+                      controller: pesquisaController,
+                      onChanged: (value) {
+                        setState(() {
+                          pesquisa = value.toLowerCase();
+                        });
+                      },
 
-                  child: TextField(
-
-                    controller:
-                        pesquisaController,
-
-                    onChanged: (value) {
-
-                      setState(() {
-
-                        pesquisa = value
-                            .toLowerCase();
-                      });
-                    },
-
-                    style:
-                        const TextStyle(
-                      color:
-                          Colors.white,
-                    ),
-
-                    decoration:
-                        const InputDecoration(
-
-                      hintText:
-                          "Pesquisar produto...",
-
-                      hintStyle:
-                          TextStyle(
-                        color:
-                            Colors.white60,
+                      style: const TextStyle(
+                        color: Colors.white, // 🔥 força visibilidade sempre
                       ),
 
-                      prefixIcon:
-                          Icon(
+                      cursorColor: Colors.white,
 
-                        Icons.search,
+                      // 🔥 ESSENCIAL (remove fundo branco do modo claro)
+                      decoration: InputDecoration(
+                        hintText: "Pesquisar produto...",
+                        hintStyle: const TextStyle(color: Colors.white70),
 
-                        color:
-                            Colors.white70,
-                      ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white70,
+                        ),
 
-                      border:
-                          InputBorder.none,
+                        filled: true,
+                        fillColor: Colors
+                            .transparent, // 🔥 chave do problema resolvido
 
-                      contentPadding:
-                          EdgeInsets.symmetric(
-                        vertical: 16,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 10,
+                        ),
                       ),
                     ),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 22),
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
-                // 🔥 CATEGORIAS
-                SizedBox(
-
-                  height: 52,
-
+              // 🔥 CATEGORIAS (MENOR)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 45,
                   child: ListView(
-
-                    scrollDirection:
-                        Axis.horizontal,
-
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     children: [
-
-                      categoriaChip(
-                          "todos"),
-
-                      categoriaChip(
-                          "Hamburguer"),
-
-                      categoriaChip(
-                          "pizza"),
-
-                      categoriaChip(
-                          "bebida"),
-
-                      categoriaChip(
-                          "combos"),
-
-                      categoriaChip(
-                          "batatas"),
+                      categoriaChip("todos"),
+                      categoriaChip("Hamburguer"),
+                      categoriaChip("pizza"),
+                      categoriaChip("bebida"),
+                      categoriaChip("combos"),
+                      categoriaChip("batatas"),
                     ],
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 25),
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
-                const Text(
-
-                  "Produtos",
-
-                  style: TextStyle(
-
-                    fontSize: 24,
-
-                    fontWeight:
-                        FontWeight.bold,
-
-                    color:
-                        Colors.white,
+              // 🔥 TÍTULO
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "Produtos",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 18),
+              const SliverToBoxAdapter(child: SizedBox(height: 10)),
 
-                Expanded(
+              // 🔥 PRODUTOS (SCROLL REAL)
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection("produtos")
+                    .orderBy("nome")
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
 
-                  child: StreamBuilder<
-                      QuerySnapshot>(
+                  final docs = snapshot.data!.docs;
 
-                    stream:
-                        FirebaseFirestore
-                            .instance
-                            .collection(
-                                "produtos")
-                            .orderBy(
-                                "nome")
-                            .snapshots(),
+                  final filtrados = docs.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
 
-                    builder:
-                        (context, snapshot) {
+                    final categoria = (data["categoria"] ?? "")
+                        .toString()
+                        .toLowerCase();
+                    final nome = (data["nome"] ?? "").toString().toLowerCase();
 
-                      if (!snapshot
-                          .hasData) {
+                    final categoriaOk = categoriaSelecionada == "todos"
+                        ? true
+                        : categoria == categoriaSelecionada.toLowerCase();
 
-                        return const Center(
-                          child:
-                              CircularProgressIndicator(),
-                        );
-                      }
+                    final pesquisaOk = nome.contains(pesquisa);
 
-                      final docs =
-                          snapshot
-                              .data!
-                              .docs;
+                    return categoriaOk && pesquisaOk;
+                  }).toList();
 
-                      final filtrados =
-                          docs.where((doc) {
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final data =
+                          filtrados[index].data() as Map<String, dynamic>;
 
-                        final data =
-                            doc.data()
-                                as Map<
-                                    String,
-                                    dynamic>;
-
-                        final categoria =
-                            (data["categoria"] ??
-                                    "")
-                                .toString()
-                                .toLowerCase();
-
-                        final nome =
-                            (data["nome"] ??
-                                    "")
-                                .toString()
-                                .toLowerCase();
-
-                        final categoriaOk =
-                            categoriaSelecionada ==
-                                    "todos"
-                                ? true
-                                : categoria == categoriaSelecionada.toLowerCase();
-
-                        final pesquisaOk =
-                            nome.contains(
-                                pesquisa);
-
-                        return categoriaOk &&
-                            pesquisaOk;
-
-                      }).toList();
-
-                      return ListView.builder(
-
-                        itemCount:
-                            filtrados.length,
-
-                        itemBuilder:
-                            (context, index) {
-
-                          final doc =
-                              filtrados[index];
-
-                          final data =
-                              doc.data()
-                                  as Map<
-                                      String,
-                                      dynamic>;
-
-                          return foodItem(
-
-                            data["nome"] ??
-                                "",
-
-                            data["preco"] ??
-                                0,
-
-                            data["imagem"] ??
-                                "",
-
-                            index,
-                          );
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: foodItem(
+                          data["nome"] ?? "",
+                          data["preco"] ?? 0,
+                          data["imagem"] ?? "",
+                          index,
+                        ),
                       );
-                    },
-                  ),
-                ),
-              ],
-            ),
+                    }, childCount: filtrados.length),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -1072,91 +693,45 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   // 🔥 CHIP CATEGORIA
-  Widget categoriaChip(
-      String titulo) {
-
+  Widget categoriaChip(String titulo) {
     final selecionado =
-        categoriaSelecionada
-                .toLowerCase() ==
-            titulo.toLowerCase();
+        categoriaSelecionada.toLowerCase() == titulo.toLowerCase();
 
     return GestureDetector(
-
       onTap: () {
-
         setState(() {
-
-          categoriaSelecionada =
-              titulo.toLowerCase();
+          categoriaSelecionada = titulo.toLowerCase();
         });
       },
 
       child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
 
-        duration:
-            const Duration(
-          milliseconds: 250,
-        ),
+        margin: const EdgeInsets.only(right: 12),
 
-        margin:
-            const EdgeInsets.only(
-          right: 12,
-        ),
-
-        padding:
-            const EdgeInsets.symmetric(
-
-          horizontal: 22,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
 
         decoration: BoxDecoration(
-
           gradient: selecionado
               ? const LinearGradient(
-
-                  colors: [
-
-                    Color(
-                        0xFFFFD166),
-
-                    Color(
-                        0xFFFFB703),
-                  ],
+                  colors: [Color(0xFFFFD166), Color(0xFFFFB703)],
                 )
               : null,
 
-          color: selecionado
-              ? null
-              : Colors.white
-                  .withValues(
-                      alpha: 0.10),
+          color: selecionado ? null : Colors.white.withValues(alpha: 0.10),
 
-          borderRadius:
-              BorderRadius.circular(
-            20,
-          ),
+          borderRadius: BorderRadius.circular(20),
 
-          border: Border.all(
-
-            color: Colors.white
-                .withValues(
-                    alpha: 0.12),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         ),
 
         child: Text(
-
           titulo,
 
           style: TextStyle(
+            color: selecionado ? Colors.black : Colors.white,
 
-            color: selecionado
-                ? Colors.black
-                : Colors.white,
-
-            fontWeight:
-                FontWeight.bold,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -1164,120 +739,46 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   // 🔥 CARD PRODUTO
-  Widget foodItem(
-
-    String nome,
-
-    dynamic preco,
-
-    String imagem,
-
-    int index,
-  ) {
-
-    final isAnimating =
-        animatingIndex == index;
+  Widget foodItem(String nome, dynamic preco, String imagem, int index) {
+    final isAnimating = animatingIndex == index;
 
     return AnimatedScale(
-
-      duration:
-          const Duration(
-        milliseconds: 200,
-      ),
-
-      scale:
-          isAnimating ? 0.97 : 1,
+      duration: const Duration(milliseconds: 180),
+      scale: isAnimating ? 0.97 : 1,
 
       child: Container(
-
-        margin:
-            const EdgeInsets.only(
-          bottom: 20,
-        ),
+        margin: const EdgeInsets.only(bottom: 12), // 🔥 menor espaçamento
 
         decoration: BoxDecoration(
-
-          color: Colors.white
-              .withValues(
-                  alpha: 0.10),
-
-          borderRadius:
-              BorderRadius.circular(
-            28,
-          ),
-
-          border: Border.all(
-
-            color: Colors.white
-                .withValues(
-                    alpha: 0.12),
-          ),
-
-          boxShadow: [
-
-            BoxShadow(
-
-              color: Colors.black
-                  .withValues(
-                      alpha: 0.18),
-
-              blurRadius: 18,
-
-              offset:
-                  const Offset(
-                0,
-                8,
-              ),
-            ),
-          ],
+          color: Colors.white.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(20), // 🔥 menos “gordinho”
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         ),
 
         child: Row(
-
           children: [
-
+            // 🔥 IMAGEM MENOR
             ClipRRect(
-
-              borderRadius:
-                  const BorderRadius.only(
-
-                topLeft:
-                    Radius.circular(
-                        28),
-
-                bottomLeft:
-                    Radius.circular(
-                        28),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
               ),
 
               child: Image.network(
-
                 imagem,
-
-                width: 120,
-                height: 120,
-
+                width: 85, // 🔥 antes 120 → agora menor
+                height: 85, // 🔥 antes 120 → agora menor
                 fit: BoxFit.cover,
 
-                errorBuilder:
-                    (_, __, ___) {
-
+                errorBuilder: (_, __, ___) {
                   return Container(
-
-                    width: 120,
-                    height: 120,
-
-                    color:
-                        Colors.black12,
-
+                    width: 85,
+                    height: 85,
+                    color: Colors.black12,
                     child: const Icon(
-
                       Icons.fastfood,
-
-                      color:
-                          Colors.white,
-
-                      size: 40,
+                      color: Colors.white,
+                      size: 30,
                     ),
                   );
                 },
@@ -1285,150 +786,80 @@ class _ClientScreenState extends State<ClientScreen> {
             ),
 
             Expanded(
-
               child: Padding(
-
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ), // 🔥 menos espaço interno
 
                 child: Column(
-
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
 
                   children: [
-
+                    // 🔥 NOME MENOR
                     Text(
-
                       nome,
-
-                      style:
-                          const TextStyle(
-
-                        color:
-                            Colors.white,
-
-                        fontSize:
-                            20,
-
-                        fontWeight:
-                            FontWeight
-                                .bold,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16, // 🔥 antes 20 → menor
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 10),
+                    const SizedBox(height: 6),
 
+                    // 🔥 PREÇO MENOR
                     Container(
-
-                      padding:
-                          const EdgeInsets.symmetric(
-
-                        horizontal: 12,
-                        vertical: 6,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
                       ),
 
-                      decoration:
-                          BoxDecoration(
-
-                        color: const Color(
-                          0xFFFFD166,
-                        ).withValues(
-                            alpha:
-                                0.18),
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          12,
-                        ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFD166).withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(10),
                       ),
 
                       child: Text(
-
                         "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
-
-                        style:
-                            const TextStyle(
-
-                          color: Color(
-                              0xFFFFD166),
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                          fontSize: 16,
+                        style: const TextStyle(
+                          color: Color(0xFFFFD166),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 16),
+                    const SizedBox(height: 8),
 
+                    // 🔥 BOTÃO MENOR
                     SizedBox(
+                      height: 34, // 🔥 antes 46 → menor
+                      width: double.infinity,
 
-                      width:
-                          double.infinity,
-
-                      height: 46,
-
-                      child:
-                          ElevatedButton(
-
-                        style:
-                            ElevatedButton.styleFrom(
-
-                          backgroundColor:
-                              const Color(
-                            0xFF7A2323,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7A2323),
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-
-                          elevation: 6,
-
-                          shape:
-                              RoundedRectangleBorder(
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              16,
-                            ),
-                          ),
+                          padding: EdgeInsets.zero,
                         ),
 
                         onPressed: () {
-
-                          adicionarAoCarrinho(
-
-                            nome,
-
-                            preco,
-                            
-                            index,
-
-                            imagem,
-
-                          );
+                          adicionarAoCarrinho(nome, preco, index, imagem);
                         },
 
                         child: Text(
-
-                          isAnimating
-                              ? "✔ Adicionado"
-                              : "Adicionar",
-
-                          style:
-                              const TextStyle(
-
-                            color:
-                                Colors.white,
-
-                            fontWeight:
-                                FontWeight.bold,
-
-                            fontSize: 15,
+                          isAnimating ? "✔ Adicionado" : "Adicionar",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
                         ),
                       ),

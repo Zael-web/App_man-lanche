@@ -5,155 +5,26 @@ class PedidosAdminScreen extends StatefulWidget {
   const PedidosAdminScreen({super.key});
 
   @override
-  State<PedidosAdminScreen> createState() =>
-      _PedidosAdminScreenState();
+  State<PedidosAdminScreen> createState() => _PedidosAdminScreenState();
 }
 
-class _PedidosAdminScreenState
-    extends State<PedidosAdminScreen> {
-
-  // 🔥 ALTERAR STATUS
-  Future<void> atualizarStatus(
-    String id,
-    String status,
-  ) async {
-
-    await FirebaseFirestore.instance
-        .collection("pedidos")
-        .doc(id)
-        .update({
+class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
+  Future<void> atualizarStatus(String id, String status) async {
+    await FirebaseFirestore.instance.collection("pedidos").doc(id).update({
       "status": status,
     });
+  }
 
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-
-  SnackBar(
-
-    behavior: SnackBarBehavior.floating,
-
-    backgroundColor: Colors.transparent,
-
-    elevation: 0,
-
-    duration: const Duration(seconds: 3),
-
-    content: Container(
-
-      padding: const EdgeInsets.all(16),
-
-      decoration: BoxDecoration(
-
-        gradient: const LinearGradient(
-
-          colors: [
-
-            Color(0xFF7A2323),
-            Color(0xFFB33939),
-
-          ],
-        ),
-
-        borderRadius: BorderRadius.circular(20),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color: Colors.black.withValues(alpha: 0.25),
-
-            blurRadius: 10,
-
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-
-      child: Row(
-
-        children: [
-
-          Container(
-
-            padding: const EdgeInsets.all(10),
-
-            decoration: BoxDecoration(
-
-              color: Colors.white.withValues(alpha: 0.15),
-
-              borderRadius: BorderRadius.circular(14),
-            ),
-
-            child: const Icon(
-
-              Icons.delivery_dining,
-
-              color: Colors.white,
-
-              size: 28,
-            ),
-          ),
-
-          const SizedBox(width: 14),
-
-          Expanded(
-
-            child: Column(
-
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              mainAxisSize: MainAxisSize.min,
-
-              children: [
-
-                const Text(
-
-                  "Pedido Atualizado",
-
-                  style: TextStyle(
-
-                    color: Colors.white,
-
-                    fontWeight: FontWeight.bold,
-
-                    fontSize: 16,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                Text(
-
-                  "Seu pedido agora está: $status",
-
-                  style: const TextStyle(
-
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-  ),
- );
-}
-
-  // 🔥 COR STATUS
   Color corStatus(String status) {
-
-    switch (status) {
-
-      case "Preparando":
+    switch (status.toLowerCase()) {
+      case "preparando":
         return Colors.orange;
 
-      case "Saiu entrega":
+      case "saiu entrega":
+      case "saiu para entrega":
         return Colors.blue;
 
-      case "Entregue":
+      case "entregue":
         return Colors.green;
 
       default:
@@ -161,640 +32,316 @@ class _PedidosAdminScreenState
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  IconData iconStatus(String status) {
+    switch (status.toLowerCase()) {
+      case "preparando":
+        return Icons.restaurant;
 
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+      case "saiu entrega":
+      case "saiu para entrega":
+        return Icons.delivery_dining;
 
-    return Scaffold(
+      case "entregue":
+        return Icons.check_circle;
 
-      extendBodyBehindAppBar: true,
+      default:
+        return Icons.info;
+    }
+  }
 
-      appBar: AppBar(
-
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-
-        centerTitle: true,
-
-        title: const Text(
-
-          "PEDIDOS",
-
-          style: TextStyle(
-
-            color: Colors.white,
-
-            fontWeight: FontWeight.bold,
-
-            letterSpacing: 1,
-          ),
-        ),
-      ),
-
-      body: Container(
-
-        width: double.infinity,
-        height: double.infinity,
-
+  Widget dashboardCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-
-          gradient: LinearGradient(
-
-            colors: isDark
-                ? [
-
-                    const Color(0xFF111111),
-                    const Color(0xFF1B1B1B),
-                    const Color(0xFF252525),
-
-                  ]
-                : [
-
-                    const Color(0xFF3E0F12),
-                    const Color(0xFF5A171B),
-                    const Color(0xFF7A2323),
-                    const Color(0xFFA63A3A),
-
-                  ],
-
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white24),
         ),
-
-        child: SafeArea(
-
-          child: StreamBuilder<QuerySnapshot>(
-
-            stream: FirebaseFirestore.instance
-                .collection("pedidos")
-                .orderBy(
-                  "data",
-                  descending: true,
-                )
-                .snapshots(),
-
-            builder: (context, snapshot) {
-
-              // 🔥 LOADING
-              if (snapshot.connectionState ==
-                  ConnectionState.waiting) {
-
-                return const Center(
-
-                  child:
-                      CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                );
-              }
-
-              // 🔥 SEM PEDIDOS
-              if (!snapshot.hasData ||
-                  snapshot.data!.docs.isEmpty) {
-
-                return const Center(
-
-                  child: Text(
-
-                    "Nenhum pedido encontrado",
-
-                    style: TextStyle(
-
-                      color: Colors.white,
-
-                      fontSize: 20,
-
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
-                  ),
-                );
-              }
-
-              return ListView.builder(
-
-                padding:
-                    const EdgeInsets.all(18),
-
-                itemCount:
-                    snapshot.data!.docs.length,
-
-                itemBuilder: (context, index) {
-
-                  final doc =
-                      snapshot.data!.docs[index];
-
-                  final data =
-                      doc.data()
-                          as Map<String, dynamic>;
-
-                  final itens =
-                      data["itens"] as List;
-
-                  double total = 0;
-
-                  for (var item in itens) {
-
-                    total +=
-                        (item["preco"] ?? 0) *
-                        (item["quantidade"] ?? 1);
-                  }
-
-                  return Container(
-
-                    margin:
-                        const EdgeInsets.only(
-                      bottom: 22,
-                    ),
-
-                    padding:
-                        const EdgeInsets.all(20),
-
-                    decoration: BoxDecoration(
-
-                      color: isDark
-                          ? Colors.white
-                              .withValues(alpha: 0.05)
-                          : Colors.white
-                              .withValues(alpha: 0.12),
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        28,
-                      ),
-
-                      border: Border.all(
-
-                        color: Colors.white
-                            .withValues(alpha: 0.08),
-                      ),
-
-                      boxShadow: [
-
-                        BoxShadow(
-
-                          color: Colors.black
-                              .withValues(alpha: 0.18),
-
-                          blurRadius: 20,
-
-                          offset:
-                              const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-
-                    child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-
-                      children: [
-
-                        // 🔥 TOPO CLIENTE
-                        Row(
-
-                          children: [
-
-                            Container(
-
-                              width: 60,
-                              height: 60,
-
-                              decoration:
-                                  BoxDecoration(
-
-                                gradient:
-                                    const LinearGradient(
-
-                                  colors: [
-
-                                    Color(0xFFD2691E),
-                                    Color(0xFFFF9800),
-
-                                  ],
-                                ),
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  18,
-                                ),
-                              ),
-
-                              child: const Icon(
-
-                                Icons.person,
-
-                                color: Colors.white,
-
-                                size: 30,
-                              ),
-                            ),
-
-                            const SizedBox(width: 14),
-
-                            Expanded(
-
-                              child: Column(
-
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
-
-                                children: [
-
-                                  Text(
-
-                                    data["nomeCliente"] ??
-                                        "Cliente",
-
-                                    style:
-                                        const TextStyle(
-
-                                      color:
-                                          Colors.white,
-
-                                      fontSize: 20,
-
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
-                                  ),
-
-                                  const SizedBox(
-                                      height: 5),
-
-                                  Text(
-
-                                    "${itens.length} item(ns)",
-
-                                    style:
-                                        const TextStyle(
-
-                                      color:
-                                          Colors.white70,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // 🔥 STATUS
-                            Container(
-
-                              padding:
-                                  const EdgeInsets.symmetric(
-
-                                horizontal: 14,
-                                vertical: 8,
-                              ),
-
-                              decoration:
-                                  BoxDecoration(
-
-                                color: corStatus(
-                                  data["status"],
-                                ),
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  20,
-                                ),
-                              ),
-
-                              child: Text(
-
-                                data["status"],
-
-                                style:
-                                    const TextStyle(
-
-                                  color: Colors.white,
-
-                                  fontWeight:
-                                      FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 22),
-
-                        // 🔥 LISTA PRODUTOS
-                        ...List.generate(
-
-                          itens.length,
-
-                          (i) {
-
-                            final item =
-                                itens[i];
-
-                            final imagem = (item["imagem"] ?? "").toString();
-
-                            return Container(
-
-                              margin:
-                                  const EdgeInsets.only(
-                                bottom: 15,
-                              ),
-
-                              padding:
-                                  const EdgeInsets.all(
-                                14,
-                              ),
-
-                              decoration:
-                                  BoxDecoration(
-
-                                color: Colors.black
-                                    .withValues(
-                                        alpha: 0.12),
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  22,
-                                ),
-                              ),
-
-                              child: Row(
-
-                                children: [
-
-                                  // 🔥 IMAGEM
-                                  ClipRRect(
-
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      18,
-                                    ),
-
-                                    child:
-                                        imagem.isNotEmpty
-
-                                            ? Image.network(
-
-                                                imagem,
-
-                                                width: 85,
-                                                height: 85,
-
-                                                fit: BoxFit.cover,
-
-                                                errorBuilder:
-                                                    (_, __, ___) {
-
-                                                  return Container(
-
-                                                    width: 85,
-                                                    height: 85,
-
-                                                    color:
-                                                        Colors.grey,
-
-                                                    child:
-                                                        const Icon(
-
-                                                      Icons.fastfood,
-
-                                                      color:
-                                                          Colors.white,
-                                                    ),
-                                                  );
-                                                },
-                                              )
-
-                                            : Container(
-
-                                                width: 85,
-                                                height: 85,
-
-                                                color: Colors.grey,
-
-                                                child:
-                                                    const Icon(
-
-                                                  Icons.fastfood,
-
-                                                  color:
-                                                      Colors.white,
-                                                ),
-                                              ),
-                                  ),
-
-                                  const SizedBox(
-                                      width: 16),
-
-                                  // 🔥 INFO PRODUTO
-                                  Expanded(
-
-                                    child: Column(
-
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .start,
-
-                                      children: [
-
-                                        Text(
-
-                                          item["nomeProduto"],
-
-                                          style:
-                                              const TextStyle(
-
-                                            color:
-                                                Colors.white,
-
-                                            fontSize:
-                                                18,
-
-                                            fontWeight:
-                                                FontWeight.bold,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                            height: 8),
-
-                                        Text(
-
-                                          "Quantidade: ${item["quantidade"]}",
-
-                                          style:
-                                              const TextStyle(
-
-                                            color:
-                                                Colors.white70,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                            height: 6),
-
-                                        Text(
-
-                                          "Preço: R\$ ${item["preco"]}",
-
-                                          style:
-                                              const TextStyle(
-
-                                            color: Color(
-                                                0xFFFFD54F),
-
-                                            fontWeight:
-                                                FontWeight.bold,
-
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        // 🔥 TOTAL
-                        Align(
-
-                          alignment:
-                              Alignment.centerRight,
-
-                          child: Container(
-
-                            padding:
-                                const EdgeInsets.symmetric(
-
-                              horizontal: 18,
-                              vertical: 10,
-                            ),
-
-                            decoration: BoxDecoration(
-
-                              color: const Color(
-                                0xFFD4A017,
-                              ),
-
-                              borderRadius:
-                                  BorderRadius.circular(
-                                18,
-                              ),
-                            ),
-
-                            child: Text(
-
-                              "Total: R\$ ${total.toStringAsFixed(2)}",
-
-                              style:
-                                  const TextStyle(
-
-                                color: Colors.white,
-
-                                fontWeight:
-                                    FontWeight.bold,
-
-                                fontSize: 17,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 22),
-
-                        // 🔥 BOTÕES STATUS
-                        Wrap(
-
-                          spacing: 10,
-                          runSpacing: 10,
-
-                          children: [
-
-                            statusButton(
-                              doc.id,
-                              "Preparando",
-                              Colors.orange,
-                            ),
-
-                            statusButton(
-                              doc.id,
-                              "Saiu entrega",
-                              Colors.blue,
-                            ),
-
-                            statusButton(
-                              doc.id,
-                              "Entregue",
-                              Colors.green,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(title, style: const TextStyle(color: Colors.white70)),
+          ],
         ),
       ),
     );
   }
 
-  // 🔥 BOTÃO STATUS
-  Widget statusButton(
-    String id,
-    String status,
-    Color cor,
-  ) {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A0F10),
 
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          "Painel de Pedidos",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("pedidos")
+            .orderBy("data", descending: true)
+            .snapshots(),
+
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final docs = snapshot.data!.docs;
+
+          // 📊 métricas estilo dashboard
+          final total = docs.length;
+          final preparando = docs
+              .where((d) => d["status"] == "Preparando")
+              .length;
+          final entrega = docs
+              .where((d) => d["status"] == "Saiu entrega")
+              .length;
+          final entregues = docs.where((d) => d["status"] == "Entregue").length;
+
+          return Column(
+            children: [
+              // 📊 DASHBOARD TOP
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        dashboardCard(
+                          "Total",
+                          "$total",
+                          Icons.receipt_long,
+                          Colors.white,
+                        ),
+                        dashboardCard(
+                          "Preparando",
+                          "$preparando",
+                          Icons.restaurant,
+                          Colors.orange,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        dashboardCard(
+                          "Entrega",
+                          "$entrega",
+                          Icons.delivery_dining,
+                          Colors.blue,
+                        ),
+                        dashboardCard(
+                          "Entregues",
+                          "$entregues",
+                          Icons.check_circle,
+                          Colors.green,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 📦 LISTA DE PEDIDOS
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final doc = docs[index];
+                    final data = doc.data() as Map<String, dynamic>;
+                    final itens = List.from(data["itens"] ?? []);
+
+                    double totalPedido = 0;
+
+                    for (var item in itens) {
+                      totalPedido +=
+                          (item["preco"] ?? 0) * (item["quantidade"] ?? 1);
+                    }
+
+                    final status = data["status"] ?? "Desconhecido";
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                      ),
+
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 👤 CLIENTE + STATUS
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: corStatus(status),
+                                child: Icon(
+                                  iconStatus(status),
+                                  color: Colors.white,
+                                ),
+                              ),
+
+                              const SizedBox(width: 12),
+
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data["nomeCliente"] ?? "Cliente",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${itens.length} itens",
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: corStatus(status),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  status,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // 🧾 ITENS
+                          ...itens.map((item) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.fastfood,
+                                    color: Colors.white70,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      item["nomeProduto"] ?? "",
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "x${item["quantidade"]}",
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+
+                          const SizedBox(height: 10),
+
+                          // 💰 TOTAL
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Total: R\$ ${totalPedido.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                color: Colors.amber,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // 🎯 AÇÕES
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              actionButton(
+                                "Preparando",
+                                Colors.orange,
+                                () => atualizarStatus(doc.id, "Preparando"),
+                              ),
+                              actionButton(
+                                "Entrega",
+                                Colors.blue,
+                                () => atualizarStatus(doc.id, "Saiu entrega"),
+                              ),
+                              actionButton(
+                                "Entregue",
+                                Colors.green,
+                                () => atualizarStatus(doc.id, "Entregue"),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget actionButton(String text, Color color, VoidCallback onTap) {
     return ElevatedButton(
-
       style: ElevatedButton.styleFrom(
-
-        backgroundColor: cor,
-
-        elevation: 5,
-
-        padding:
-            const EdgeInsets.symmetric(
-
-          horizontal: 18,
-          vertical: 14,
-        ),
-
-        shape: RoundedRectangleBorder(
-
-          borderRadius:
-              BorderRadius.circular(16),
-        ),
+        backgroundColor: color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
-
-      onPressed: () {
-
-        atualizarStatus(id, status);
-      },
-
-      child: Text(
-
-        status,
-
-        style: const TextStyle(
-
-          color: Colors.white,
-
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      onPressed: onTap,
+      child: Text(text),
     );
   }
 }

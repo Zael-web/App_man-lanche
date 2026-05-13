@@ -1,421 +1,307 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:mana_lanche/screens/login_screens.dart';
-import 'package:mana_lanche/screens/produtos_admin_screens.dart';
-
-class AdminScreen extends StatefulWidget {
-  const AdminScreen({super.key});
+class ProdutosAdminScreen extends StatefulWidget {
+  const ProdutosAdminScreen({super.key});
 
   @override
-  State<AdminScreen> createState() => _AdminScreenState();
+  State<ProdutosAdminScreen> createState() => _ProdutosAdminScreenState();
 }
 
-class _AdminScreenState extends State<AdminScreen> {
+class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
+  String pesquisa = "";
+  String categoriaSelecionada = "todos";
 
-  // 🔥 ALTERAR STATUS
-  Future<void> atualizarStatus(
-    String id,
-    String status,
-  ) async {
+  // 🔥 CHIP CATEGORIA
+  Widget categoriaChip(String titulo) {
+    final selecionado =
+        categoriaSelecionada.toLowerCase() == titulo.toLowerCase();
 
-    await FirebaseFirestore.instance
-        .collection("pedidos")
-        .doc(id)
-        .update({
-          "status": status,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          categoriaSelecionada = titulo.toLowerCase();
         });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        decoration: BoxDecoration(
+          color: selecionado
+              ? const Color(0xFFFFB703)
+              : Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Text(
+          titulo,
+          style: TextStyle(
+            color: selecionado ? Colors.black : Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 
-  // LOGOUT
-  Future<void> logout() async {
+  // 🔥 CARD PRODUTO (MELHORADO)
+  Widget produtoCard(Map<String, dynamic> data, String id) {
+    final nome = data["nome"] ?? "Sem nome";
+    final categoria = data["categoria"] ?? "sem categoria";
+    final imagem = data["imagem"] ?? "";
+    final preco = data["preco"];
 
-    await FirebaseAuth.instance.signOut();
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white24),
+      ),
+      child: Row(
+        children: [
+          // 🖼 IMAGEM
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: imagem.isNotEmpty
+                ? Image.network(
+                    imagem,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) {
+                      return Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.black26,
+                        child: const Icon(Icons.fastfood, color: Colors.white),
+                      );
+                    },
+                  )
+                : Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.black26,
+                    child: const Icon(Icons.fastfood, color: Colors.white),
+                  ),
+          ),
 
-    if (!mounted) return;
+          const SizedBox(width: 12),
 
-    Navigator.pushReplacement(
+          // 📦 INFO
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nome,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
-      context,
+                const SizedBox(height: 6),
 
-      MaterialPageRoute(
-        builder: (_) => const LoginScreen(),
+                Text(
+                  "Categoria: $categoria",
+                  style: const TextStyle(color: Colors.white70),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  "R\$ ${(preco ?? 0).toString()}",
+                  style: const TextStyle(
+                    color: Color(0xFFFFD166),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ✏️ EDITAR
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.white),
+            onPressed: () {
+              // TODO: abrir modal editar produto
+            },
+          ),
+
+          // 🗑 DELETAR
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () async {
+              await FirebaseFirestore.instance
+                  .collection("produtos")
+                  .doc(id)
+                  .delete();
+
+              if (!mounted) return;
+
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text("Produto deletado")));
+            },
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
-
     return Scaffold(
-
       extendBodyBehindAppBar: true,
-
       appBar: AppBar(
-
         backgroundColor: Colors.transparent,
         elevation: 0,
-
-        centerTitle: true,
-
-        title: const Text(
-
-          "ADMIN MANÁ LANCHES",
-
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-
-        actions: [
-
-          // PRODUTOS
-          IconButton(
-
-            icon: const Icon(
-              Icons.fastfood_rounded,
-              color: Colors.white,
-            ),
-
-            onPressed: () {
-
-              Navigator.push(
-
-                context,
-
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const ProdutosAdminScreen(),
-                ),
-              );
-            },
-          ),
-
-          // SAIR
-          IconButton(
-
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-
-            onPressed: logout,
-          ),
-        ],
+        title: const Text(
+          "PRODUTOS",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
 
       body: Container(
-
         width: double.infinity,
-
-        decoration: BoxDecoration(
-
+        height: double.infinity,
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-
-            colors: isDark
-                ? [
-
-                    const Color(0xFF111111),
-                    const Color(0xFF1B1B1B),
-                    const Color(0xFF252525),
-
-                  ]
-                : [
-
-                    const Color(0xFF3E0F12),
-                    const Color(0xFF5A171B),
-                    const Color(0xFF7A2323),
-                    const Color(0xFFA63A3A),
-
-                  ],
-
+            colors: [
+              Color(0xFF3E0F12),
+              Color(0xFF5A171B),
+              Color(0xFF7A2323),
+              Color(0xFFA63A3A),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
 
-        child: StreamBuilder<QuerySnapshot>(
-
-          stream: FirebaseFirestore.instance
-              .collection("pedidos")
-              .orderBy(
-                "data",
-                descending: true,
-              )
-              .snapshots(),
-
-          builder: (context, snapshot) {
-
-            if (snapshot.connectionState ==
-                ConnectionState.waiting) {
-
-              return const Center(
-                child:
-                    CircularProgressIndicator(),
-              );
-            }
-
-            if (!snapshot.hasData ||
-                snapshot.data!.docs.isEmpty) {
-
-              return const Center(
-
-                child: Text(
-
-                  "Nenhum pedido encontrado",
-
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-              );
-            }
-
-            return ListView.builder(
-
-              padding:
-                  const EdgeInsets.all(15),
-
-              itemCount:
-                  snapshot.data!.docs.length,
-
-              itemBuilder: (context, index) {
-
-                final doc =
-                    snapshot.data!.docs[index];
-
-                final data =
-                    doc.data()
-                        as Map<String, dynamic>;
-
-                return Container(
-
-                  margin:
-                      const EdgeInsets.only(
-                        bottom: 15,
-                      ),
-
-                  padding:
-                      const EdgeInsets.all(
-                        18,
-                      ),
-
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // 🔎 PESQUISA
+                Container(
                   decoration: BoxDecoration(
-
-                    color: isDark
-                        ? Colors.white
-                            .withValues(alpha: 0.05)
-                        : Colors.white
-                            .withValues(alpha: 0.12),
-
-                    borderRadius:
-                        BorderRadius.circular(
-                          22,
-                        ),
-
-                    border: Border.all(
-                      color:
-                          Colors.white
-                              .withValues(alpha: 0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        pesquisa = value.toLowerCase();
+                      });
+                    },
+                    style: const TextStyle(color: Colors.white),
+                    cursorColor: Colors.white,
+                    decoration: const InputDecoration(
+                      hintText: "Pesquisar produto...",
+                      hintStyle: TextStyle(color: Colors.white70),
+                      prefixIcon: Icon(Icons.search, color: Colors.white70),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
-
-                  child: Column(
-
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                    children: [
-
-                      // 👤 CLIENTE
-                      Text(
-
-                        data["nomeCliente"] ??
-                            "Cliente",
-
-                        style: const TextStyle(
-
-                          color: Colors.white,
-
-                          fontSize: 20,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // 🍔 PRODUTO
-                      Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: List.generate(
-
-                     (data["itens"] as List).length,
-
-                     (index) {
-
-                     final item = data["itens"][index];
-
-                     return Padding(
-
-                    padding: const EdgeInsets.only(bottom: 12),
-
-                     child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                   Text(
-                      "Produto: ${item["nomeProduto"]}",
-
-                       style: const TextStyle(
-                      color: Colors.white70,
-                     fontSize: 16,
-                    ),
-                    ),
-
-                   const SizedBox(height: 4),
-
-                  Text(
-                "Quantidade: ${item["quantidade"]}",
- 
-                style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-                  Text(
-                  "Preço: R\$ ${item["preco"]}",
-
-                        style: const TextStyle(
-                           color: Colors.white70,
-                            fontSize: 16,
-                            ),
-                           ),
-
-                      const Divider(
-                      color: Colors.white24,
-                       height: 20,
-                    ),
-                   ],
                 ),
-              );
-            },
-          ),
-        ),
 
-                      const SizedBox(height: 14),
+                const SizedBox(height: 12),
 
-                      // STATUS
-                      Row(
-
-                        children: [
-
-                          const Text(
-
-                            "Status: ",
-
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
-                          ),
-
-                          Container(
-
-                            padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-
-                            decoration: BoxDecoration(
-
-                              color: Colors.green,
-
-                              borderRadius:
-                                  BorderRadius.circular(
-                                    20,
-                                  ),
-                            ),
-
-                            child: Text(
-
-                              data["status"],
-
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      // ALTERAR STATUS
-                      Wrap(
-
-                        spacing: 8,
-
-                        children: [
-
-                          statusButton(
-                            doc.id,
-                            "Preparando",
-                          ),
-
-                          statusButton(
-                            doc.id,
-                            "Saiu entrega",
-                          ),
-
-                          statusButton(
-                            doc.id,
-                            "Entregue",
-                          ),
-                        ],
-                      ),
+                // 🍕 CATEGORIAS
+                SizedBox(
+                  height: 50,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      categoriaChip("todos"),
+                      categoriaChip("hamburguer"),
+                      categoriaChip("pizza"),
+                      categoriaChip("bebida"),
+                      categoriaChip("combos"),
+                      categoriaChip("batatas"),
                     ],
                   ),
-                );
-              },
-            );
-          },
+                ),
+
+                const SizedBox(height: 12),
+
+                // 📦 LISTA
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("produtos")
+                        .orderBy("nome")
+                        .snapshots(),
+
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        );
+                      }
+
+                      final docs = snapshot.data!.docs;
+
+                      final filtrados = docs.where((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+
+                        final nome = (data["nome"] ?? "")
+                            .toString()
+                            .toLowerCase();
+
+                        final categoria = (data["categoria"] ?? "")
+                            .toString()
+                            .toLowerCase();
+
+                        final matchCategoria = categoriaSelecionada == "todos"
+                            ? true
+                            : categoria == categoriaSelecionada.toLowerCase();
+
+                        final matchPesquisa = nome.contains(pesquisa);
+
+                        return matchCategoria && matchPesquisa;
+                      }).toList();
+
+                      if (filtrados.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "Nenhum produto encontrado",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: filtrados.length,
+                        itemBuilder: (context, index) {
+                          final doc = filtrados[index];
+                          final data = doc.data() as Map<String, dynamic>;
+
+                          return produtoCard(data, doc.id);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-    );
-  }
-
-  // 🔥 BOTÃO STATUS
-  Widget statusButton(
-    String id,
-    String status,
-  ) {
-
-    return ElevatedButton(
-
-      style: ElevatedButton.styleFrom(
-        backgroundColor:
-            const Color(0xFFD4A017),
-      ),
-
-      onPressed: () {
-        atualizarStatus(id, status);
-      },
-
-      child: Text(status),
     );
   }
 }

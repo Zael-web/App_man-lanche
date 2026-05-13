@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:mana_lanche/screens/client_screens.dart';
-import 'package:mana_lanche/screens/admin_screens.dart';
+import 'package:mana_lanche/screens/admin_menu_screen.dart';
 import 'package:mana_lanche/screens/register_screens.dart';
 import 'package:mana_lanche/main.dart';
 
@@ -57,8 +57,9 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              tipo == "admin" ? const AdminScreen() : const ClientScreen(),
+          builder: (_) => tipo == "admin"
+              ? const AdminMenuScreen()
+              : const ClientScreen(),
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -72,18 +73,16 @@ class _LoginScreenState extends State<LoginScreen> {
         erro = "Email inválido";
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(erro)));
     }
   }
 
   // 🔐 RECUPERAR SENHA
   Future<void> recuperarSenha() async {
     if (emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Digite seu email")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Digite seu email")));
       return;
     }
 
@@ -93,9 +92,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Email enviado")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Email enviado")));
   }
 
   // 🔥 GOOGLE LOGIN
@@ -116,8 +115,9 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleAuth.idToken,
       );
 
-      final userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
 
       final user = userCredential.user!;
       final doc = await FirebaseFirestore.instance
@@ -130,10 +130,10 @@ class _LoginScreenState extends State<LoginScreen> {
             .collection("usuarios")
             .doc(user.uid)
             .set({
-          "nome": user.displayName ?? "Usuário",
-          "email": user.email,
-          "tipo": "cliente",
-        });
+              "nome": user.displayName ?? "Usuário",
+              "email": user.email,
+              "tipo": "cliente",
+            });
       }
 
       if (!mounted) return;
@@ -143,9 +143,9 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (_) => const ClientScreen()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro Google Login: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erro Google Login: $e")));
     }
   }
 
@@ -168,11 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [
-                    Color(0xFF111111),
-                    Color(0xFF1B1B1B),
-                    Color(0xFF252525),
-                  ]
+                ? [Color(0xFF111111), Color(0xFF1B1B1B), Color(0xFF252525)]
                 : [
                     Color(0xFF5C1A1B),
                     Color(0xFF7A2323),
@@ -188,7 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: size.height - MediaQuery.of(context).padding.top,
@@ -419,11 +418,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // 🔥 BOTÃO SOCIAL
-  Widget socialButton(
-    IconData icon,
-    Color color, {
-    VoidCallback? onTap,
-  }) {
+  Widget socialButton(IconData icon, Color color, {VoidCallback? onTap}) {
     final size = MediaQuery.of(context).size;
     final isSmall = size.height < 700;
 
@@ -437,11 +432,7 @@ class _LoginScreenState extends State<LoginScreen> {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.white24),
         ),
-        child: Icon(
-          icon,
-          color: color,
-          size: isSmall ? 28 : 34,
-        ),
+        child: Icon(icon, color: color, size: isSmall ? 28 : 34),
       ),
     );
   }

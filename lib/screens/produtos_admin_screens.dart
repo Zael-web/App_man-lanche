@@ -528,33 +528,69 @@ Future<void> editarProduto(
 
   // LOGOUT
   Future<void> logout() async {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+          title: const Text(
+            "Sair da conta",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            "Tem certeza que deseja sair de sua conta?",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  await FirebaseAuth.instance.signOut();
 
-    try {
+                  if (!mounted) return;
 
-      await FirebaseAuth.instance.signOut();
-
-      if (!mounted) return;
-
-      Navigator.of(context).pushAndRemoveUntil(
-
-        MaterialPageRoute(
-
-          builder: (_) => const LoginScreen(),
-        ),
-
-        (route) => false,
-      );
-
-    } catch (e) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-
-          content: Text("Erro ao fazer logout"),
-        ),
-      );
-    }
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => const LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+                } catch (e) {
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Erro ao fazer logout"),
+                    ),
+                  );
+                }
+              },
+              child: const Text(
+                "Sair",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

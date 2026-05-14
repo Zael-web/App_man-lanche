@@ -328,10 +328,54 @@ class _ClientScreenState extends State<ClientScreen> {
               icon: const Icon(Icons.logout, color: Colors.white),
 
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black54,
+                  builder: (_) {
+                    return AlertDialog(
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      title: const Text(
+                        "Sair da conta",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      content: const Text(
+                        "Tem certeza que deseja sair de sua conta?",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            "Cancelar",
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Sair",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),

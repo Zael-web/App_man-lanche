@@ -13,6 +13,263 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
   String pesquisa = "";
   String categoriaSelecionada = "todos";
 
+  // 🔥 EDITAR PRODUTO
+  Future<void> editarProduto(
+    String id,
+    String nomeAtual,
+    String precoAtual,
+  ) async {
+    final nomeEditController =
+        TextEditingController(text: nomeAtual);
+    final precoEditController =
+        TextEditingController(text: precoAtual);
+
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return Dialog(
+          backgroundColor: const Color.fromARGB(0, 221, 4, 4),
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [
+                        const Color(0xFF1A1A1A),
+                        const Color(0xFF232323),
+                        const Color(0xFF2B2B2B),
+                      ]
+                    : [
+                        const Color(0xFFFFFBF7),
+                        const Color(0xFFF8EFEA),
+                        const Color(0xFFF3E4DE),
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.white.withValues(alpha: 0.7),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ÍCONE
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B0000).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: const Icon(
+                    Icons.edit_rounded,
+                    color: Color(0xFF8B0000),
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                // TÍTULO
+                Text(
+                  "Editar Produto",
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Atualize as informações do produto",
+                  style: TextStyle(
+                    color: isDark ? Colors.white60 : Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                // CAMPO NOME
+                TextField(
+                  controller: nomeEditController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: "Nome do produto",
+                    hintStyle: TextStyle(
+                      color:
+                          isDark ? Colors.white38 : Colors.grey.shade600,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.fastfood_rounded,
+                      color: Color(0xFF8B0000),
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 18,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD2691E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // CAMPO PREÇO
+                TextField(
+                  controller: precoEditController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: "Preço",
+                    hintStyle: TextStyle(
+                      color:
+                          isDark ? Colors.white38 : Colors.grey.shade600,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.attach_money,
+                      color: Color(0xFFD2691E),
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 18,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD2691E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                // BOTÕES
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            "Cancelar",
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD2691E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: () async {
+                            final novoNome =
+                                nomeEditController.text;
+                            final novoPreco = double.parse(
+                              precoEditController.text
+                                  .replaceAll(",", "."),
+                            );
+
+                            await FirebaseFirestore.instance
+                                .collection("produtos")
+                                .doc(id)
+                                .update({
+                              "nome": novoNome,
+                              "preco": novoPreco,
+                            });
+
+                            if (!mounted) return;
+
+                            Navigator.pop(context);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Produto atualizado!"),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Salvar",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // 🔥 CHIP CATEGORIA
   Widget categoriaChip(String titulo) {
     final selecionado =
@@ -132,24 +389,72 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
-              // TODO: abrir modal editar produto
+              editarProduto(id, nome, preco.toString());
             },
           ),
 
           // 🗑 DELETAR
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () async {
-              await FirebaseFirestore.instance
-                  .collection("produtos")
-                  .doc(id)
-                  .delete();
+            onPressed: () {
+              showDialog(
+                context: context,
+                barrierColor: Colors.black54,
+                builder: (_) {
+                  return AlertDialog(
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    title: const Text(
+                      "Confirmar exclusão",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    content: Text(
+                      "Tem certeza que deseja excluir o produto '$nome'? Esta ação não pode ser desfeita.",
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "Cancelar",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await FirebaseFirestore.instance
+                              .collection("produtos")
+                              .doc(id)
+                              .delete();
 
-              if (!mounted) return;
+                          if (!mounted) return;
 
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text("Produto deletado")));
+                          Navigator.pop(context);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Produto deletado"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Excluir",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ],

@@ -251,8 +251,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextStyle(color: Colors.white.withValues(alpha: 0.6)),
         prefixIcon: Icon(icon, color: const Color(0xFFFFD166)),
         filled: true,
-        fillColor:
-            Colors.white.withValues(alpha: isDark ? 0.06 : 0.12),
+        fillColor: isDark
+            ? const Color(0xFF1B1B1B)
+            : Colors.white.withOpacity(0.12),
         contentPadding: const EdgeInsets.symmetric(vertical: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),

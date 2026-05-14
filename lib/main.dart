@@ -66,6 +66,7 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFFE53935);
+    const darkPrimaryColor = Color(0xFFB71C1C);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -133,21 +134,21 @@ class MyAppState extends State<MyApp> {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: primaryColor,
-        scaffoldBackgroundColor: const Color(0xFF121212),
+        primaryColor: darkPrimaryColor,
+        scaffoldBackgroundColor: const Color(0xFF070707),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: primaryColor,
+          seedColor: darkPrimaryColor,
           brightness: Brightness.dark,
-          primary: primaryColor,
+          primary: darkPrimaryColor,
           onPrimary: Colors.white,
-          secondary: const Color(0xFFB3B3B3),
-          onSecondary: Colors.black,
-          surface: const Color(0xFF1E1E1E),
+          secondary: const Color(0xFF9E9E9E),
+          onSecondary: Colors.white,
+          surface: const Color(0xFF141414),
           onSurface: Colors.white,
-          background: const Color(0xFF121212),
+          background: const Color(0xFF070707),
         ),
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color(0xFF1E1E1E),
+          backgroundColor: const Color(0xFF141414),
           elevation: 0,
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
@@ -159,7 +160,7 @@ class MyAppState extends State<MyApp> {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
+            backgroundColor: darkPrimaryColor,
             foregroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(
@@ -169,18 +170,18 @@ class MyAppState extends State<MyApp> {
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF1F1F1F),
+          fillColor: const Color(0xFF1A1A1A),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: primaryColor),
+            borderSide: BorderSide(color: darkPrimaryColor),
           ),
         ),
         cardTheme: CardThemeData(
-          color: const Color(0xFF1B1B1B),
+          color: const Color(0xFF101010),
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

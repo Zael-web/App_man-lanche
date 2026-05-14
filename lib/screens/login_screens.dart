@@ -277,7 +277,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: Color(0xFF7D2035),
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.9),
+                                fillColor: isDark
+                                    ? Colors.white.withOpacity(0.08)
+                                    : Colors.white.withOpacity(0.9),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(18),
                                   borderSide: BorderSide.none,
@@ -322,7 +324,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ],
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.9),
+                                fillColor: isDark
+                                    ? Colors.white.withOpacity(0.08)
+                                    : Colors.white.withOpacity(0.9),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(18),
                                   borderSide: BorderSide.none,
@@ -332,22 +336,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             const SizedBox(height: 22),
 
-                            // BOTÃO LOGIN
                             SizedBox(
                               width: double.infinity,
-                              height: isSmall ? 52 : 58,
+                              height: isSmall ? 50 : 56,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF7A2323),
+                                  backgroundColor: const Color(0xFF7A2323),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18),
                                   ),
                                 ),
                                 onPressed: login,
-                                child: Text(
-                                  "Entrar",
+                                child: const Text(
+                                  'Entrar',
                                   style: TextStyle(
-                                    fontSize: isSmall ? 18 : 22,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

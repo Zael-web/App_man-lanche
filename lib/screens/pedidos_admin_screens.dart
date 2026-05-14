@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PedidosAdminScreen extends StatefulWidget {
@@ -50,14 +51,20 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
   }
 
   Widget dashboardCard(String title, String value, IconData icon, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Expanded(
       child: Container(
         margin: const EdgeInsets.all(6),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withOpacity(0.04),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white24),
+          border: Border.all(
+            color: isDark ? Colors.white24 : Colors.black12,
+          ),
         ),
         child: Column(
           children: [
@@ -65,13 +72,18 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
             const SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(title, style: const TextStyle(color: Colors.white70)),
+            Text(
+              title,
+              style: TextStyle(
+                color: isDark ? Colors.white70 : Colors.black54,
+              ),
+            ),
           ],
         ),
       ),
@@ -80,27 +92,59 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0F10),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
 
       appBar: AppBar(
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           "Painel de Pedidos",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
       ),
 
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection("pedidos")
-            .orderBy("data", descending: true)
-            .snapshots(),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? const [
+                    Color(0xFF111111),
+                    Color(0xFF1B1B1B),
+                    Color(0xFF252525),
+                  ]
+                : const [
+                    Color(0xFF7A2323),
+                    Color(0xFF8B1F1F),
+                    Color(0xFF9B2C2C),
+                    Color(0xFFB33939),
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection("pedidos")
+                .orderBy("data", descending: true)
+                .snapshots(),
 
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -331,7 +375,9 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
           );
         },
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget actionButton(String text, Color color, VoidCallback onTap) {

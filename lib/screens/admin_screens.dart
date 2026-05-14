@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProdutosAdminScreen extends StatefulWidget {
@@ -158,32 +159,41 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
+        title: Text(
           "PRODUTOS",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
 
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF3E0F12),
-              Color(0xFF5A171B),
-              Color(0xFF7A2323),
-              Color(0xFFA63A3A),
-            ],
+            colors: isDark
+                ? const [
+                    Color(0xFF111111),
+                    Color(0xFF1A1A1A),
+                    Color(0xFF222222),
+                    Color(0xFF2C2C2C),
+                  ]
+                : const [
+                    Color(0xFF7A2323),
+                    Color(0xFF8B1F1F),
+                    Color(0xFF9B2C2C),
+                    Color(0xFFB33939),
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -197,9 +207,13 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                 // 🔎 PESQUISA
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white24),
+                    border: Border.all(
+                      color: isDark ? Colors.white24 : Colors.black12,
+                    ),
                   ),
                   child: TextField(
                     onChanged: (value) {
@@ -207,14 +221,21 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                         pesquisa = value.toLowerCase();
                       });
                     },
-                    style: const TextStyle(color: Colors.white),
-                    cursorColor: Colors.white,
-                    decoration: const InputDecoration(
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                    cursorColor: isDark ? Colors.white : Colors.black,
+                    decoration: InputDecoration(
                       hintText: "Pesquisar produto...",
-                      hintStyle: TextStyle(color: Colors.white70),
-                      prefixIcon: Icon(Icons.search, color: Colors.white70),
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black45,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: isDark ? Colors.white70 : Colors.black45,
+                      ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
                 ),

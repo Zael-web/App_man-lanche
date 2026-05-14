@@ -26,28 +26,40 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
+        title: Text(
           "ADMINISTRADOR",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.white70,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF3E0F12),
-              Color(0xFF5A171B),
-              Color(0xFF7A2323),
-              Color(0xFFA63A3A),
-            ],
+            colors: isDark
+                ? const [
+                    Color(0xFF111111),
+                    Color(0xFF1B1B1B),
+                    Color(0xFF252525),
+                  ]
+                : const [
+                    Color(0xFF7A2323),
+                    Color(0xFF8B1F1F),
+                    Color(0xFF9B2C2C),
+                    Color(0xFFB33939),
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -67,18 +79,17 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
 
                     // 🔥 ÍCONE PRINCIPAL
                     Container(
-                      padding: const EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(100),
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                        shape: BoxShape.circle,
                         border: Border.all(color: Colors.white24),
-                      ),
-                      child: const Icon(
-                        Icons.admin_panel_settings,
-                        color: Colors.white,
-                        size: 60,
-                      ),
-                    ),
+                        image: const DecorationImage(
+                        image: AssetImage("assets/images/logo.png"),
+                        fit: BoxFit.cover,
+                        ),
+                       ),
+                  ),
 
                     const SizedBox(height: 25),
 
@@ -95,7 +106,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                     const SizedBox(height: 8),
 
                     const Text(
-                      "Gerencie produtos e pedidos do seu restaurante",
+                      "Gerencie produtos e pedidos do seu lanche",
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 14,

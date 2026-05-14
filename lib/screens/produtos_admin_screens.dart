@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -568,6 +569,9 @@ Future<void> editarProduto(
       extendBodyBehindAppBar: true,
 
       appBar: AppBar(
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
 
         backgroundColor: Colors.transparent,
         elevation: 0,

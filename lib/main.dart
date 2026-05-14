@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/login_screens.dart';
@@ -11,13 +12,31 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform);
-    await FirebaseMessaging.instance.requestPermission();
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-String? token = await FirebaseMessaging.instance.getToken();
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-print("TOKEN FCM:");
-print(token);
+  // 🔥 PEDIR PERMISSÃO
+  await messaging.requestPermission();
+
+  String? token;
+
+  // 🔥 WEB
+  if (kIsWeb) {
+    token = await messaging.getToken(
+      vapidKey:
+          "BO5IaTz8CrDF_CsdriA21GX6zcqkU0A23L3Agb_mjJ1DXwn3Q2XzJb0A7F4A-WUSmcGIeQkz5yhHkkBm6UG80Yo",
+    );
+  }
+
+  // 🔥 ANDROID
+  else {
+    token = await messaging.getToken();
+  }
+
+  print("TOKEN FCM:");
+  print(token);
 
   runApp(const MyApp());
 }

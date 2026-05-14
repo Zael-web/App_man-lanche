@@ -233,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen>
           const AnimatedBackground(),
 
           const FloatingFood(
-            icon: Icons.lunch_dining,
+            image: "assets/images/hamburguer.png",
             left: 20,
             top: 120,
             size: 65,
@@ -241,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
 
           const FloatingFood(
-            icon: Icons.fastfood,
+            image: "assets/images/batata.png",
             left: 280,
             top: 250,
             size: 60,
@@ -249,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
 
           const FloatingFood(
-            icon: Icons.local_pizza,
+            image: "assets/images/pizza.png",
             left: 140,
             top: 480,
             size: 55,
@@ -257,12 +257,13 @@ class _LoginScreenState extends State<LoginScreen>
           ),
 
           const FloatingFood(
-            icon: Icons.local_drink,
+            image: "assets/images/refrigerantes.png",
             left: 320,
             top: 100,
-            size: 50,
+            size: 70,
             duration: Duration(seconds: 9),
           ),
+          
 
           SafeArea(
             child: SingleChildScrollView(
@@ -718,7 +719,7 @@ class _AnimatedBackgroundState
 // 🍔 ÍCONES FLUTUANDO
 
 class FloatingFood extends StatefulWidget {
-  final IconData icon;
+  final String image;
   final double left;
   final double top;
   final double size;
@@ -726,7 +727,7 @@ class FloatingFood extends StatefulWidget {
 
   const FloatingFood({
     super.key,
-    required this.icon,
+    required this.image,
     required this.left,
     required this.top,
     required this.size,
@@ -779,13 +780,14 @@ class _FloatingFoodState
           left: widget.left,
           top: widget.top + animation.value,
           child: Opacity(
-            opacity: 0.10,
-            child: Icon(
-              widget.icon,
-              size: widget.size,
-              color: Colors.white,
+            opacity: 0.40,
+            child: Image.asset(
+                widget.image,
+                width: widget.size,
+                height: widget.size,
+                fit: BoxFit.contain,
+                ),
             ),
-          ),
         );
       },
     );

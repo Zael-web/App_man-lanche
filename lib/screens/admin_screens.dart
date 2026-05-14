@@ -166,11 +166,11 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.white),
         title: Text(
           "PRODUTOS",
           style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? Colors.white : Colors.white70,
             fontWeight: FontWeight.bold,
           ),
         ),

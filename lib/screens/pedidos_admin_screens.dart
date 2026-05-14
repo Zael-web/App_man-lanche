@@ -60,7 +60,7 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
         decoration: BoxDecoration(
           color: isDark
               ? Colors.white.withValues(alpha: 0.08)
-              : Colors.black.withOpacity(0.04),
+              : Colors.black.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: isDark ? Colors.white24 : Colors.black12,
@@ -73,7 +73,7 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
             Text(
               value,
               style: TextStyle(
-                color: isDark ? Colors.white : Colors.black,
+                color: isDark ? Colors.white : Colors.white70,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -81,7 +81,7 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
             Text(
               title,
               style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.black54,
+                color: isDark ? Colors.white70 : const Color.fromARGB(137, 243, 243, 243),
               ),
             ),
           ],
@@ -106,14 +106,14 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
         elevation: 0,
         iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           "Painel de Pedidos",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? Colors.white : Colors.white,
           ),
         ),
       ),

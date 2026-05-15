@@ -232,50 +232,72 @@ class _ClientScreenState extends State<ClientScreen> {
           ),
         ),
 
-        leading: IconButton(
-          icon: const Icon(
-            Icons.logout,
-            color: Colors.white,
+leading: IconButton(
+  icon: const Icon(
+    Icons.logout,
+    color: Colors.white,
+  ),
+
+  onPressed: () async {
+
+    final sair = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Sair da conta"),
+
+          content: const Text(
+            "Deseja sair da sua conta?",
           ),
 
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text("Sair da conta"),
-                  content: const Text(
-                    "Tem certeza que deseja sair?",
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Cancelar"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const LoginScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Sair",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                );
+          actions: [
+
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
               },
-            );
-          },
+              child: const Text("Cancelar"),
+            ),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+
+              child: const Text(
+                "Sair",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (sair == true) {
+
+      // 🔥 LOGOUT FIREBASE
+      await FirebaseAuth.instance.signOut();
+
+      if (!mounted) return;
+
+      // 🔥 REMOVE TODAS AS TELAS
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
         ),
+        (route) => false,
+      );
+    }
+  },
+),
 
         actions: [
           Padding(

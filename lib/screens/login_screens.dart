@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen>
     _controller.forward();
   }
 
-  // 🔥 LOGIN EMAIL/SENHA
+  // 🔥 LOGIN
   Future<void> login() async {
     try {
       final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🔥 GOOGLE LOGIN
+  // 🔥 LOGIN GOOGLE
   Future<void> loginGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -225,6 +225,9 @@ class _LoginScreenState extends State<LoginScreen>
 
     final size = MediaQuery.of(context).size;
 
+    final largura = MediaQuery.of(context).size.width;
+    final altura = MediaQuery.of(context).size.height;
+
     final isSmall = size.height < 700;
 
     return Scaffold(
@@ -232,38 +235,41 @@ class _LoginScreenState extends State<LoginScreen>
         children: [
           const AnimatedBackground(),
 
-          const FloatingFood(
+          // 🍔 HAMBÚRGUER
+          FloatingFood(
             image: "assets/images/hamburguer.png",
-            left: 100,
-            top: 120,
-            size: 65,
-            duration: Duration(seconds: 3),
+            left: largura * 0.08,
+            top: altura * 0.12,
+            size: largura * 0.16,
+            duration: const Duration(seconds: 3),
           ),
 
-          const FloatingFood(
+          // 🍟 BATATA
+          FloatingFood(
             image: "assets/images/batata.png",
-            left: 340,
-            top: 300,
-            size: 60,
-            duration: Duration(seconds: 3),
+            left: largura * 0.72,
+            top: altura * 0.30,
+            size: largura * 0.15,
+            duration: const Duration(seconds: 3),
           ),
 
-          const FloatingFood(
+          // 🍕 PIZZA
+          FloatingFood(
             image: "assets/images/pizza.png",
-            left: 100,
-            top: 300,
-            size: 55,
-            duration: Duration(seconds: 3),
+            left: largura * 0.10,
+            top: altura * 0.38,
+            size: largura * 0.14,
+            duration: const Duration(seconds: 3),
           ),
 
-          const FloatingFood(
+          // 🥤 REFRIGERANTE
+          FloatingFood(
             image: "assets/images/refrigerantes.png",
-            left: 340,
-            top: 120,
-            size: 70,
-            duration: Duration(seconds: 3),
+            left: largura * 0.70,
+            top: altura * 0.12,
+            size: largura * 0.17,
+            duration: const Duration(seconds: 3),
           ),
-          
 
           SafeArea(
             child: SingleChildScrollView(
@@ -297,11 +303,10 @@ class _LoginScreenState extends State<LoginScreen>
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white 
+                                      color: Colors.white
                                           .withOpacity(0.12),
                                       borderRadius:
-                                          BorderRadius.circular(
-                                              15),
+                                          BorderRadius.circular(15),
                                     ),
                                     child: IconButton(
                                       icon: Icon(
@@ -360,8 +365,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       : Colors.white
                                           .withOpacity(0.18),
                                   borderRadius:
-                                      BorderRadius.circular(
-                                          30),
+                                      BorderRadius.circular(30),
                                   border: Border.all(
                                     color: Colors.white24,
                                   ),
@@ -383,32 +387,25 @@ class _LoginScreenState extends State<LoginScreen>
                                         prefixIcon:
                                             const Icon(
                                           Icons.email,
-                                          color: Color(
-                                              0xFF7D2035),
+                                          color: Color(0xFF7D2035),
                                         ),
                                         filled: true,
                                         fillColor: isDark
                                             ? Colors.white
-                                                .withOpacity(
-                                                    0.08)
+                                                .withOpacity(0.08)
                                             : Colors.white
-                                                .withOpacity(
-                                                    0.9),
+                                                .withOpacity(0.9),
                                         border:
                                             OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius
-                                                  .circular(
-                                                      18),
+                                              BorderRadius.circular(18),
                                           borderSide:
-                                              BorderSide
-                                                  .none,
+                                              BorderSide.none,
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(
-                                        height: 16),
+                                    const SizedBox(height: 16),
 
                                     TextField(
                                       controller:
@@ -427,26 +424,20 @@ class _LoginScreenState extends State<LoginScreen>
                                         prefixIcon:
                                             const Icon(
                                           Icons.lock,
-                                          color: Color(
-                                              0xFFB8860B),
+                                          color: Color(0xFFB8860B),
                                         ),
                                         suffixIcon: Row(
                                           mainAxisSize:
-                                              MainAxisSize
-                                                  .min,
+                                              MainAxisSize.min,
                                           children: [
                                             IconButton(
                                               icon: Icon(
                                                 mostrarSenha
-                                                    ? Icons
-                                                        .visibility_off
-                                                    : Icons
-                                                        .visibility,
+                                                    ? Icons.visibility_off
+                                                    : Icons.visibility,
                                               ),
-                                              onPressed:
-                                                  () {
-                                                setState(
-                                                    () {
+                                              onPressed: () {
+                                                setState(() {
                                                   mostrarSenha =
                                                       !mostrarSenha;
                                                 });
@@ -465,58 +456,45 @@ class _LoginScreenState extends State<LoginScreen>
                                         filled: true,
                                         fillColor: isDark
                                             ? Colors.white
-                                                .withOpacity(
-                                                    0.08)
+                                                .withOpacity(0.08)
                                             : Colors.white
-                                                .withOpacity(
-                                                    0.9),
+                                                .withOpacity(0.9),
                                         border:
                                             OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius
-                                                  .circular(
-                                                      18),
+                                              BorderRadius.circular(18),
                                           borderSide:
-                                              BorderSide
-                                                  .none,
+                                              BorderSide.none,
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(
-                                        height: 22),
+                                    const SizedBox(height: 22),
 
                                     SizedBox(
-                                      width:
-                                          double.infinity,
-                                      height: isSmall
-                                          ? 50
-                                          : 56,
-                                      child:
-                                          ElevatedButton(
+                                      width: double.infinity,
+                                      height:
+                                          isSmall ? 50 : 56,
+                                      child: ElevatedButton(
                                         style:
-                                            ElevatedButton
-                                                .styleFrom(
+                                            ElevatedButton.styleFrom(
                                           backgroundColor:
                                               const Color(0xFFFFC107),
-                                            foregroundColor:
+                                          foregroundColor:
                                               Colors.white,
                                           shape:
                                               RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(
-                                                    18),
+                                                BorderRadius.circular(18),
                                           ),
                                         ),
                                         onPressed: login,
                                         child: const Text(
                                           'Entrar',
-                                          style:
-                                              TextStyle(
+                                          style: TextStyle(
                                             fontSize: 18,
                                             fontWeight:
-                                                FontWeight
-                                                    .bold,
+                                                FontWeight.bold,
                                           ),
                                         ),
                                       ),
@@ -529,14 +507,12 @@ class _LoginScreenState extends State<LoginScreen>
 
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .center,
+                                    MainAxisAlignment.center,
                                 children: [
                                   const Text(
                                     "Não tem uma conta?",
                                     style: TextStyle(
-                                      color:
-                                          Colors.white,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   TextButton(
@@ -552,11 +528,10 @@ class _LoginScreenState extends State<LoginScreen>
                                     child: const Text(
                                       "Cadastre-se",
                                       style: TextStyle(
-                                        color: Color(
-                                            0xFFFFE082),
+                                        color:
+                                            Color(0xFFFFE082),
                                         fontWeight:
-                                            FontWeight
-                                                .bold,
+                                            FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -567,26 +542,22 @@ class _LoginScreenState extends State<LoginScreen>
 
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .center,
+                                    MainAxisAlignment.center,
                                 children: [
                                   socialButton(
                                     Icons.facebook,
                                     Colors.blue,
                                   ),
 
-                                  const SizedBox(
-                                      width: 15),
+                                  const SizedBox(width: 15),
 
                                   socialButton(
                                     Icons.g_mobiledata,
                                     Colors.orange,
-                                    onTap:
-                                        loginGoogle,
+                                    onTap: loginGoogle,
                                   ),
 
-                                  const SizedBox(
-                                      width: 15),
+                                  const SizedBox(width: 15),
 
                                   socialButton(
                                     Icons.camera_alt,
@@ -642,7 +613,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 }
 
-// 🌌 FUNDO ANIMADO
+// 🌌 FUNDO
 class AnimatedBackground extends StatefulWidget {
   const AnimatedBackground({super.key});
 
@@ -692,8 +663,6 @@ class _AnimatedBackgroundState
                 1,
                 1 - controller.value,
               ),
-
-              // 🌙 DARK MODE
               colors: isDark
                   ? const [
                       Color(0xFF050505),
@@ -701,8 +670,6 @@ class _AnimatedBackgroundState
                       Color(0xFF1A1A1A),
                       Color(0xFF222222),
                     ]
-
-                  // ☀️ LIGHT MODE
                   : const [
                       Color(0xFF4A0E0F),
                       Color(0xFF7A2323),
@@ -717,8 +684,7 @@ class _AnimatedBackgroundState
   }
 }
 
-// 🍔 ÍCONES FLUTUANDO
-
+// 🍔 ALIMENTOS FLUTUANDO
 class FloatingFood extends StatefulWidget {
   final String image;
   final double left;
@@ -781,22 +747,21 @@ class _FloatingFoodState
           left: widget.left,
           top: widget.top + animation.value,
           child: Opacity(
-            opacity: 0.40,
+            opacity: 0.18,
             child: Image.asset(
-                widget.image,
-                width: widget.size,
-                height: widget.size,
-                fit: BoxFit.contain,
-                ),
+              widget.image,
+              width: widget.size,
+              height: widget.size,
+              fit: BoxFit.contain,
             ),
+          ),
         );
       },
     );
   }
 }
 
-// ✨ LOGO PREMIUM
-
+// ✨ LOGO
 class FloatingLogo extends StatefulWidget {
   const FloatingLogo({super.key});
 

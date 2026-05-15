@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
 import 'package:mana_lanche/screens/carrinho_screens.dart';
-import 'dart:async';
 
 class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
@@ -33,7 +34,7 @@ class _ClientScreenState extends State<ClientScreen> {
 
   int bannerAtual = 0;
 
-  StreamSubscription? pedidosSub; // ✅ CORRIGIDO (com espaço)
+  StreamSubscription? pedidosSub;
 
   String? ultimoStatus;
 
@@ -68,12 +69,12 @@ class _ClientScreenState extends State<ClientScreen> {
     pesquisaController.dispose();
     bannerController.dispose();
 
-    pedidosSub?.cancel(); // 🔥 IMPORTANTE
+    pedidosSub?.cancel();
 
     super.dispose();
   }
 
-  // 🔥 ESCUTAR MUDANÇA DO PEDIDO
+  // 🔥 ESCUTAR PEDIDO
   void escutarPedidoUnico() {
     if (pedidoIdAtual == null) return;
 
@@ -83,6 +84,7 @@ class _ClientScreenState extends State<ClientScreen> {
         .snapshots()
         .listen((doc) {
           final data = doc.data();
+
           if (data == null) return;
 
           final status = data["status"];
@@ -93,92 +95,9 @@ class _ClientScreenState extends State<ClientScreen> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  behavior: SnackBarBehavior.floating,
-
-                  backgroundColor: Colors.transparent,
-
-                  elevation: 0,
-
-                  duration: const Duration(seconds: 3),
-
-                  content: Container(
-                    padding: const EdgeInsets.all(16),
-
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF7A2323), Color(0xFFB33939)],
-                      ),
-
-                      borderRadius: BorderRadius.circular(20),
-
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.25),
-
-                          blurRadius: 10,
-
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-
-                          child: Icon(
-                            status == "Entregue"
-                                ? Icons.check_circle
-                                : status == "Saiu entrega"
-                                ? Icons.delivery_dining
-                                : Icons.restaurant,
-
-                            color: Colors.white,
-
-                            size: 28,
-                          ),
-                        ),
-
-                        const SizedBox(width: 14),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            mainAxisSize: MainAxisSize.min,
-
-                            children: [
-                              const Text(
-                                "Pedido Atualizado",
-
-                                style: TextStyle(
-                                  color: Colors.white,
-
-                                  fontWeight: FontWeight.bold,
-
-                                  fontSize: 16,
-                                ),
-                              ),
-
-                              const SizedBox(height: 4),
-
-                              Text(
-                                "Seu pedido agora está: $status",
-
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  backgroundColor: const Color(0xFF7A2323),
+                  content: Text(
+                    "Seu pedido agora está: $status",
                   ),
                 ),
               );
@@ -198,16 +117,18 @@ class _ClientScreenState extends State<ClientScreen> {
         fraseIndex = (fraseIndex + 1) % frases.length;
       });
 
-      return true;
+      return mounted;
     });
   }
 
-  // 🔥 BANNER AUTO
+  // 🔥 BANNER
   void iniciarBanner() {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 4));
 
       if (!mounted) return false;
+
+      if (!bannerController.hasClients) return false;
 
       bannerAtual++;
 
@@ -215,19 +136,17 @@ class _ClientScreenState extends State<ClientScreen> {
         bannerAtual = 0;
       }
 
-      bannerController.animateToPage(
+      await bannerController.animateToPage(
         bannerAtual,
-
         duration: const Duration(milliseconds: 600),
-
         curve: Curves.easeInOut,
       );
 
-      return true;
+      return mounted;
     });
   }
 
-  // 🔥 NOME USUÁRIO
+  // 🔥 CARREGAR NOME
   Future<void> carregarNome() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -241,13 +160,15 @@ class _ClientScreenState extends State<ClientScreen> {
     if (!mounted) return;
 
     setState(() {
-      nomeCliente = doc.exists ? doc["nome"] ?? "Cliente" : "Cliente";
+      nomeCliente = doc.exists
+          ? doc["nome"] ?? "Cliente"
+          : "Cliente";
 
       carregando = false;
     });
   }
 
-  // 🔥 CARRINHO
+  // 🔥 ADICIONAR AO CARRINHO
   void adicionarAoCarrinho(
     String nome,
     dynamic preco,
@@ -258,10 +179,14 @@ class _ClientScreenState extends State<ClientScreen> {
       animatingIndex = index;
     });
 
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(
+      const Duration(milliseconds: 200),
+    );
 
     setState(() {
-      final i = carrinho.indexWhere((item) => item["nomeProduto"] == nome);
+      final i = carrinho.indexWhere(
+        (item) => item["nomeProduto"] == nome,
+      );
 
       if (i >= 0) {
         carrinho[i]["quantidade"]++;
@@ -270,8 +195,6 @@ class _ClientScreenState extends State<ClientScreen> {
           "nomeProduto": nome,
           "preco": preco,
           "quantidade": 1,
-
-          // 🔥 ISSO É O MAIS IMPORTANTE
           "imagem": imagem,
         });
       }
@@ -282,104 +205,76 @@ class _ClientScreenState extends State<ClientScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: const Color(0xFF7A2323),
-
-        content: Text("🍔 $nome adicionado ao carrinho"),
+        content: Text("🍔 $nome adicionado"),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-
         elevation: 0,
-
         centerTitle: true,
 
         title: const Text(
           "MANÁ LANCHES",
-
           style: TextStyle(
             color: Colors.white,
-
             fontWeight: FontWeight.bold,
-
             letterSpacing: 1,
           ),
         ),
 
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.logout,
+            color: Colors.white,
+          ),
 
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.10),
-
-              borderRadius: BorderRadius.circular(14),
-            ),
-
-            child: IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  barrierColor: Colors.black54,
-                  builder: (_) {
-                    return AlertDialog(
-                      backgroundColor: const Color(0xFF1A1A1A),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      title: const Text(
-                        "Sair da conta",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      content: const Text(
-                        "Tem certeza que deseja sair de sua conta?",
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            "Cancelar",
-                            style: TextStyle(color: Colors.white70),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text("Sair da conta"),
+                  content: const Text(
+                    "Tem certeza que deseja sair?",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancelar"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LoginScreen(),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const LoginScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Sair",
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                        );
+                      },
+                      child: const Text(
+                        "Sair",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
                 );
               },
-            ),
-          ),
+            );
+          },
         ),
 
         actions: [
@@ -388,49 +283,44 @@ class _ClientScreenState extends State<ClientScreen> {
 
             child: Stack(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.10),
-
-                    borderRadius: BorderRadius.circular(14),
+                IconButton(
+                  icon: const Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
                   ),
 
-                  child: IconButton(
-                    icon: const Icon(Icons.shopping_cart, color: Colors.white),
-
-                    onPressed: () async {
-                      final pedidoId = await Navigator.push(
-                        context,
-
-                        MaterialPageRoute(
-                          builder: (_) => CarrinhoScreen(
-                            carrinho: carrinho,
-
-                            nomeCliente: nomeCliente,
-                          ),
+                  onPressed: () async {
+                    final pedidoId =
+                        await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CarrinhoScreen(
+                          carrinho: carrinho,
+                          nomeCliente: nomeCliente,
                         ),
-                      );
-                      if (pedidoId != null) {
-                        pedidoIdAtual = pedidoId;
+                      ),
+                    );
 
-                        escutarPedidoUnico();
-                      }
-                    },
-                  ),
+                    if (pedidoId != null) {
+                      pedidoIdAtual = pedidoId;
+
+                      escutarPedidoUnico();
+                    }
+                  },
                 ),
 
                 if (carrinho.isNotEmpty)
                   Positioned(
-                    right: 2,
-                    top: 2,
+                    right: 0,
+                    top: 0,
 
                     child: Container(
                       padding: const EdgeInsets.all(5),
 
                       decoration: BoxDecoration(
                         color: Colors.red,
-
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius:
+                            BorderRadius.circular(20),
                       ),
 
                       child: Text(
@@ -438,7 +328,6 @@ class _ClientScreenState extends State<ClientScreen> {
 
                         style: const TextStyle(
                           color: Colors.white,
-
                           fontSize: 11,
                         ),
                       ),
@@ -449,8 +338,10 @@ class _ClientScreenState extends State<ClientScreen> {
           ),
         ],
       ),
+
       body: Container(
         width: double.infinity,
+
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
@@ -465,6 +356,7 @@ class _ClientScreenState extends State<ClientScreen> {
                     const Color(0xFF9B2C2C),
                     const Color(0xFFB33939),
                   ],
+
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -475,15 +367,21 @@ class _ClientScreenState extends State<ClientScreen> {
             physics: const BouncingScrollPhysics(),
 
             slivers: [
-              // 🔥 NOME + FRASES
+              // 🔥 TOPO
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
+
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
                     children: [
                       Text(
-                        carregando ? "Carregando..." : "Olá, $nomeCliente 👋",
+                        carregando
+                            ? "Carregando..."
+                            : "Olá, $nomeCliente 👋",
+
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -494,10 +392,17 @@ class _ClientScreenState extends State<ClientScreen> {
                       const SizedBox(height: 8),
 
                       AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 500),
+                        duration: const Duration(
+                          milliseconds: 500,
+                        ),
+
                         child: Text(
                           frases[fraseIndex],
-                          key: ValueKey(frases[fraseIndex]),
+
+                          key: ValueKey(
+                            frases[fraseIndex],
+                          ),
+
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 16,
@@ -516,58 +421,104 @@ class _ClientScreenState extends State<ClientScreen> {
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 220,
+
                   child: PageView.builder(
                     controller: bannerController,
+
                     itemCount: banners.length,
+
                     itemBuilder: (_, index) {
                       return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        margin:
+                            const EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
+
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius:
+                              BorderRadius.circular(30),
+
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.30),
+                              color: Colors.black
+                                  .withOpacity(0.30),
+
                               blurRadius: 20,
-                              offset: const Offset(0, 10),
+
+                              offset:
+                                  const Offset(0, 10),
                             ),
                           ],
                         ),
+
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius:
+                              BorderRadius.circular(30),
+
                           child: Stack(
                             fit: StackFit.expand,
+
                             children: [
-                              Image.network(banners[index], fit: BoxFit.cover),
+                              Image.network(
+                                banners[index],
+                                fit: BoxFit.cover,
+                              ),
+
                               Container(
                                 decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
+                                  gradient:
+                                      LinearGradient(
+                                    begin:
+                                        Alignment.topCenter,
+
+                                    end:
+                                        Alignment.bottomCenter,
+
                                     colors: [
-                                      Colors.black.withValues(alpha: 0.15),
-                                      Colors.black.withValues(alpha: 0.80),
+                                      Colors.black
+                                          .withOpacity(0.15),
+
+                                      Colors.black
+                                          .withOpacity(0.80),
                                     ],
                                   ),
                                 ),
                               ),
+
                               const Positioned(
                                 left: 20,
                                 bottom: 20,
+
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment
+                                          .start,
+
                                   children: [
                                     Text(
                                       "MANÁ LANCHES 🍔",
+
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color:
+                                            Colors.white,
+
                                         fontSize: 24,
-                                        fontWeight: FontWeight.bold,
+
+                                        fontWeight:
+                                            FontWeight
+                                                .bold,
                                       ),
                                     ),
+
                                     SizedBox(height: 6),
+
                                     Text(
                                       "Peça agora e receba rápido",
-                                      style: TextStyle(color: Colors.white70),
+
+                                      style: TextStyle(
+                                        color:
+                                            Colors.white70,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -581,73 +532,91 @@ class _ClientScreenState extends State<ClientScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 20),
+              ),
 
               // 🔥 PESQUISA
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.20), // 🔥 fix principal
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.white24),
-                    ),
+  padding: const EdgeInsets.symmetric(horizontal: 16),
 
-                    child: TextField(
-                      controller: pesquisaController,
-                      onChanged: (value) {
-                        setState(() {
-                          pesquisa = value.toLowerCase();
-                        });
-                      },
+  child: Container(
+    decoration: BoxDecoration(
+      color: Colors.white.withValues(alpha: 0.10), // 🔥 transparência
+      borderRadius: BorderRadius.circular(18),
 
-                      style: const TextStyle(
-                        color: Colors.white, // 🔥 força visibilidade sempre
-                      ),
+      border: Border.all(
+        color: Colors.white.withValues(alpha: 0.15),
+      ),
+    ),
 
-                      cursorColor: Colors.white,
+    child: TextField(
+      controller: pesquisaController,
 
-                      // 🔥 ESSENCIAL (remove fundo branco do modo claro)
-                      decoration: InputDecoration(
-                        hintText: "Pesquisar produto...",
-                        hintStyle: const TextStyle(color: Colors.white70),
+      onChanged: (value) {
+        setState(() {
+          pesquisa = value.toLowerCase();
+        });
+      },
 
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Colors.white70,
-                        ),
+      style: const TextStyle(
+        color: Colors.white,
+      ),
 
-                        filled: true,
-                        fillColor: Colors
-                            .transparent, // 🔥 chave do problema resolvido
+      cursorColor: Colors.white,
 
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
+      decoration: InputDecoration(
+        hintText: "Pesquisar produto...",
 
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 10,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+        hintStyle: TextStyle(
+          color: Colors.white.withValues(alpha: 0.55),
+        ),
+
+        prefixIcon: Icon(
+          Icons.search,
+          color: Colors.white.withValues(alpha: 0.55),
+        ),
+
+        filled: true,
+
+        // 🔥 REMOVE O BRANCO
+        fillColor: Colors.transparent,
+
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+        ),
+      ),
+    ),
+  ),
+),
               ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 18)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 18),
+              ),
 
-              // 🔥 CATEGORIAS (MENOR)
+              // 🔥 CATEGORIAS
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 45,
+
                   child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    scrollDirection:
+                        Axis.horizontal,
+
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
+
                     children: [
                       categoriaChip("todos"),
-                      categoriaChip("Hamburguer"),
+                      categoriaChip("hamburguer"),
                       categoriaChip("pizza"),
                       categoriaChip("bebida"),
                       categoriaChip("combos"),
@@ -657,75 +626,116 @@ class _ClientScreenState extends State<ClientScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 18)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 18),
+              ),
 
               // 🔥 TÍTULO
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding:
+                      EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+
                   child: Text(
                     "Produtos",
+
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontWeight:
+                          FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 10)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 10),
+              ),
 
-              // 🔥 PRODUTOS (SCROLL REAL)
+              // 🔥 PRODUTOS
               StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
+                stream: FirebaseFirestore
+                    .instance
                     .collection("produtos")
                     .orderBy("nome")
                     .snapshots(),
+
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(
+                        child:
+                            CircularProgressIndicator(),
+                      ),
                     );
                   }
 
-                  final docs = snapshot.data!.docs;
+                  final docs =
+                      snapshot.data!.docs;
 
-                  final filtrados = docs.where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
+                  final filtrados =
+                      docs.where((doc) {
+                    final data =
+                        doc.data()
+                            as Map<String, dynamic>;
 
-                    final categoria = (data["categoria"] ?? "")
-                        .toString()
-                        .toLowerCase();
-                    final nome = (data["nome"] ?? "").toString().toLowerCase();
+                    final categoria =
+                        (data["categoria"] ?? "")
+                            .toString()
+                            .toLowerCase();
 
-                    final categoriaOk = categoriaSelecionada == "todos"
-                        ? true
-                        : categoria == categoriaSelecionada.toLowerCase();
+                    final nome =
+                        (data["nome"] ?? "")
+                            .toString()
+                            .toLowerCase();
 
-                    final pesquisaOk = nome.contains(pesquisa);
+                    final categoriaOk =
+                        categoriaSelecionada ==
+                                "todos"
+                            ? true
+                            : categoria ==
+                                categoriaSelecionada;
 
-                    return categoriaOk && pesquisaOk;
+                    final pesquisaOk =
+                        nome.contains(pesquisa);
+
+                    return categoriaOk &&
+                        pesquisaOk;
                   }).toList();
 
                   return SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final data =
-                          filtrados[index].data() as Map<String, dynamic>;
+                    delegate:
+                        SliverChildBuilderDelegate(
+                      (context, index) {
+                        final data =
+                            filtrados[index].data()
+                                as Map<
+                                  String,
+                                  dynamic
+                                >;
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: foodItem(
-                          data["nome"] ?? "",
-                          data["preco"] ?? 0,
-                          data["imagem"] ?? "",
-                          index,
-                        ),
-                      );
-                    }, childCount: filtrados.length),
+                        return Padding(
+                          padding:
+                              const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+
+                          child: foodItem(
+                            data["nome"] ?? "",
+                            data["preco"] ?? 0,
+                            data["imagem"] ?? "",
+                            index,
+                          ),
+                        );
+                      },
+
+                      childCount:
+                          filtrados.length,
+                    ),
                   );
                 },
               ),
@@ -736,44 +746,60 @@ class _ClientScreenState extends State<ClientScreen> {
     );
   }
 
-  // 🔥 CHIP CATEGORIA
+  // 🔥 CATEGORIAS
   Widget categoriaChip(String titulo) {
     final selecionado =
-        categoriaSelecionada.toLowerCase() == titulo.toLowerCase();
+        categoriaSelecionada == titulo;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          categoriaSelecionada = titulo.toLowerCase();
+          categoriaSelecionada = titulo;
         });
       },
 
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration:
+            const Duration(milliseconds: 250),
 
-        margin: const EdgeInsets.only(right: 12),
+        margin:
+            const EdgeInsets.only(right: 12),
 
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 22,
+          vertical: 12,
+        ),
 
         decoration: BoxDecoration(
           gradient: selecionado
               ? const LinearGradient(
-                  colors: [Color(0xFFFFD166), Color(0xFFFFB703)],
+                  colors: [
+                    Color(0xFFFFD166),
+                    Color(0xFFFFB703),
+                  ],
                 )
               : null,
 
-          color: selecionado ? null : Colors.white.withValues(alpha: 0.10),
+          color: selecionado
+              ? null
+              : Colors.white.withOpacity(0.10),
 
-          borderRadius: BorderRadius.circular(20),
+          borderRadius:
+              BorderRadius.circular(20),
 
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          border: Border.all(
+            color: Colors.white24,
+          ),
         ),
 
         child: Text(
           titulo,
 
           style: TextStyle(
-            color: selecionado ? Colors.black : Colors.white,
+            color: selecionado
+                ? Colors.black
+                : Colors.white,
 
             fontWeight: FontWeight.bold,
           ),
@@ -783,46 +809,63 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   // 🔥 CARD PRODUTO
-  Widget foodItem(String nome, dynamic preco, String imagem, int index) {
-    final isAnimating = animatingIndex == index;
+  Widget foodItem(
+    String nome,
+    dynamic preco,
+    String imagem,
+    int index,
+  ) {
+    final isAnimating =
+        animatingIndex == index;
 
     return AnimatedScale(
-      duration: const Duration(milliseconds: 180),
+      duration:
+          const Duration(milliseconds: 180),
+
       scale: isAnimating ? 0.97 : 1,
 
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12), // 🔥 menor espaçamento
+        margin:
+            const EdgeInsets.only(bottom: 12),
 
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(20), // 🔥 menos “gordinho”
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          color:
+              Colors.white.withOpacity(0.10),
+
+          borderRadius:
+              BorderRadius.circular(20),
+
+          border: Border.all(
+            color: Colors.white24,
+          ),
         ),
 
         child: Row(
           children: [
-            // 🔥 IMAGEM MENOR
             ClipRRect(
-              borderRadius: const BorderRadius.only(
+              borderRadius:
+                  const BorderRadius.only(
                 topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
+                bottomLeft:
+                    Radius.circular(20),
               ),
 
               child: Image.network(
                 imagem,
-                width: 85, // 🔥 antes 120 → agora menor
-                height: 85, // 🔥 antes 120 → agora menor
+                width: 85,
+                height: 85,
                 fit: BoxFit.cover,
 
-                errorBuilder: (_, __, ___) {
+                errorBuilder:
+                    (_, __, ___) {
                   return Container(
                     width: 85,
                     height: 85,
                     color: Colors.black12,
+
                     child: const Icon(
                       Icons.fastfood,
                       color: Colors.white,
-                      size: 30,
                     ),
                   );
                 },
@@ -831,79 +874,86 @@ class _ClientScreenState extends State<ClientScreen> {
 
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ), // 🔥 menos espaço interno
+                padding:
+                    const EdgeInsets.all(12),
 
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
 
                   children: [
-                    // 🔥 NOME MENOR
                     Text(
                       nome,
+
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+
+                      overflow:
+                          TextOverflow.ellipsis,
+
+                      style:
+                          const TextStyle(
                         color: Colors.white,
-                        fontSize: 16, // 🔥 antes 20 → menor
-                        fontWeight: FontWeight.bold,
+                        fontWeight:
+                            FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
 
                     const SizedBox(height: 6),
 
-                    // 🔥 PREÇO MENOR
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
+                    Text(
+                      "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
 
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFD166).withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-
-                      child: Text(
-                        "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
-                        style: const TextStyle(
-                          color: Color(0xFFFFD166),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+                      style:
+                          const TextStyle(
+                        color:
+                            Color(0xFFFFD166),
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
 
-                    // 🔥 BOTÃO MENOR
                     SizedBox(
-                      height: 34, // 🔥 antes 46 → menor
+                      height: 36,
                       width: double.infinity,
 
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7A2323),
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                        style:
+                            ElevatedButton
+                                .styleFrom(
+                          backgroundColor:
+                              const Color(
+                                  0xFF7A2323),
+
+                          shape:
+                              RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                                    12),
                           ),
-                          padding: EdgeInsets.zero,
                         ),
 
                         onPressed: () {
-                          adicionarAoCarrinho(nome, preco, index, imagem);
+                          adicionarAoCarrinho(
+                            nome,
+                            preco,
+                            index,
+                            imagem,
+                          );
                         },
 
                         child: Text(
-                          isAnimating ? "✔ Adicionado" : "Adicionar",
-                          style: const TextStyle(
+                          isAnimating
+                              ? "✔ Adicionado"
+                              : "Adicionar",
+
+                          style:
+                              const TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                            fontWeight:
+                                FontWeight.bold,
                           ),
                         ),
                       ),

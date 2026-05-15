@@ -509,41 +509,60 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // 🔎 PESQUISA
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.black.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDark ? Colors.white24 : Colors.black12,
-                    ),
-                  ),
-                  child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        pesquisa = value.toLowerCase();
-                      });
-                    },
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                    ),
-                    cursorColor: isDark ? Colors.white : Colors.black,
-                    decoration: InputDecoration(
-                      hintText: "Pesquisar produto...",
-                      hintStyle: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.black45,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: isDark ? Colors.white70 : Colors.black45,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                ),
+Container(
+  decoration: BoxDecoration(
+    color: isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.white.withValues(alpha: 0.10),
+
+    borderRadius: BorderRadius.circular(20),
+
+    border: Border.all(
+      color: isDark
+          ? Colors.white24
+          : Colors.white.withValues(alpha: 0.15),
+    ),
+  ),
+
+  child: TextField(
+    onChanged: (value) {
+      setState(() {
+        pesquisa = value.toLowerCase();
+      });
+    },
+
+    style: TextStyle(
+      color: isDark ? Colors.white : Colors.white,
+    ),
+
+    cursorColor: Colors.white,
+
+    decoration: InputDecoration(
+      hintText: "Pesquisar produto...",
+
+      hintStyle: TextStyle(
+        color: Colors.white.withValues(alpha: 0.55),
+      ),
+
+      prefixIcon: Icon(
+        Icons.search,
+        color: Colors.white.withValues(alpha: 0.55),
+      ),
+
+      // 🔥 REMOVE O FUNDO BRANCO
+      filled: true,
+      fillColor: Colors.transparent,
+
+      border: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      focusedBorder: InputBorder.none,
+
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 14,
+      ),
+    ),
+  ),
+),
 
                 const SizedBox(height: 12),
 

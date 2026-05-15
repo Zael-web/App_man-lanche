@@ -234,34 +234,34 @@ class _LoginScreenState extends State<LoginScreen>
 
           const FloatingFood(
             image: "assets/images/hamburguer.png",
-            left: 20,
+            left: 100,
             top: 120,
             size: 65,
-            duration: Duration(seconds: 6),
+            duration: Duration(seconds: 3),
           ),
 
           const FloatingFood(
             image: "assets/images/batata.png",
-            left: 280,
-            top: 250,
+            left: 340,
+            top: 300,
             size: 60,
-            duration: Duration(seconds: 8),
+            duration: Duration(seconds: 3),
           ),
 
           const FloatingFood(
             image: "assets/images/pizza.png",
-            left: 140,
-            top: 480,
+            left: 100,
+            top: 300,
             size: 55,
-            duration: Duration(seconds: 7),
+            duration: Duration(seconds: 3),
           ),
 
           const FloatingFood(
             image: "assets/images/refrigerantes.png",
-            left: 320,
-            top: 100,
+            left: 340,
+            top: 120,
             size: 70,
-            duration: Duration(seconds: 9),
+            duration: Duration(seconds: 3),
           ),
           
 
@@ -297,7 +297,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white
+                                      color: Colors.white 
                                           .withOpacity(0.12),
                                       borderRadius:
                                           BorderRadius.circular(
@@ -498,8 +498,9 @@ class _LoginScreenState extends State<LoginScreen>
                                             ElevatedButton
                                                 .styleFrom(
                                           backgroundColor:
-                                              const Color(
-                                                  0xFF7A2323),
+                                              const Color(0xFFFFC107),
+                                            foregroundColor:
+                                              Colors.white,
                                           shape:
                                               RoundedRectangleBorder(
                                             borderRadius:
@@ -706,7 +707,7 @@ class _AnimatedBackgroundState
                       Color(0xFF4A0E0F),
                       Color(0xFF7A2323),
                       Color(0xFFB33939),
-                      Color(0xFF1B1B1B),
+                      Color(0xFF7A2323),
                     ],
             ),
           ),

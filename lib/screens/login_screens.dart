@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen>
             image: "assets/images/hamburguer.png",
             left: largura * 0.08,
             top: altura * 0.12,
-            size: largura * 0.16,
+            size: largura * 0.15,
             duration: const Duration(seconds: 3),
           ),
 
@@ -248,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen>
           FloatingFood(
             image: "assets/images/batata.png",
             left: largura * 0.72,
-            top: altura * 0.30,
+            top: altura * 0.38,
             size: largura * 0.15,
             duration: const Duration(seconds: 3),
           ),
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen>
             image: "assets/images/pizza.png",
             left: largura * 0.10,
             top: altura * 0.38,
-            size: largura * 0.14,
+            size: largura * 0.15,
             duration: const Duration(seconds: 3),
           ),
 
@@ -267,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen>
             image: "assets/images/refrigerantes.png",
             left: largura * 0.70,
             top: altura * 0.12,
-            size: largura * 0.17,
+            size: largura * 0.16,
             duration: const Duration(seconds: 3),
           ),
 
@@ -539,32 +539,49 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
 
                               const SizedBox(height: 15),
+                             SizedBox(
+  width: double.infinity,
+  height: 56,
 
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
-                                children: [
-                                  socialButton(
-                                    Icons.facebook,
-                                    Colors.blue,
-                                  ),
+  child: ElevatedButton.icon(
+    style: ElevatedButton.styleFrom(
+      backgroundColor:
+          Colors.white.withOpacity(0.10),
 
-                                  const SizedBox(width: 15),
+      foregroundColor: Colors.white,
 
-                                  socialButton(
-                                    Icons.g_mobiledata,
-                                    Colors.orange,
-                                    onTap: loginGoogle,
-                                  ),
+      elevation: 0,
 
-                                  const SizedBox(width: 15),
+      side: BorderSide(
+        color: Colors.white.withOpacity(0.15),
+      ),
 
-                                  socialButton(
-                                    Icons.camera_alt,
-                                    Colors.pink,
-                                  ),
-                                ],
-                              ),
+      shape: RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(18),
+      ),
+    ),
+
+    onPressed: loginGoogle,
+
+    icon: Image.asset(
+      "assets/images/google.png",
+      width: 30,
+      height: 30,
+    ),
+
+    label: const Text(
+      "Entrar com o Google",
+
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+),
+                              
 
                               const SizedBox(height: 20),
                             ],

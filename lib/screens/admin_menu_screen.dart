@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mana_lanche/screens/admin_screens.dart';
 import 'package:mana_lanche/screens/pedidos_admin_screens.dart';
+import 'package:mana_lanche/screens/perfil_screens.dart';
 import 'package:mana_lanche/screens/login_screens.dart';
 
 class AdminMenuScreen extends StatefulWidget {
@@ -85,6 +86,18 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            color: isDark ? Colors.white : Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PerfilScreen()),
+              );
+            },
+          ),
+        ],
         centerTitle: true,
       ),
       body: Container(

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:mana_lanche/screens/login_screens.dart';
 import 'package:mana_lanche/screens/carrinho_screens.dart';
+import 'package:mana_lanche/screens/perfil_screens.dart';
 
 class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
@@ -300,6 +301,20 @@ leading: IconButton(
 ),
 
         actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PerfilScreen(),
+                ),
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
 

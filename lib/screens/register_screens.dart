@@ -13,6 +13,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final nomeController = TextEditingController();
   final emailController = TextEditingController();
   final telefoneController = TextEditingController();
+  final enderecoController = TextEditingController();
   final senhaController = TextEditingController();
   final confirmarSenhaController = TextEditingController();
 
@@ -49,6 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         "nome": nomeController.text.trim(),
         "email": emailController.text.trim(),
         "telefone": telefoneController.text.trim(),
+        "endereco": enderecoController.text.trim(),
         "tipo": "cliente",
         "createdAt": Timestamp.now(),
       });
@@ -85,6 +87,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } finally {
       if (mounted) setState(() => carregando = false);
     }
+  }
+
+  @override
+  void dispose() {
+    nomeController.dispose();
+    emailController.dispose();
+    telefoneController.dispose();
+    enderecoController.dispose();
+    senhaController.dispose();
+    confirmarSenhaController.dispose();
+    super.dispose();
   }
 
   @override
@@ -151,6 +164,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 18),
 
                 campoInput(telefoneController, "Telefone", Icons.phone, isDark),
+                const SizedBox(height: 18),
+
+                campoInput(enderecoController, "Endereço", Icons.location_on, isDark),
                 const SizedBox(height: 18),
 
                 campoInput(senhaController, "Senha", Icons.lock, isDark,

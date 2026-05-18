@@ -94,7 +94,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
     final pedidoId = pedidoRef.id;
 
     // 🔥 COLOQUE SEU NÚMERO AQUI
-    final numero = "5571999999999";
+    final numero = "5577998121262";
 
     // 🔥 LINK WHATSAPP
     final url =

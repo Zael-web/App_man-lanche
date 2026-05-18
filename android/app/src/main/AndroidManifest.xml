@@ -1,6 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- INTERNET -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- NOTIFICAÇÕES -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!-- CONSULTAS DE APPS -->
+    <queries>
+
+        <!-- Flutter PROCESS TEXT -->
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+
+        <!-- WHATSAPP -->
+        <package android:name="com.whatsapp"/>
+
+    </queries>
 
     <application
         android:label="mana_lanche"

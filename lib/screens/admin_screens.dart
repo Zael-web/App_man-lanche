@@ -41,12 +41,18 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
       }
 
       final preco = double.parse(precoTexto.replaceAll(",", "."));
+      final rawImagem = imagemController.text.trim();
+      final imagemLink = rawImagem.isEmpty
+          ? ""
+          : (rawImagem.startsWith(RegExp(r'https?://'))
+                ? rawImagem
+                : 'https://$rawImagem');
 
       await FirebaseFirestore.instance.collection("produtos").add({
         "nome": nome,
         "preco": preco,
         "categoria": categoriaController.text.trim(),
-        "imagem": imagemController.text.trim(),
+        "imagem": imagemLink,
       });
 
       if (!mounted) return;
@@ -291,9 +297,11 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
     String id,
     String nomeAtual,
     String precoAtual,
+    String imagemAtual,
   ) async {
     final nomeEditController = TextEditingController(text: nomeAtual);
     final precoEditController = TextEditingController(text: precoAtual);
+    final imagemEditController = TextEditingController(text: imagemAtual);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -452,6 +460,46 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: imagemEditController,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    hintText: "URL da imagem (opcional)",
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white38 : Colors.grey.shade600,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.image,
+                      color: Color(0xFFD2691E),
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 18,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD2691E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 30),
                 // BOTÕES
                 Row(
@@ -493,11 +541,21 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                             final novoPreco = double.parse(
                               precoEditController.text.replaceAll(",", "."),
                             );
+                            final rawImagem = imagemEditController.text.trim();
+                            final imagemLink = rawImagem.isEmpty
+                                ? ""
+                                : (rawImagem.startsWith(RegExp(r'https?://'))
+                                      ? rawImagem
+                                      : 'https://$rawImagem');
 
                             await FirebaseFirestore.instance
                                 .collection("produtos")
                                 .doc(id)
-                                .update({"nome": novoNome, "preco": novoPreco});
+                                .update({
+                                  "nome": novoNome,
+                                  "preco": novoPreco,
+                                  "imagem": imagemLink,
+                                });
 
                             if (!mounted) return;
 
@@ -566,7 +624,7 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
   Widget produtoCard(Map<String, dynamic> data, String id) {
     final nome = data["nome"] ?? "Sem nome";
     final categoria = data["categoria"] ?? "sem categoria";
-    final imagem = data["imagem"] ?? "";
+    final imagem = data["imagem"] ?? data["image"] ?? "";
     final preco = data["preco"];
 
     return Container(
@@ -648,7 +706,7 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
-              editarProduto(id, nome, preco.toString());
+              editarProduto(id, nome, preco.toString(), imagem);
             },
           ),
 

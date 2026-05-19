@@ -606,7 +606,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
       appBar: AppBar(
         title: const Text(
           "Seu carrinho",
-        ),
+          ),
+          backgroundColor: const Color(0xFF4A0E0F),
         centerTitle: true,
       ),
 

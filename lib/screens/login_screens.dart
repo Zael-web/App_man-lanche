@@ -297,32 +297,50 @@ class _LoginScreenState extends State<LoginScreen>
                             mainAxisAlignment:
                                 MainAxisAlignment.center,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white
-                                          .withValues(alpha: 0.12),
-                                      borderRadius:
-                                          BorderRadius.circular(15),
-                                    ),
-                                    child: IconButton(
-                                      icon: Icon(
-                                        isDark
-                                            ? Icons.light_mode
-                                            : Icons.dark_mode,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {
-                                        MyApp.of(context)
-                                            ?.toggleTheme();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+Align(
+  alignment: Alignment.topRight,
+
+  child: Padding(
+    padding: EdgeInsets.only(
+      top: MediaQuery.of(context).padding.top + 8,
+      right: 4,
+    ),
+
+    child: Container(
+      width: 50,
+      height: 50,
+
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.10),
+
+        borderRadius:
+            BorderRadius.circular(16),
+
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.15),
+        ),
+      ),
+
+      child: IconButton(
+        splashRadius: 24,
+
+        icon: Icon(
+          isDark
+              ? Icons.light_mode
+              : Icons.dark_mode,
+
+          color: Colors.white,
+          size: 26,
+        ),
+
+        onPressed: () {
+          MyApp.of(context)
+              ?.toggleTheme();
+        },
+      ),
+    ),
+  ),
+),
 
                               const SizedBox(height: 12),
 

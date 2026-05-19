@@ -24,6 +24,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
   final observacaoController = TextEditingController();
 
   String formaPagamento = "Dinheiro";
+  // ignore: unused_field
   bool _enderecoCarregado = false;
 
   @override

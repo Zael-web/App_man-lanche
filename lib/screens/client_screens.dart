@@ -478,7 +478,7 @@ leading: IconButton(
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black
-                                  .withOpacity(0.30),
+                                  .withValues(alpha: 0.30),
 
                               blurRadius: 20,
 
@@ -513,10 +513,10 @@ leading: IconButton(
 
                                     colors: [
                                       Colors.black
-                                          .withOpacity(0.15),
+                                          .withValues(alpha: 0.15),
 
                                       Colors.black
-                                          .withOpacity(0.80),
+                                          .withValues(alpha: 0.80),
                                     ],
                                   ),
                                 ),
@@ -820,7 +820,7 @@ leading: IconButton(
 
           color: selecionado
               ? null
-              : Colors.white.withOpacity(0.10),
+              : Colors.white.withValues(alpha: 0.10),
 
           borderRadius:
               BorderRadius.circular(20),
@@ -867,7 +867,7 @@ leading: IconButton(
 
         decoration: BoxDecoration(
           color:
-              Colors.white.withOpacity(0.10),
+              Colors.white.withValues(alpha: 0.10),
 
           borderRadius:
               BorderRadius.circular(20),

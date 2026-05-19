@@ -304,7 +304,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white
-                                          .withOpacity(0.12),
+                                          .withValues(alpha: 0.12),
                                       borderRadius:
                                           BorderRadius.circular(15),
                                     ),
@@ -347,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 "Entre para continuar",
                                 style: TextStyle(
                                   color: Colors.white
-                                      .withOpacity(0.85),
+                                      .withValues(alpha: 0.85),
                                   fontSize: 15,
                                 ),
                               ),
@@ -361,9 +361,9 @@ class _LoginScreenState extends State<LoginScreen>
                                 decoration: BoxDecoration(
                                   color: isDark
                                       ? Colors.white
-                                          .withOpacity(0.06)
+                                          .withValues(alpha: 0.06)
                                       : Colors.white
-                                          .withOpacity(0.18),
+                                          .withValues(alpha: 0.18),
                                   borderRadius:
                                       BorderRadius.circular(30),
                                   border: Border.all(
@@ -392,9 +392,9 @@ class _LoginScreenState extends State<LoginScreen>
                                         filled: true,
                                         fillColor: isDark
                                             ? Colors.white
-                                                .withOpacity(0.08)
+                                                .withValues(alpha: 0.08)
                                             : Colors.white
-                                                .withOpacity(0.9),
+                                                .withValues(alpha: 0.9),
                                         border:
                                             OutlineInputBorder(
                                           borderRadius:
@@ -456,9 +456,9 @@ class _LoginScreenState extends State<LoginScreen>
                                         filled: true,
                                         fillColor: isDark
                                             ? Colors.white
-                                                .withOpacity(0.08)
+                                                .withValues(alpha: 0.08)
                                             : Colors.white
-                                                .withOpacity(0.9),
+                                                .withValues(alpha: 0.9),
                                         border:
                                             OutlineInputBorder(
                                           borderRadius:
@@ -546,14 +546,14 @@ class _LoginScreenState extends State<LoginScreen>
   child: ElevatedButton.icon(
     style: ElevatedButton.styleFrom(
       backgroundColor:
-          Colors.white.withOpacity(0.10),
+          Colors.white.withValues(alpha: 0.10),
 
       foregroundColor: Colors.white,
 
       elevation: 0,
 
       side: BorderSide(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
       ),
 
       shape: RoundedRectangleBorder(
@@ -614,7 +614,7 @@ class _LoginScreenState extends State<LoginScreen>
         width: isSmall ? 50 : 58,
         height: isSmall ? 50 : 58,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.10),
+          color: Colors.white.withValues(alpha: 0.10),
           borderRadius:
               BorderRadius.circular(18),
           border:
@@ -837,7 +837,7 @@ class _FloatingLogoState
           boxShadow: [
             BoxShadow(
               color:
-                  Colors.red.withOpacity(0.35),
+                  Colors.red.withValues(alpha: 0.35),
               blurRadius: 35,
               spreadRadius: 5,
             ),

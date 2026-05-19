@@ -152,7 +152,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           Text(
                             email,
                             style: TextStyle(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7)
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -398,8 +398,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar perfil'),

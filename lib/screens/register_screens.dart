@@ -269,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         filled: true,
         fillColor: isDark
             ? const Color(0xFF1B1B1B)
-            : Colors.white.withOpacity(0.12),
+            : Colors.white.withValues(alpha: 0.12),
         contentPadding: const EdgeInsets.symmetric(vertical: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),

@@ -13,19 +13,289 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
   String pesquisa = "";
   String categoriaSelecionada = "todos";
 
+  final nomeAddController = TextEditingController();
+  final precoAddController = TextEditingController();
+  final categoriaAddController = TextEditingController();
+  final imagemAddController = TextEditingController();
+
+  @override
+  void dispose() {
+    nomeAddController.dispose();
+    precoAddController.dispose();
+    categoriaAddController.dispose();
+    imagemAddController.dispose();
+    super.dispose();
+  }
+
+  Future<void> adicionarProduto(
+    TextEditingController nomeController,
+    TextEditingController precoController,
+    TextEditingController categoriaController,
+    TextEditingController imagemController,
+  ) async {
+    try {
+      final nome = nomeController.text.trim();
+      final precoTexto = precoController.text.trim();
+      if (nome.isEmpty || precoTexto.isEmpty) {
+        return;
+      }
+
+      final preco = double.parse(precoTexto.replaceAll(",", "."));
+
+      await FirebaseFirestore.instance.collection("produtos").add({
+        "nome": nome,
+        "preco": preco,
+        "categoria": categoriaController.text.trim(),
+        "imagem": imagemController.text.trim(),
+      });
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Produto adicionado!")));
+
+      nomeController.clear();
+      precoController.clear();
+      categoriaController.clear();
+      imagemController.clear();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Erro ao adicionar produto: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> mostrarDialogAdicionarProduto() async {
+    final nomeController = TextEditingController();
+    final precoController = TextEditingController();
+    final categoriaController = TextEditingController();
+    final imagemController = TextEditingController();
+
+    try {
+      await showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Dialog(
+            backgroundColor: const Color.fromARGB(0, 221, 4, 4),
+            insetPadding: const EdgeInsets.all(20),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [
+                          const Color(0xFF1A1A1A),
+                          const Color(0xFF232323),
+                          const Color(0xFF2B2B2B),
+                        ]
+                      : [
+                          const Color(0xFFFFFBF7),
+                          const Color(0xFFF8EFEA),
+                          const Color(0xFFF3E4DE),
+                        ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(32),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.white.withValues(alpha: 0.7),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8B0000).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: const Icon(
+                        Icons.add_circle,
+                        color: Color(0xFF8B0000),
+                        size: 34,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      "Adicionar Produto",
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Preencha os dados do novo produto",
+                      style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: nomeController,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Nome do produto",
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white38 : Colors.grey.shade600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.fastfood_rounded,
+                          color: Color(0xFF8B0000),
+                        ),
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: precoController,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Preço",
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white38 : Colors.grey.shade600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.attach_money,
+                          color: Color(0xFFD2691E),
+                        ),
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: categoriaController,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Categoria (opcional)",
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white38 : Colors.grey.shade600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.label_outline,
+                          color: Color(0xFFD2691E),
+                        ),
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: imagemController,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "URL da imagem (opcional)",
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white38 : Colors.grey.shade600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.image,
+                          color: Color(0xFFD2691E),
+                        ),
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD2691E),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        onPressed: () => adicionarProduto(
+                          nomeController,
+                          precoController,
+                          categoriaController,
+                          imagemController,
+                        ),
+                        child: const Text(
+                          "Adicionar Produto",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } finally {
+      nomeController.dispose();
+      precoController.dispose();
+      categoriaController.dispose();
+      imagemController.dispose();
+    }
+  }
+
   // 🔥 EDITAR PRODUTO
   Future<void> editarProduto(
     String id,
     String nomeAtual,
     String precoAtual,
   ) async {
-    final nomeEditController =
-        TextEditingController(text: nomeAtual);
-    final precoEditController =
-        TextEditingController(text: precoAtual);
+    final nomeEditController = TextEditingController(text: nomeAtual);
+    final precoEditController = TextEditingController(text: precoAtual);
 
-    final isDark =
-        Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,
@@ -103,14 +373,11 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                 // CAMPO NOME
                 TextField(
                   controller: nomeEditController,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
                   decoration: InputDecoration(
                     hintText: "Nome do produto",
                     hintStyle: TextStyle(
-                      color:
-                          isDark ? Colors.white38 : Colors.grey.shade600,
+                      color: isDark ? Colors.white38 : Colors.grey.shade600,
                     ),
                     prefixIcon: const Icon(
                       Icons.fastfood_rounded,
@@ -148,14 +415,11 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                 TextField(
                   controller: precoEditController,
                   keyboardType: TextInputType.number,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
                   decoration: InputDecoration(
                     hintText: "Preço",
                     hintStyle: TextStyle(
-                      color:
-                          isDark ? Colors.white38 : Colors.grey.shade600,
+                      color: isDark ? Colors.white38 : Colors.grey.shade600,
                     ),
                     prefixIcon: const Icon(
                       Icons.attach_money,
@@ -225,20 +489,15 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                             ),
                           ),
                           onPressed: () async {
-                            final novoNome =
-                                nomeEditController.text;
+                            final novoNome = nomeEditController.text;
                             final novoPreco = double.parse(
-                              precoEditController.text
-                                  .replaceAll(",", "."),
+                              precoEditController.text.replaceAll(",", "."),
                             );
 
                             await FirebaseFirestore.instance
                                 .collection("produtos")
                                 .doc(id)
-                                .update({
-                              "nome": novoNome,
-                              "preco": novoPreco,
-                            });
+                                .update({"nome": novoNome, "preco": novoPreco});
 
                             if (!mounted) return;
 
@@ -468,6 +727,12 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: mostrarDialogAdicionarProduto,
+        icon: const Icon(Icons.add),
+        label: const Text("Adicionar"),
+        backgroundColor: const Color(0xFFD2691E),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -509,60 +774,58 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-Container(
-  decoration: BoxDecoration(
-    color: isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.white.withValues(alpha: 0.10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.white.withValues(alpha: 0.10),
 
-    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20),
 
-    border: Border.all(
-      color: isDark
-          ? Colors.white24
-          : Colors.white.withValues(alpha: 0.15),
-    ),
-  ),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white24
+                          : Colors.white.withValues(alpha: 0.15),
+                    ),
+                  ),
 
-  child: TextField(
-    onChanged: (value) {
-      setState(() {
-        pesquisa = value.toLowerCase();
-      });
-    },
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        pesquisa = value.toLowerCase();
+                      });
+                    },
 
-    style: TextStyle(
-      color: isDark ? Colors.white : Colors.white,
-    ),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.white,
+                    ),
 
-    cursorColor: Colors.white,
+                    cursorColor: Colors.white,
 
-    decoration: InputDecoration(
-      hintText: "Pesquisar produto...",
+                    decoration: InputDecoration(
+                      hintText: "Pesquisar produto...",
 
-      hintStyle: TextStyle(
-        color: Colors.white.withValues(alpha: 0.55),
-      ),
+                      hintStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.55),
+                      ),
 
-      prefixIcon: Icon(
-        Icons.search,
-        color: Colors.white.withValues(alpha: 0.55),
-      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.white.withValues(alpha: 0.55),
+                      ),
 
-      // 🔥 REMOVE O FUNDO BRANCO
-      filled: true,
-      fillColor: Colors.transparent,
+                      // 🔥 REMOVE O FUNDO BRANCO
+                      filled: true,
+                      fillColor: Colors.transparent,
 
-      border: InputBorder.none,
-      enabledBorder: InputBorder.none,
-      focusedBorder: InputBorder.none,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
 
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 14,
-      ),
-    ),
-  ),
-),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 12),
 

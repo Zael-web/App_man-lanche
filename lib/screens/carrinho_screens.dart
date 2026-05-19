@@ -422,15 +422,15 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
       // 🔥 TEXTO WHATSAPP
       String mensagem =
-          "🍔 *NOVO PEDIDO - MANÁ LANCHES* \n\n";
+          "🍔 NOVO PEDIDO - MANÁ LANCHES \n\n";
 
       for (var item in widget.carrinho) {
 
         itensPedido.add({
           "nomeProduto":
               item["nomeProduto"],
-          "preco": item["preco"],
-          "quantidade":
+          "Preco": item["preco"],
+          "Quantidade":
               item["quantidade"],
           "imagem":
               item["imagem"] ?? "",
@@ -441,16 +441,16 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
       }
 
       mensagem +=
-          "\n💰 *Total:* R\$ ${total.toStringAsFixed(2)}";
+          "\n💰 Total: R\$ ${total.toStringAsFixed(2)}";
 
       mensagem +=
-          "\n\n👤 *Cliente:* ${widget.nomeCliente}";
+          "\n\n👤 Cliente: ${widget.nomeCliente}";
 
       mensagem +=
-          "\n📍 *Endereço:* ${enderecoController.text}";
+          "\n📍 Endereço: ${enderecoController.text}";
 
       mensagem +=
-          "\n💳 *Pagamento:* $formaPagamento";
+          "\n💳 Pagamento: $formaPagamento";
 
       if (observacaoController
           .text
@@ -458,7 +458,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
           .isNotEmpty) {
 
         mensagem +=
-            "\n📝 *Observação:* ${observacaoController.text}";
+            "\n📝 Observação: ${observacaoController.text}";
       }
 
       // 🔥 SALVAR FIREBASE
@@ -495,7 +495,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
       final pedidoId = pedidoRef.id;
 
       // 🔥 NÚMERO
-      final numero = "5595984131557";
+      final numero = "5577998121262";
 
       // 🔥 APP WHATSAPP
       final Uri whatsappUrl = Uri.parse(
@@ -615,22 +615,20 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [
-                    const Color(
-                      0xFF121212,
-                    ),
-                    const Color(
-                      0xFF0D0D0D,
-                    ),
-                  ]
-                : [
-                    const Color(
-                      0xFFDB1F26,
-                    ),
-                    const Color(
-                      0xFFB70F1D,
-                    ),
-                  ],
+                  ? const [
+                      
+                      
+                      Color(0xFF4A0E0F),
+                      Color(0xFF7A2323),
+                      Color(0xFFB33939),
+                      Color(0xFF7A2323),
+                    ]
+                  : const [
+                      Color(0xFF4A0E0F),
+                      Color(0xFF7A2323),
+                      Color(0xFFB33939),
+                      Color(0xFF7A2323),
+                    ],
 
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

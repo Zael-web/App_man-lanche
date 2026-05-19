@@ -761,12 +761,14 @@ leading: IconButton(
                             vertical: 8,
                           ),
 
-                          child: foodItem(
-                            data["nome"] ?? "",
-                            data["preco"] ?? 0,
-                            data["imagem"] ?? "",
-                            index,
-                          ),
+child: foodItem(
+  data["nome"] ?? "",
+  data["preco"] ?? 0,
+  data["imagem"] ?? "",
+  index,
+  data["descricao"] ?? "",
+  data["ingredientes"] ?.toString() ?? "",
+),
                         );
                       },
 
@@ -845,163 +847,371 @@ leading: IconButton(
     );
   }
 
-  // 🔥 CARD PRODUTO
-  Widget foodItem(
-    String nome,
-    dynamic preco,
-    String imagem,
-    int index,
-  ) {
-    final isAnimating =
-        animatingIndex == index;
+// 🔥 CARD PRODUTO
+Widget foodItem(
+  String nome,
+  dynamic preco,
+  String imagem,
+  int index,
+  String descricao,
+  String ingredientes,
+) {
+  final isAnimating =
+      animatingIndex == index;
 
-    return AnimatedScale(
-      duration:
-          const Duration(milliseconds: 180),
+  return AnimatedScale(
+    duration:
+        const Duration(milliseconds: 180),
 
-      scale: isAnimating ? 0.97 : 1,
+    scale: isAnimating ? 0.97 : 1,
 
-      child: Container(
-        margin:
-            const EdgeInsets.only(bottom: 12),
+    child: Container(
+      margin:
+          const EdgeInsets.only(bottom: 14),
 
-        decoration: BoxDecoration(
-          color:
-              Colors.white.withValues(alpha: 0.10),
+      decoration: BoxDecoration(
+        color:
+            Colors.white.withValues(alpha: 0.10),
 
-          borderRadius:
-              BorderRadius.circular(20),
+        borderRadius:
+            BorderRadius.circular(22),
 
-          border: Border.all(
-            color: Colors.white24,
-          ),
-        ),
-
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft:
-                    Radius.circular(20),
-              ),
-
-              child: Image.network(
-                imagem,
-                width: 85,
-                height: 85,
-                fit: BoxFit.cover,
-
-                errorBuilder:
-                    (_, __, ___) {
-                  return Container(
-                    width: 85,
-                    height: 85,
-                    color: Colors.black12,
-
-                    child: const Icon(
-                      Icons.fastfood,
-                      color: Colors.white,
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            Expanded(
-              child: Padding(
-                padding:
-                    const EdgeInsets.all(12),
-
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-
-                  children: [
-                    Text(
-                      nome,
-
-                      maxLines: 1,
-
-                      overflow:
-                          TextOverflow.ellipsis,
-
-                      style:
-                          const TextStyle(
-                        color: Colors.white,
-                        fontWeight:
-                            FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Text(
-                      "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
-
-                      style:
-                          const TextStyle(
-                        color:
-                            Color(0xFFFFD166),
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    SizedBox(
-                      height: 36,
-                      width: double.infinity,
-
-                      child: ElevatedButton(
-                        style:
-                            ElevatedButton
-                                .styleFrom(
-                          backgroundColor:
-                              const Color(
-                                  0xFF7A2323),
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                                    12),
-                          ),
-                        ),
-
-                        onPressed: () {
-                          adicionarAoCarrinho(
-                            nome,
-                            preco,
-                            index,
-                            imagem,
-                          );
-                        },
-
-                        child: Text(
-                          isAnimating
-                              ? "✔ Adicionado"
-                              : "Adicionar",
-
-                          style:
-                              const TextStyle(
-                            color: Colors.white,
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        border: Border.all(
+          color: Colors.white24,
         ),
       ),
-    );
-  }
+
+      child: Column(
+        children: [
+
+          // 🔥 CONTEÚDO PRINCIPAL
+          Row(
+            children: [
+
+              // 🔥 IMAGEM
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.only(
+                  topLeft: Radius.circular(22),
+                  bottomLeft:
+                      Radius.circular(22),
+                ),
+
+                child: Image.network(
+                  imagem,
+
+                  width: 95,
+                  height: 120,
+
+                  fit: BoxFit.cover,
+
+                  errorBuilder:
+                      (_, __, ___) {
+                    return Container(
+                      width: 95,
+                      height: 120,
+
+                      color: Colors.black12,
+
+                      child: const Icon(
+                        Icons.fastfood,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // 🔥 TEXTO
+              Expanded(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.all(12),
+
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
+                    children: [
+
+                      // 🔥 NOME
+                      Text(
+                        nome,
+
+                        maxLines: 1,
+
+                        overflow:
+                            TextOverflow.ellipsis,
+
+                        style:
+                            const TextStyle(
+                          color: Colors.white,
+                          fontWeight:
+                              FontWeight.bold,
+                          fontSize: 17,
+                        ),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      // 🔥 DESCRIÇÃO
+                      Text(
+                        descricao,
+
+                        maxLines: 2,
+
+                        overflow:
+                            TextOverflow.ellipsis,
+
+                        style:
+                            TextStyle(
+                          color: Colors.white
+                              .withValues(alpha: 0.75),
+
+                          fontSize: 13,
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // 🔥 PREÇO
+                      Text(
+                        "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
+
+                        style:
+                            const TextStyle(
+                          color:
+                              Color(0xFFFFD166),
+
+                          fontWeight:
+                              FontWeight.bold,
+
+                          fontSize: 16,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 🔥 BOTÕES
+                      Row(
+                        children: [
+
+                          // 🔥 VER INGREDIENTES
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              style:
+                                  OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: Colors.white
+                                      .withValues(alpha: 0.30),
+                                ),
+
+                                shape:
+                                    RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    12,
+                                  ),
+                                ),
+                              ),
+
+                              onPressed: () {
+
+                                showModalBottomSheet(
+                                  context: context,
+
+                                  backgroundColor:
+                                      const Color(
+                                    0xFF1E1E1E,
+                                  ),
+
+                                  shape:
+                                      const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.vertical(
+                                      top:
+                                          Radius.circular(
+                                        26,
+                                      ),
+                                    ),
+                                  ),
+
+                                  builder: (_) {
+
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.all(
+                                        20,
+                                      ),
+
+                                      child: Column(
+                                        mainAxisSize:
+                                            MainAxisSize.min,
+
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment
+                                                .start,
+
+                                        children: [
+
+                                          Text(
+                                            "Ingredientes de $nome",
+
+                                            style:
+                                                const TextStyle(
+                                              color:
+                                                  Colors.white,
+
+                                              fontSize: 20,
+
+                                              fontWeight:
+                                                  FontWeight
+                                                      .bold,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height: 18,
+                                          ),
+
+                                          ...ingredientes.split(",").map(
+                                            (item) {
+
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.only(
+                                                  bottom:
+                                                      10,
+                                                ),
+
+                                                child: Row(
+                                                  children: [
+
+                                                    const Icon(
+                                                      Icons.check_circle,
+
+                                                      color:
+                                                          Color(
+                                                        0xFFFFD166,
+                                                      ),
+
+                                                      size:
+                                                          20,
+                                                    ),
+
+                                                    const SizedBox(
+                                                      width:
+                                                          10,
+                                                    ),
+
+                                                    Expanded(
+                                                      child:
+                                                          Text(
+                                                        item.toString(),
+
+                                                        style:
+                                                            const TextStyle(
+                                                          color:
+                                                              Colors.white,
+
+                                                          fontSize:
+                                                              15,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+
+                                          const SizedBox(
+                                            height: 12,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+
+                              icon: const Icon(
+                                Icons.menu_book,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+
+                              label: const Text(
+                                "Ingredientes",
+
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          // 🔥 ADICIONAR
+                          Expanded(
+                            child: SizedBox(
+                              height: 42,
+
+                              child: ElevatedButton(
+                                style:
+                                    ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color(
+                                    0xFF7A2323,
+                                  ),
+
+                                  shape:
+                                      RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      12,
+                                    ),
+                                  ),
+                                ),
+
+                                onPressed: () {
+                                  adicionarAoCarrinho(
+                                    nome,
+                                    preco,
+                                    index,
+                                    imagem,
+                                  );
+                                },
+
+                                child: Text(
+                                  isAnimating
+                                      ? "✔"
+                                      : "Adicionar",
+
+                                  style:
+                                      const TextStyle(
+                                    color: Colors.white,
+
+                                    fontWeight:
+                                        FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+ }
 }

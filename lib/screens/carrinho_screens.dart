@@ -24,6 +24,36 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
   final observacaoController = TextEditingController();
 
   String formaPagamento = "Dinheiro";
+  bool _enderecoCarregado = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarEnderecoUsuario();
+  }
+
+  Future<void> _carregarEnderecoUsuario() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(user.uid)
+        .get();
+
+    if (!mounted) return;
+
+    final dados = doc.data();
+    final endereco = dados?['endereco']?.toString().trim() ?? '';
+
+    if (endereco.isNotEmpty && enderecoController.text.trim().isEmpty) {
+      enderecoController.text = endereco;
+    }
+
+    setState(() {
+      _enderecoCarregado = true;
+    });
+  }
 
   @override
   void dispose() {
@@ -151,6 +181,36 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                     const SizedBox(height: 20),
 
                     // 🔥 ENDEREÇO
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Endereço de entrega",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {
+                            enderecoController.clear();
+                          },
+                          icon: const Icon(
+                            Icons.edit_location,
+                          ),
+                          label: const Text(
+                            "Trocar",
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
                     TextField(
                       controller:
                           enderecoController,
@@ -163,6 +223,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                       decoration: InputDecoration(
                         labelText: "Endereço",
+                        hintText:
+                            "Use o endereço cadastrado ou altere aqui",
 
                         labelStyle: TextStyle(
                           color: isDark
@@ -339,6 +401,19 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         FirebaseAuth.instance.currentUser;
 
     if (widget.carrinho.isEmpty) return;
+
+    if (enderecoController.text.trim().isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            "Por favor, informe o endereço de entrega antes de finalizar.",
+          ),
+        ),
+      );
+      return;
+    }
 
     try {
 

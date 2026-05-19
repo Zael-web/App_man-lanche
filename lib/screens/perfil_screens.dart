@@ -3,9 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mana_lanche/screens/admin_menu_screen.dart';
-
 import 'package:mana_lanche/screens/login_screens.dart';
-import 'package:mana_lanche/screens/admin_screens.dart';
 
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
@@ -75,6 +73,42 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   Future<void> sair() async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Sair da conta"),
+          content: const Text(
+            "Deseja sair da sua conta?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text("Cancelar"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text(
+                "Sair",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+
+    if (!confirmar) return;
+
     await _auth.signOut();
 
     if (!mounted) return;
@@ -119,11 +153,31 @@ class _PerfilScreenState extends State<PerfilScreen> {
         theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
 
       appBar: AppBar(
         title: const Text('Perfil'),
         centerTitle: true,
+
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+          ),
+
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+          ),
+
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
 
       body: Container(
@@ -166,11 +220,23 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                     children: [
 
+                      const SizedBox(height: 10),
+
                       // 🔥 CARD PERFIL
-                      Card(
-                        shape: RoundedRectangleBorder(
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(
+                            alpha: 0.08,
+                          ),
+
                           borderRadius:
-                              BorderRadius.circular(18),
+                              BorderRadius.circular(20),
+
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: 0.08,
+                            ),
+                          ),
                         ),
 
                         child: Padding(
@@ -183,7 +249,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                             children: [
 
-                              // 🔥 FOTO
                               CircleAvatar(
                                 radius: 52,
 
@@ -218,7 +283,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                               const SizedBox(height: 16),
 
-                              // 🔥 NOME
                               Text(
                                 nome,
 
@@ -226,28 +290,25 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                   fontSize: 22,
                                   fontWeight:
                                       FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
 
                               const SizedBox(height: 6),
 
-                              // 🔥 EMAIL
                               Text(
                                 email,
 
                                 style: TextStyle(
-                                  color: theme
-                                      .colorScheme
-                                      .onSurface
+                                  color: Colors.white
                                       .withValues(
-                                        alpha: 0.7,
-                                      ),
+                                    alpha: 0.7,
+                                  ),
                                 ),
                               ),
 
                               const SizedBox(height: 10),
 
-                              // 🔥 TIPO
                               Container(
                                 padding:
                                     const EdgeInsets.symmetric(
@@ -257,8 +318,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                                 decoration: BoxDecoration(
                                   color:
-                                      tipoUsuario ==
-                                              "admin"
+                                      tipoUsuario == "admin"
                                           ? Colors.orange
                                           : Colors.green,
 
@@ -269,8 +329,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                 ),
 
                                 child: Text(
-                                  tipoUsuario ==
-                                          "admin"
+                                  tipoUsuario == "admin"
                                       ? "Administrador"
                                       : "Cliente",
 
@@ -286,14 +345,28 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               const SizedBox(height: 18),
 
                               ElevatedButton.icon(
+                                style:
+                                    ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white
+                                          .withValues(
+                                    alpha: 0.12,
+                                  ),
+                                ),
+
                                 onPressed: abrirEdicao,
 
                                 icon: const Icon(
                                   Icons.edit,
+                                  color: Colors.white,
                                 ),
 
                                 label: const Text(
                                   'Editar perfil',
+
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],
@@ -304,10 +377,20 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       const SizedBox(height: 20),
 
                       // 🔥 DADOS
-                      Card(
-                        shape: RoundedRectangleBorder(
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(
+                            alpha: 0.08,
+                          ),
+
                           borderRadius:
-                              BorderRadius.circular(18),
+                              BorderRadius.circular(20),
+
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: 0.08,
+                            ),
+                          ),
                         ),
 
                         child: Padding(
@@ -327,6 +410,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                   fontSize: 18,
                                   fontWeight:
                                       FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
 
@@ -352,21 +436,34 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                       const SizedBox(height: 20),
 
-                      // 🔥 BOTÕES
                       Row(
                         children: [
 
                           Expanded(
                             child: ElevatedButton.icon(
+                              style:
+                                  ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Colors.white
+                                        .withValues(
+                                  alpha: 0.12,
+                                ),
+                              ),
+
                               onPressed:
                                   abrirEdicao,
 
                               icon: const Icon(
                                 Icons.edit_location,
+                                color: Colors.white,
                               ),
 
                               label: const Text(
                                 'Editar perfil',
+
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -374,223 +471,28 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           const SizedBox(width: 12),
 
                           Expanded(
-                            child:
-                                tipoUsuario == "admin"
-
-                                    ? ElevatedButton.icon(
-                                        style:
-                                            ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Colors.orange,
-                                        ),
-
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  const AdminMenuScreen(),
-                                            ),
-                                          );
-                                        },
-
-                                        icon: const Icon(
-                                          Icons
-                                              .admin_panel_settings,
-                                        ),
-
-                                        label: const Text(
-                                          "Admin",
-                                        ),
-                                      )
-
-                                    : OutlinedButton.icon(
-                                        onPressed: sair,
-
-                                        icon: const Icon(
-                                          Icons.logout,
-                                        ),
-
-                                        label: const Text(
-                                          'Sair',
-                                        ),
-                                      ),
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: Colors.white.withValues(
+                                    alpha: 0.4,
+                                  ),
+                                ),
+                              ),
+                              onPressed: sair,
+                              icon: const Icon(
+                                Icons.logout,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Sair',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // 🔥 HISTÓRICO
-                      const Text(
-                        'Histórico de pedidos',
-
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      StreamBuilder<
-                          QuerySnapshot<
-                              Map<String, dynamic>>>(
-                        stream:
-                            _auth.currentUser == null
-                                ? const Stream.empty()
-                                : _firestore
-                                    .collection(
-                                      'pedidos',
-                                    )
-                                    .where(
-                                      'usuarioId',
-                                      isEqualTo:
-                                          _auth
-                                              .currentUser!
-                                              .uid,
-                                    )
-                                    .orderBy(
-                                      'data',
-                                      descending: true,
-                                    )
-                                    .snapshots(),
-
-                        builder: (
-                          context,
-                          snapshot,
-                        ) {
-
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child:
-                                  CircularProgressIndicator(),
-                            );
-                          }
-
-                          if (!snapshot.hasData ||
-                              snapshot
-                                  .data!
-                                  .docs
-                                  .isEmpty) {
-
-                            return const Padding(
-                              padding:
-                                  EdgeInsets.only(
-                                top: 16,
-                              ),
-
-                              child: Text(
-                                'Nenhum pedido encontrado ainda.',
-                              ),
-                            );
-                          }
-
-                          return Column(
-                            children:
-                                snapshot.data!.docs.map((
-                              doc,
-                            ) {
-
-                              final data = doc.data();
-
-                              final status =
-                                  data['status']
-                                          ?.toString() ??
-                                      'Desconhecido';
-
-                              final total =
-                                  data['total']
-                                          ?.toString() ??
-                                      '0,00';
-
-                              final timestamp =
-                                  data['data']
-                                      as Timestamp?;
-
-                              final pedidoData =
-                                  timestamp != null
-                                      ? DateTime
-                                          .fromMillisecondsSinceEpoch(
-                                          timestamp
-                                              .millisecondsSinceEpoch,
-                                        )
-                                      : null;
-
-                              return Card(
-                                shape:
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    16,
-                                  ),
-                                ),
-
-                                margin:
-                                    const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-
-                                child: ListTile(
-                                  contentPadding:
-                                      const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
-                                  ),
-
-                                  title: Text(
-                                    'Pedido ${doc.id.substring(0, 6)}',
-                                  ),
-
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment
-                                            .start,
-
-                                    children: [
-
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
-
-                                      Text(
-                                        'Status: $status',
-                                      ),
-
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
-
-                                      Text(
-                                        'Total: R\$ $total',
-                                      ),
-
-                                      if (pedidoData !=
-                                          null) ...[
-
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-
-                                        Text(
-                                          'Data: ${pedidoData.day.toString().padLeft(2, '0')}/${pedidoData.month.toString().padLeft(2, '0')}/${pedidoData.year}',
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-
-                                  trailing: const Icon(
-                                    Icons.chevron_right,
-                                  ),
-
-                                  onTap: () {},
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
                       ),
                     ],
                   ),
@@ -612,7 +514,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
       children: [
 
-        Icon(icon, size: 22),
+        Icon(
+          icon,
+          size: 22,
+          color: Colors.white,
+        ),
 
         const SizedBox(width: 12),
 
@@ -629,6 +535,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 style: const TextStyle(
                   fontWeight:
                       FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
 
@@ -639,6 +546,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                 style: const TextStyle(
                   fontSize: 15,
+                  color: Colors.white70,
                 ),
               ),
             ],
@@ -699,99 +607,41 @@ class _EditProfileScreenState
         widget.endereco;
   }
 
-  @override
-  void dispose() {
-    nomeController.dispose();
-    telefoneController.dispose();
-    enderecoController.dispose();
-
-    super.dispose();
-  }
-
   Future<void> salvar() async {
 
     final user = _auth.currentUser;
 
     if (user == null) return;
 
-    if (nomeController.text
-        .trim()
-        .isEmpty) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            'O nome não pode ficar vazio.',
-          ),
-        ),
-      );
-
-      return;
-    }
-
     setState(() {
       _salvando = true;
     });
 
-    try {
+    await _firestore
+        .collection('usuarios')
+        .doc(user.uid)
+        .update({
 
-      await _firestore
-          .collection('usuarios')
-          .doc(user.uid)
-          .update({
+      'nome':
+          nomeController.text.trim(),
 
-        'nome':
-            nomeController.text.trim(),
+      'telefone':
+          telefoneController.text.trim(),
 
-        'telefone':
-            telefoneController.text.trim(),
+      'endereco':
+          enderecoController.text.trim(),
+    });
 
-        'endereco':
-            enderecoController.text.trim(),
-      });
+    if (!mounted) return;
 
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Perfil atualizado com sucesso!',
-          ),
-        ),
-      );
-
-      Navigator.pop(context, true);
-
-    } catch (e) {
-
-      if (mounted) {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro ao salvar: $e',
-            ),
-          ),
-        );
-      }
-
-    } finally {
-
-      if (mounted) {
-        setState(() {
-          _salvando = false;
-        });
-      }
-    }
+    Navigator.pop(context, true);
   }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
 
       appBar: AppBar(
         title: const Text(
@@ -799,100 +649,217 @@ class _EditProfileScreenState
         ),
 
         centerTitle: true,
+
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+          ),
+
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+          ),
+
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
 
-      body: SingleChildScrollView(
-        padding:
-            const EdgeInsets.all(16),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
 
-        child: Column(
-          children: [
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF5C1A1B),
+              Color(0xFF7A2323),
+              Color(0xFF9B2C2C),
+              Color(0xFFB33939),
+            ],
 
-            // 🔥 NOME
-            TextField(
-              controller: nomeController,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
 
-              decoration: const InputDecoration(
-                labelText: 'Nome',
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding:
+                const EdgeInsets.all(16),
 
-                prefixIcon: Icon(
-                  Icons.person,
+            child: Column(
+              children: [
+
+                TextField(
+                  controller: nomeController,
+
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+
+                  decoration: InputDecoration(
+                    labelText: 'Nome',
+
+                    labelStyle:
+                        const TextStyle(
+                      color: Colors.white70,
+                    ),
+
+                    prefixIcon: const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                    ),
+
+                    filled: true,
+
+                    fillColor:
+                        Colors.white.withValues(
+                      alpha: 0.08,
+                    ),
+
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(16),
+
+                      borderSide:
+                          BorderSide.none,
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-            // 🔥 TELEFONE
-            TextField(
-              controller:
-                  telefoneController,
+                TextField(
+                  controller:
+                      telefoneController,
 
-              keyboardType:
-                  TextInputType.phone,
+                  keyboardType:
+                      TextInputType.phone,
 
-              inputFormatters: [
+                  inputFormatters: [
 
-                FilteringTextInputFormatter
-                    .digitsOnly,
+                    FilteringTextInputFormatter
+                        .digitsOnly,
 
-                LengthLimitingTextInputFormatter(
-                  11,
+                    LengthLimitingTextInputFormatter(
+                      11,
+                    ),
+
+                    _TelefoneInputFormatter(),
+                  ],
+
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+
+                  decoration: InputDecoration(
+                    labelText: 'Telefone',
+
+                    labelStyle:
+                        const TextStyle(
+                      color: Colors.white70,
+                    ),
+
+                    prefixIcon: const Icon(
+                      Icons.phone,
+                      color: Colors.white,
+                    ),
+
+                    filled: true,
+
+                    fillColor:
+                        Colors.white.withValues(
+                      alpha: 0.08,
+                    ),
+
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(16),
+
+                      borderSide:
+                          BorderSide.none,
+                    ),
+                  ),
                 ),
 
-                _TelefoneInputFormatter(),
+                const SizedBox(height: 16),
+
+                TextField(
+                  controller:
+                      enderecoController,
+
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+
+                  decoration: InputDecoration(
+                    labelText: 'Endereço',
+
+                    labelStyle:
+                        const TextStyle(
+                      color: Colors.white70,
+                    ),
+
+                    prefixIcon: const Icon(
+                      Icons.location_on,
+                      color: Colors.white,
+                    ),
+
+                    filled: true,
+
+                    fillColor:
+                        Colors.white.withValues(
+                      alpha: 0.08,
+                    ),
+
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(16),
+
+                      borderSide:
+                          BorderSide.none,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+
+                  child: ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.orange,
+                    ),
+
+                    onPressed:
+                        _salvando
+                            ? null
+                            : salvar,
+
+                    child: _salvando
+                        ? const CircularProgressIndicator(
+                            color:
+                                Colors.white,
+                          )
+                        : const Text(
+                            'Salvar alterações',
+                          ),
+                  ),
+                ),
               ],
-
-              decoration:
-                  const InputDecoration(
-                labelText: 'Telefone',
-
-                prefixIcon: Icon(
-                  Icons.phone,
-                ),
-              ),
             ),
-
-            const SizedBox(height: 16),
-
-            // 🔥 ENDEREÇO
-            TextField(
-              controller:
-                  enderecoController,
-
-              decoration:
-                  const InputDecoration(
-                labelText: 'Endereço',
-
-                prefixIcon: Icon(
-                  Icons.location_on,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-
-              child: ElevatedButton(
-                onPressed:
-                    _salvando
-                        ? null
-                        : salvar,
-
-                child: _salvando
-                    ? const CircularProgressIndicator(
-                        color:
-                            Colors.white,
-                      )
-                    : const Text(
-                        'Salvar alterações',
-                      ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

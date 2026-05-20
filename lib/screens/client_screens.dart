@@ -617,7 +617,7 @@ leading: IconButton(
 
         filled: true,
 
-        // 🔥 REMOVE O BRANCO
+        
         fillColor: Colors.transparent,
 
         border: InputBorder.none,
@@ -998,159 +998,113 @@ Widget foodItem(
 
                           // 🔥 VER INGREDIENTES
                           Expanded(
-                            child: OutlinedButton.icon(
-                              style:
-                                  OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                  color: Colors.white
-                                      .withValues(alpha: 0.30),
-                                ),
+  child: OutlinedButton(
+    style: OutlinedButton.styleFrom(
+      side: BorderSide(
+        color: Colors.white.withValues(alpha: 0.30),
+      ),
 
-                                shape:
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    12,
-                                  ),
-                                ),
-                              ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
 
-                              onPressed: () {
+      padding: const EdgeInsets.symmetric(
+        vertical: 12,
+      ),
+    ),
 
-                                showModalBottomSheet(
-                                  context: context,
+    onPressed: () {
+      showModalBottomSheet(
+        context: context,
 
-                                  backgroundColor:
-                                      const Color(
-                                    0xFF1E1E1E,
-                                  ),
+        backgroundColor: const Color(
+          0xFF1E1E1E,
+        ),
 
-                                  shape:
-                                      const RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.vertical(
-                                      top:
-                                          Radius.circular(
-                                        26,
-                                      ),
-                                    ),
-                                  ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(26),
+          ),
+        ),
 
-                                  builder: (_) {
+        builder: (_) {
+          return Padding(
+            padding: const EdgeInsets.all(20),
 
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.all(
-                                        20,
-                                      ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
 
-                                      child: Column(
-                                        mainAxisSize:
-                                            MainAxisSize.min,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
 
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment
-                                                .start,
+              children: [
 
-                                        children: [
+                Text(
+                  "Ingredientes de $nome",
 
-                                          Text(
-                                            "Ingredientes de $nome",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
-                                            style:
-                                                const TextStyle(
-                                              color:
-                                                  Colors.white,
+                const SizedBox(height: 18),
 
-                                              fontSize: 20,
+                ...ingredientes.split(",").map(
+                  (item) {
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(
+                        bottom: 10,
+                      ),
 
-                                              fontWeight:
-                                                  FontWeight
-                                                      .bold,
-                                            ),
-                                          ),
+                      child: Row(
+                        children: [
 
-                                          const SizedBox(
-                                            height: 18,
-                                          ),
+                          const Icon(
+                            Icons.check_circle,
 
-                                          ...ingredientes.split(",").map(
-                                            (item) {
+                            color: Color(
+                              0xFFFFD166,
+                            ),
 
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.only(
-                                                  bottom:
-                                                      10,
-                                                ),
+                            size: 20,
+                          ),
 
-                                                child: Row(
-                                                  children: [
+                          const SizedBox(width: 10),
 
-                                                    const Icon(
-                                                      Icons.check_circle,
+                          Expanded(
+                            child: Text(
+                              item.toString(),
 
-                                                      color:
-                                                          Color(
-                                                        0xFFFFD166,
-                                                      ),
-
-                                                      size:
-                                                          20,
-                                                    ),
-
-                                                    const SizedBox(
-                                                      width:
-                                                          10,
-                                                    ),
-
-                                                    Expanded(
-                                                      child:
-                                                          Text(
-                                                        item.toString(),
-
-                                                        style:
-                                                            const TextStyle(
-                                                          color:
-                                                              Colors.white,
-
-                                                          fontSize:
-                                                              15,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-
-                                          const SizedBox(
-                                            height: 12,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-
-                              icon: const Icon(
-                                Icons.menu_book,
+                              style: const TextStyle(
                                 color: Colors.white,
-                                size: 18,
-                              ),
-
-                              label: const Text(
-                                "Ingredientes",
-
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
+                                fontSize: 15,
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 12),
+              ],
+            ),
+          );
+        },
+      );
+    },
+
+    child: const Icon(
+      Icons.menu_book,
+      color: Colors.white,
+      size: 22,
+    ),
+  ),
+),
 
                           const SizedBox(width: 10),
 
@@ -1163,9 +1117,7 @@ Widget foodItem(
                                 style:
                                     ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      const Color(
-                                    0xFF7A2323,
-                                  ),
+                                      const Color.fromARGB(144, 16, 155, 11),
 
                                   shape:
                                       RoundedRectangleBorder(

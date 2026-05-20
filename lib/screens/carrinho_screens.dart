@@ -566,7 +566,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         );
       }
 
-      // 🔥 LIMPA CARRINHO
+      
       setState(() {
         widget.carrinho.clear();
       });
@@ -607,7 +607,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         title: const Text(
           "Seu carrinho",
           ),
-          backgroundColor: const Color(0xFF4A0E0F),
+          backgroundColor: const Color(0xFFB33939),
         centerTitle: true,
       ),
 
@@ -620,14 +620,13 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                   ? const [
                       
                       
-                      Color(0xFF4A0E0F),
+                      Color(0xFFB33939),
                       Color(0xFF7A2323),
                       Color(0xFFB33939),
                       Color(0xFF7A2323),
                     ]
                   : const [
-                      Color(0xFF4A0E0F),
-                      Color(0xFF7A2323),
+                      Color(0xFFB33939),
                       Color(0xFFB33939),
                       Color(0xFF7A2323),
                     ],
@@ -641,16 +640,88 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
           child: widget.carrinho.isEmpty
 
-              ? const Center(
-                  child: Text(
-                    "Carrinho vazio",
+          ? Center(
+    child: Column(
+      mainAxisAlignment:
+          MainAxisAlignment.center,
 
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                )
+      children: [
+
+        // 🔥 IMAGEM
+        Image.asset(
+          "assets/images/vazio.png",
+          height: 180,
+        ),
+
+        const SizedBox(height: 20),
+
+        // 🔥 TEXTO
+        const Text(
+          "Carrinho vazio",
+
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        const Text(
+          "Adicione produtos para continuar",
+
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 15,
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        // 🔥 BOTÃO VER CARDÁPIO
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor:
+                Colors.white,
+
+            foregroundColor:
+                const Color(
+              0xFFB33939,
+            ),
+
+            padding:
+                const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 14,
+            ),
+
+            shape:
+                RoundedRectangleBorder(
+              borderRadius:
+                  BorderRadius.circular(
+                14,
+              ),
+            ),
+          ),
+
+          onPressed: () {
+
+            Navigator.pop(context);
+
+          },
+
+          icon: const Icon(
+            Icons.restaurant_menu,
+          ),
+
+          label: const Text(
+            "Ver cardápio",
+          ),
+        ),
+      ],
+    ),
+  )
 
               : Column(
                   children: [

@@ -1109,50 +1109,56 @@ Widget foodItem(
                           const SizedBox(width: 10),
 
                           // 🔥 ADICIONAR
-                          Expanded(
-                            child: SizedBox(
-                              height: 42,
+Expanded(
+  child: SizedBox(
+    height: 45,
 
-                              child: ElevatedButton(
-                                style:
-                                    ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(144, 16, 155, 11),
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            const Color.fromARGB(
+          144,
+          16,
+          155,
+          11,
+        ),
 
-                                  shape:
-                                      RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      12,
-                                    ),
-                                  ),
-                                ),
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(12),
+        ),
+      ),
 
-                                onPressed: () {
-                                  adicionarAoCarrinho(
-                                    nome,
-                                    preco,
-                                    index,
-                                    imagem,
-                                  );
-                                },
+      onPressed: () {
+        adicionarAoCarrinho(
+          nome,
+          preco,
+          index,
+          imagem,
+        );
+      },
 
-                                child: Text(
-                                  isAnimating
-                                      ? "✔"
-                                      : "Adicionar",
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
 
-                                  style:
-                                      const TextStyle(
-                                    color: Colors.white,
+        child: Text(
+          isAnimating
+              ? "✔"
+              : "Adicionar",
 
-                                    fontWeight:
-                                        FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+          maxLines: 1,
+
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight:
+                FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    ),
+  ),
+)
                         ],
                       ),
                     ],

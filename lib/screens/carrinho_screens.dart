@@ -117,6 +117,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         return StatefulBuilder(
           builder: (context, setModalState) {
 
+            final theme = Theme.of(context);
+
             return Container(
               padding: EdgeInsets.only(
                 left: 20,
@@ -350,7 +352,9 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                         style:
                             ElevatedButton.styleFrom(
                           backgroundColor:
-                              Colors.green,
+                              theme.colorScheme.primary,
+                          foregroundColor:
+                              theme.colorScheme.onPrimary,
 
                           shape:
                               RoundedRectangleBorder(
@@ -606,8 +610,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
       appBar: AppBar(
         title: const Text(
           "Seu carrinho",
-          ),
-          backgroundColor: const Color(0xFFB33939),
+        ),
+        backgroundColor: theme.appBarTheme.backgroundColor,
         centerTitle: true,
       ),
 
@@ -617,20 +621,16 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                  ? const [
-                      
-                      
-                      Color(0xFFB33939),
-                      Color(0xFF7A2323),
-                      Color(0xFFB33939),
-                      Color(0xFF7A2323),
-                    ]
-                  : const [
-                      Color(0xFFB33939),
-                      Color(0xFFB33939),
-                      Color(0xFF7A2323),
-                    ],
-
+                ? const [
+                    Color(0xFF141414),
+                    Color(0xFF070707),
+                    Color(0xFF141414),
+                  ]
+                : const [
+                    Color(0xFFB33939),
+                    Color(0xFFB33939),
+                    Color(0xFF7A2323),
+                  ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -656,23 +656,22 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         const SizedBox(height: 20),
 
         // 🔥 TEXTO
-        const Text(
+        Text(
           "Carrinho vazio",
 
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.onBackground,
             fontWeight: FontWeight.bold,
           ),
         ),
 
         const SizedBox(height: 10),
 
-        const Text(
+        Text(
           "Adicione produtos para continuar",
 
-          style: TextStyle(
-            color: Colors.white70,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onBackground.withOpacity(0.75),
             fontSize: 15,
           ),
         ),
@@ -682,14 +681,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         // 🔥 BOTÃO VER CARDÁPIO
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                Colors.white,
-
-            foregroundColor:
-                const Color(
-              0xFFB33939,
-            ),
-
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
             padding:
                 const EdgeInsets.symmetric(
               horizontal: 24,
@@ -998,8 +991,9 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                   ElevatedButton
                                       .styleFrom(
                                 backgroundColor:
-                                    Colors.green,
-
+                                    theme.colorScheme.primary,
+                                foregroundColor:
+                                    theme.colorScheme.onPrimary,
                                 shape:
                                     RoundedRectangleBorder(
                                   borderRadius:

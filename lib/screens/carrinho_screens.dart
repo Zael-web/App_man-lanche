@@ -671,7 +671,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
           "Adicione produtos para continuar",
 
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onBackground.withOpacity(0.75),
+            color: theme.colorScheme.onBackground.withValues(alpha: 0.75),
             fontSize: 15,
           ),
         ),

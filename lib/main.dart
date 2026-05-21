@@ -13,9 +13,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -31,7 +29,6 @@ void main() async {
           "BO5IaTz8CrDF_CsdriA21GX6zcqkU0A23L3Agb_mjJ1DXwn3Q2XzJb0A7F4A-WUSmcGIeQkz5yhHkkBm6UG80Yo",
     );
   }
-
   // 🔥 ANDROID
   else {
     token = await messaging.getToken();

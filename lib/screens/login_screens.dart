@@ -129,25 +129,360 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   // 🔐 RECUPERAR SENHA
-  Future<void> recuperarSenha() async {
-    if (emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Digite seu email")),
+Future<void> abrirRecuperarSenha() async {
+
+  final emailResetController =
+      TextEditingController();
+
+  final isDark =
+      Theme.of(context).brightness ==
+          Brightness.dark;
+
+  await showDialog(
+    context: context,
+
+    barrierDismissible: true,
+
+    builder: (context) {
+
+      return Dialog(
+        backgroundColor:
+            Colors.transparent,
+
+        insetPadding:
+            const EdgeInsets.symmetric(
+          horizontal: 24,
+        ),
+
+        child: Container(
+          padding:
+              const EdgeInsets.all(26),
+
+          decoration: BoxDecoration(
+
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+
+              colors: isDark
+                  ? const [
+                      Color(0xFF111111),
+                      Color(0xFF1B1B1B),
+                      Color(0xFF222222),
+                    ]
+                  : const [
+                      Color(0xFF4A0E0F),
+                      Color(0xFF7A2323),
+                      Color(0xFFB33939),
+                    ],
+            ),
+
+            borderRadius:
+                BorderRadius.circular(
+              30,
+            ),
+
+            border: Border.all(
+              color: Colors.white24,
+            ),
+
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black
+                    .withValues(
+                  alpha: 0.35,
+                ),
+
+                blurRadius: 25,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize:
+                  MainAxisSize.min,
+
+              children: [
+
+                // 🔥 ÍCONE
+                Container(
+                  width: 90,
+                  height: 90,
+
+                  decoration:
+                      BoxDecoration(
+                    shape:
+                        BoxShape.circle,
+
+                    color: Colors.white
+                        .withValues(
+                      alpha: 0.12,
+                    ),
+                  ),
+
+                  child: const Icon(
+                    Icons.lock_reset,
+                    size: 45,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 20,
+                ),
+
+                // 🔥 TÍTULO
+                const Text(
+                  "Recuperar senha",
+
+                  textAlign:
+                      TextAlign.center,
+
+                  style: TextStyle(
+                    color: Colors.white,
+
+                    fontSize: 26,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 10,
+                ),
+
+                Text(
+                  "Digite seu email para receber o link de recuperação.",
+
+                  textAlign:
+                      TextAlign.center,
+
+                  style: TextStyle(
+                    color: Colors.white
+                        .withValues(
+                      alpha: 0.85,
+                    ),
+
+                    fontSize: 15,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 28,
+                ),
+
+                // 🔥 CAMPO EMAIL
+                TextField(
+                  controller:
+                      emailResetController,
+
+                  keyboardType:
+                      TextInputType
+                          .emailAddress,
+
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+
+                  decoration:
+                      InputDecoration(
+                    hintText:
+                        "Digite seu email",
+
+                    hintStyle:
+                        TextStyle(
+                      color: Colors.white
+                          .withValues(
+                        alpha: 0.65,
+                      ),
+                    ),
+
+                    prefixIcon:
+                        const Icon(
+                      Icons.email,
+                      color: Colors.white,
+                    ),
+
+                    filled: true,
+
+                    fillColor: Colors.white
+                        .withValues(
+                      alpha: 0.10,
+                    ),
+
+                    border:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        18,
+                      ),
+
+                      borderSide:
+                          BorderSide
+                              .none,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 28,
+                ),
+
+                // 🔥 BOTÃO
+                SizedBox(
+                  width:
+                      double.infinity,
+
+                  height: 56,
+
+                  child:
+                      ElevatedButton.icon(
+
+                    style:
+                        ElevatedButton
+                            .styleFrom(
+                      backgroundColor:
+                          const Color(
+                        0xFFFFC107,
+                      ),
+
+                      foregroundColor:
+                          Colors.white,
+
+                      elevation: 0,
+
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius
+                                .circular(
+                          18,
+                        ),
+                      ),
+                    ),
+
+                    onPressed:
+                        () async {
+
+                      final email =
+                          emailResetController
+                              .text
+                              .trim();
+
+                      if (email
+                          .isEmpty) {
+
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+                          const SnackBar(
+                            content:
+                                Text(
+                              "Digite um email",
+                            ),
+                          ),
+                        );
+
+                        return;
+                      }
+
+                      try {
+
+                        await FirebaseAuth
+                            .instance
+                            .sendPasswordResetEmail(
+                          email:
+                              email,
+                        );
+
+                        if (!mounted)
+                          return;
+
+                        Navigator.pop(
+                          context,
+                        );
+
+                        ScaffoldMessenger.of(
+                          this.context,
+                        ).showSnackBar(
+                          const SnackBar(
+                            backgroundColor:
+                                Colors.green,
+
+                            content:
+                                Text(
+                              "Email enviado com sucesso!",
+                            ),
+                          ),
+                        );
+
+                      } catch (e) {
+
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+                          SnackBar(
+                            backgroundColor:
+                                Colors.red,
+
+                            content:
+                                Text(
+                              "Erro: $e",
+                            ),
+                          ),
+                        );
+                      }
+                    },
+
+                    icon: const Icon(
+                      Icons.send,
+                    ),
+
+                    label: const Text(
+                      "Enviar link",
+
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 14,
+                ),
+
+                // 🔥 CANCELAR
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(
+                      context,
+                    );
+                  },
+
+                  child: const Text(
+                    "Cancelar",
+
+                    style: TextStyle(
+                      color:
+                          Colors.white70,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
-      return;
-    }
-
-    await FirebaseAuth.instance.sendPasswordResetEmail(
-      email: emailController.text.trim(),
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Email enviado")),
-    );
-  }
-
+    },
+  );
+}
   // 🔥 LOGIN GOOGLE
   Future<void> loginGoogle() async {
     try {
@@ -463,7 +798,14 @@ Align(
                                             ),
                                             TextButton(
                                               onPressed:
-                                                  recuperarSenha,
+                                                  abrirRecuperarSenha,
+                                              style: TextButton.styleFrom(
+                                                foregroundColor:
+                                                    isDark
+                                                        ? Theme.of(context)
+                                                            .hintColor
+                                                        : Colors.red,
+                                              ),
                                               child:
                                                   const Text(
                                                 "Esqueceu?",

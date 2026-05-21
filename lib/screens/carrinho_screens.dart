@@ -607,13 +607,27 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
     return Scaffold(
 
-      appBar: AppBar(
-        title: const Text(
-          "Seu carrinho",
-        ),
-        backgroundColor: theme.appBarTheme.backgroundColor,
-        centerTitle: true,
-      ),
+                      appBar: AppBar(
+                      title: const Text(
+                      "Seu carrinho",
+                      style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                     ),
+
+                      centerTitle: true,
+
+                      elevation: 0,
+
+                      backgroundColor: isDark
+                      ? const Color(0xFF141414)
+                      : const Color(0xFFB33939),
+
+                        iconTheme: const IconThemeData(
+                    color: Colors.white,
+                    ),
+                  ),
 
       body: Container(
         width: double.infinity,
@@ -657,10 +671,10 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
         // 🔥 TEXTO
         Text(
-          "Carrinho vazio",
+          "Carrinho vazio..",
 
           style: theme.textTheme.headlineSmall?.copyWith(
-            color: theme.colorScheme.onBackground,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -671,7 +685,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
           "Adicione produtos para continuar",
 
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onBackground.withValues(alpha: 0.75),
+            color: Colors.white,
             fontSize: 15,
           ),
         ),
@@ -681,8 +695,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         // 🔥 BOTÃO VER CARDÁPIO
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
+            backgroundColor: const Color(0xFFFFD166),
+            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
             padding:
                 const EdgeInsets.symmetric(
               horizontal: 24,

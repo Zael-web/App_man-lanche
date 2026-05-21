@@ -789,7 +789,7 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
         onPressed: mostrarDialogAdicionarProduto,
         icon: const Icon(Icons.add),
         label: const Text("Adicionar"),
-        backgroundColor: const Color(0xFFD2691E),
+        backgroundColor: const Color(0xFFFFB703),
       ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,

@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,287 +14,608 @@ class ProdutosAdminScreen extends StatefulWidget {
 }
 
 class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
+
+  XFile? imagemSelecionada;
+
+  bool carregandoImagem = false;
+
+  Future<void> escolherImagem() async {
+
+  final picker = ImagePicker();
+
+  final XFile? imagem = await picker.pickImage(
+    source: ImageSource.gallery,
+    imageQuality: 70,
+  );
+
+  if (imagem == null) return;
+
+  setState(() {
+    imagemSelecionada = imagem;
+  });
+
+  await uploadImagem();
+}
+   Future<void> uploadImagem() async {
+
+  if (imagemSelecionada == null) return;
+
+  setState(() {
+    carregandoImagem = true;
+  });
+
+  try {
+
+    final uri = Uri.parse(
+      "https://api.imgbb.com/1/upload?key=9775633925a7a9aaf191abefeb34e170",
+    );
+
+    final request = http.MultipartRequest(
+      "POST",
+      uri,
+    );
+
+    final bytes = await imagemSelecionada!.readAsBytes();
+
+      request.files.add(
+      http.MultipartFile.fromBytes(
+      "image",
+      bytes,
+      filename: imagemSelecionada!.name,
+      ),
+    );
+
+    final response = await request.send();
+
+    final responseData =
+        await response.stream.bytesToString();
+
+    final data = jsonDecode(responseData);
+
+    imagemUrl = data["data"]["url"];
+
+    setState(() {});
+
+  } catch (e) {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Erro upload imagem: $e"),
+      ),
+    );
+
+  } finally {
+
+    setState(() {
+      carregandoImagem = false;
+    });
+  }
+}
+  String? imagemUrl;
   String pesquisa = "";
   String categoriaSelecionada = "todos";
 
   final nomeAddController = TextEditingController();
   final precoAddController = TextEditingController();
   final categoriaAddController = TextEditingController();
-  final imagemAddController = TextEditingController();
+
 
   @override
   void dispose() {
     nomeAddController.dispose();
     precoAddController.dispose();
     categoriaAddController.dispose();
-    imagemAddController.dispose();
+
     super.dispose();
   }
-
-  Future<void> adicionarProduto(
-    TextEditingController nomeController,
-    TextEditingController precoController,
-    TextEditingController categoriaController,
-    TextEditingController imagemController,
-  ) async {
-    try {
-      final nome = nomeController.text.trim();
-      final precoTexto = precoController.text.trim();
-      if (nome.isEmpty || precoTexto.isEmpty) {
-        return;
-      }
-
-      final preco = double.parse(precoTexto.replaceAll(",", "."));
-      final rawImagem = imagemController.text.trim();
-      final imagemLink = rawImagem.isEmpty
-          ? ""
-          : (rawImagem.startsWith(RegExp(r'https?://'))
-                ? rawImagem
-                : 'https://$rawImagem');
-
-      await FirebaseFirestore.instance.collection("produtos").add({
-        "nome": nome,
-        "preco": preco,
-        "categoria": categoriaController.text.trim(),
-        "imagem": imagemLink,
-      });
-
-      if (!mounted) return;
-
-      Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Produto adicionado!")));
-
-      nomeController.clear();
-      precoController.clear();
-      categoriaController.clear();
-      imagemController.clear();
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Erro ao adicionar produto: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
+//adicionar produto
   Future<void> mostrarDialogAdicionarProduto() async {
-    final nomeController = TextEditingController();
-    final precoController = TextEditingController();
-    final categoriaController = TextEditingController();
-    final imagemController = TextEditingController();
 
-    try {
-      await showDialog(
-        context: context,
-        barrierColor: Colors.black54,
-        builder: (context) {
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          return Dialog(
-            backgroundColor: const Color.fromARGB(0, 221, 4, 4),
-            insetPadding: const EdgeInsets.all(20),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [
-                          const Color(0xFF1A1A1A),
-                          const Color(0xFF232323),
-                          const Color(0xFF2B2B2B),
-                        ]
-                      : [
-                          const Color(0xFFFFFBF7),
-                          const Color(0xFFF8EFEA),
-                          const Color(0xFFF3E4DE),
-                        ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+  final nomeController = TextEditingController();
+  final precoController = TextEditingController();
+  final categoriaController = TextEditingController();
+
+  try {
+
+    await showDialog(
+
+      context: context,
+      barrierColor: Colors.black54,
+
+      builder: (context) {
+
+        final isDark =
+            Theme.of(context).brightness ==
+                Brightness.dark;
+
+        return StatefulBuilder(
+
+          builder: (context, setStateDialog) {
+
+            return Dialog(
+
+              backgroundColor:
+                  Colors.transparent,
+
+              insetPadding:
+                  const EdgeInsets.all(20),
+
+              child: Container(
+
+                padding:
+                    const EdgeInsets.all(24),
+
+                decoration: BoxDecoration(
+
+                  gradient: LinearGradient(
+
+                    colors: isDark
+                        ? [
+
+                            const Color(
+                                0xFF1A1A1A),
+
+                            const Color(
+                                0xFF232323),
+
+                            const Color(
+                                0xFF2B2B2B),
+                          ]
+                        : [
+
+                            const Color(
+                                0xFFFFFBF7),
+
+                            const Color(
+                                0xFFF8EFEA),
+
+                            const Color(
+                                0xFFF3E4DE),
+                          ],
+
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(32),
                 ),
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white.withValues(alpha: 0.7),
-                ),
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8B0000).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: const Icon(
-                        Icons.add_circle,
-                        color: Color(0xFF8B0000),
-                        size: 34,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Text(
-                      "Adicionar Produto",
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Preencha os dados do novo produto",
-                      style: TextStyle(
-                        color: isDark ? Colors.white60 : Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: nomeController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Nome do produto",
-                        hintStyle: TextStyle(
-                          color: isDark ? Colors.white38 : Colors.grey.shade600,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.fastfood_rounded,
-                          color: Color(0xFF8B0000),
-                        ),
-                        filled: true,
-                        fillColor: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    TextField(
-                      controller: precoController,
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Preço",
-                        hintStyle: TextStyle(
-                          color: isDark ? Colors.white38 : Colors.grey.shade600,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.attach_money,
-                          color: Color(0xFFD2691E),
-                        ),
-                        filled: true,
-                        fillColor: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    TextField(
-                      controller: categoriaController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Categoria (opcional)",
-                        hintStyle: TextStyle(
-                          color: isDark ? Colors.white38 : Colors.grey.shade600,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.label_outline,
-                          color: Color(0xFFD2691E),
-                        ),
-                        filled: true,
-                        fillColor: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    TextField(
-                      controller: imagemController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "URL da imagem (opcional)",
-                        hintStyle: TextStyle(
-                          color: isDark ? Colors.white38 : Colors.grey.shade600,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.image,
-                          color: Color(0xFFD2691E),
-                        ),
-                        filled: true,
-                        fillColor: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD2691E),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
+
+                child: SingleChildScrollView(
+
+                  child: Column(
+
+                    mainAxisSize:
+                        MainAxisSize.min,
+
+                    children: [
+
+                      Container(
+
+                        padding:
+                            const EdgeInsets.all(16),
+
+                        decoration: BoxDecoration(
+
+                          color: const Color(
+                            0xFF8B0000,
+                          ).withValues(alpha: 0.12),
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            22,
                           ),
                         ),
-                        onPressed: () => adicionarProduto(
-                          nomeController,
-                          precoController,
-                          categoriaController,
-                          imagemController,
+
+                        child: const Icon(
+
+                          Icons.add_circle,
+
+                          color:
+                              Color(0xFF8B0000),
+
+                          size: 34,
                         ),
-                        child: const Text(
-                          "Adicionar Produto",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      Text(
+
+                        "Adicionar Produto",
+
+                        style: TextStyle(
+
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black87,
+
+                          fontSize: 24,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      // NOME
+                      TextField(
+
+                        controller: nomeController,
+
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+
+                        decoration: InputDecoration(
+
+                          hintText:
+                              "Nome do produto",
+
+                          prefixIcon: const Icon(
+
+                            Icons.fastfood,
+
+                            color:
+                                Color(0xFF8B0000),
+                          ),
+
+                          filled: true,
+
+                          fillColor: isDark
+                              ? Colors.white
+                                    .withValues(
+                                    alpha: 0.05)
+                              : Colors.white,
+
+                          border:
+                              OutlineInputBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              22,
+                            ),
+
+                            borderSide:
+                                BorderSide.none,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 14),
+
+                      // PREÇO
+                      TextField(
+
+                        controller: precoController,
+
+                        keyboardType:
+                            TextInputType.number,
+
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+
+                        decoration: InputDecoration(
+
+                          hintText: "Preço",
+
+                          prefixIcon: const Icon(
+
+                            Icons.attach_money,
+
+                            color:
+                                Color(0xFFD2691E),
+                          ),
+
+                          filled: true,
+
+                          fillColor: isDark
+                              ? Colors.white
+                                    .withValues(
+                                    alpha: 0.05)
+                              : Colors.white,
+
+                          border:
+                              OutlineInputBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              22,
+                            ),
+
+                            borderSide:
+                                BorderSide.none,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      // CATEGORIA
+                      TextField(
+
+                        controller:
+                            categoriaController,
+
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+
+                        decoration: InputDecoration(
+
+                          hintText: "Categoria",
+
+                          prefixIcon: const Icon(
+
+                            Icons.category,
+
+                            color:
+                                Color(0xFFD2691E),
+                          ),
+
+                          filled: true,
+
+                          fillColor: isDark
+                              ? Colors.white
+                                    .withValues(
+                                    alpha: 0.05)
+                              : Colors.white,
+
+                          border:
+                              OutlineInputBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              22,
+                            ),
+
+                            borderSide:
+                                BorderSide.none,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // IMAGEM
+                      GestureDetector(
+
+                        onTap: () async {
+
+                          await escolherImagem();
+
+                          setStateDialog(() {});
+                        },
+
+                        child: Container(
+
+                          width: double.infinity,
+
+                          height: 180,
+
+                          decoration: BoxDecoration(
+
+                            color: Colors.white
+                                .withValues(
+                              alpha: 0.06,
+                            ),
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              22,
+                            ),
+
+                            border: Border.all(
+                              color: Colors.white24,
+                            ),
+                          ),
+
+                          child: carregandoImagem
+                              ? const Center(
+                                  child:
+                                      CircularProgressIndicator(),
+                                )
+                              : imagemSelecionada !=
+                                      null
+                                  ? ClipRRect(
+
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                        22,
+                                      ),
+
+                                      child: kIsWeb
+                                     ? Image.network(
+                                     imagemSelecionada!.path,
+                                     fit: BoxFit.cover,
+                                 )
+                                : Image.network(
+                                  imagemSelecionada!.path,
+                                  fit: BoxFit.cover,
+                                ),
+                                    )
+                                  : Column(
+
+                                      mainAxisAlignment:
+                                          MainAxisAlignment
+                                              .center,
+
+                                      children: const [
+
+                                        Icon(
+
+                                          Icons.add_a_photo,
+
+                                          color:
+                                              Colors.white,
+
+                                          size: 40,
+                                        ),
+
+                                        SizedBox(
+                                            height: 10),
+
+                                        Text(
+
+                                          "Selecionar imagem",
+
+                                          style: TextStyle(
+                                            color:
+                                                Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // BOTÃO
+                      SizedBox(
+
+                        width: double.infinity,
+                        height: 55,
+
+                        child: ElevatedButton(
+
+                          style:
+                              ElevatedButton.styleFrom(
+
+                            backgroundColor:
+                                const Color(
+                              0xFFD2691E,
+                            ),
+
+                            shape:
+                                RoundedRectangleBorder(
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                18,
+                              ),
+                            ),
+                          ),
+
+                          onPressed: () async {
+
+                            try {
+                              if (nomeController.text.trim().isEmpty ||
+                               precoController.text.trim().isEmpty) {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(
+                               content: Text("Preencha nome e preço"),
+                                   ),
+                                );
+                              return;
+                           }
+
+                              final nome =
+                                  nomeController.text
+                                      .trim();
+
+                              final preco =
+                                  double.parse(
+
+                                precoController.text
+                                    .replaceAll(",", "."),
+                              );
+
+                              await FirebaseFirestore
+                                  .instance
+                                  .collection(
+                                      "produtos")
+                                  .add({
+
+                                "nome": nome,
+
+                                "preco": preco,
+
+                                "categoria":
+                                    categoriaController
+                                        .text
+                                        .trim(),
+
+                                "imagem":
+                                    imagemUrl ?? "",
+                              });
+
+                              if (!mounted) return;
+
+                              Navigator.pop(context);
+                              imagemSelecionada = null;
+                              imagemUrl = null;
+
+                              ScaffoldMessenger.of(
+                                      context)
+                                  .showSnackBar(
+
+                                const SnackBar(
+
+                                  content: Text(
+                                    "Produto adicionado!",
+                                  ),
+                                ),
+                              );
+
+                            } catch (e) {
+
+                              ScaffoldMessenger.of(
+                                      context)
+                                  .showSnackBar(
+
+                                SnackBar(
+
+                                  content: Text(
+                                    "Erro: $e",
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+
+                          child: const Text(
+
+                            "Adicionar Produto",
+
+                            style: TextStyle(
+
+                              color: Colors.white,
+
+                              fontSize: 18,
+
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      );
-    } finally {
-      nomeController.dispose();
-      precoController.dispose();
-      categoriaController.dispose();
-      imagemController.dispose();
-    }
+            );
+          },
+        );
+      },
+    );
+
+  } finally {
+
+    nomeController.dispose();
+    precoController.dispose();
+    categoriaController.dispose();
   }
+}
+
 
   // 🔥 EDITAR PRODUTO
   Future<void> editarProduto(
@@ -872,7 +1197,7 @@ class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
                         color: Colors.white.withValues(alpha: 0.55),
                       ),
 
-                      // 🔥 REMOVE O FUNDO BRANCO
+
                       filled: true,
                       fillColor: Colors.transparent,
 

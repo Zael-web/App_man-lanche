@@ -329,6 +329,7 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
                               }
 
                               final status = data["status"] ?? "Desconhecido";
+                              final statusFormatado = status.toString().trim().toLowerCase();
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 16),
@@ -464,25 +465,93 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
                                     const SizedBox(height: 12),
 
                                     // 🎯 AÇÕES
-                                    Wrap(
-                                      spacing: 8,
-                                      children: [
-                                        if (status.toLowerCase() != "entregue")
-                                          actionButton(
-                                            "Entregue",
-                                            Colors.green,
-                                            () => atualizarStatus(
-                                              doc.id,
-                                              "Entregue",
-                                            ),
-                                          ),
-                                        actionButton(
-                                          "Remover",
-                                          Colors.red,
-                                          () => confirmarRemocao(doc.id),
-                                        ),
-                                      ],
-                                    ),
+                                
+
+
+Wrap(
+  spacing: 8,
+  runSpacing: 8,
+  children: [
+
+    // 🔥 PEDIDO PENDENTE
+    if (statusFormatado == "pendente")
+      actionButton(
+        "Preparando",
+        Colors.orange,
+        () async {
+          await atualizarStatus(
+            doc.id,
+            "Preparando",
+          );
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Pedido em preparação 🍔",
+                ),
+              ),
+            );
+          }
+        },
+      ),
+
+    // 🚚 PEDIDO PREPARANDO
+    if (statusFormatado == "preparando")
+      actionButton(
+        "Saiu para entrega",
+        Colors.blue,
+        () async {
+          await atualizarStatus(
+            doc.id,
+            "Saiu para entrega",
+          );
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Pedido saiu para entrega 🚚",
+                ),
+              ),
+            );
+          }
+        },
+      ),
+
+    // ✅ QUALQUER STATUS MENOS ENTREGUE
+    if (statusFormatado != "entregue")
+      actionButton(
+        "Entregue",
+        Colors.green,
+        () async {
+          await atualizarStatus(
+            doc.id,
+            "Entregue",
+          );
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Pedido entregue ✅",
+                ),
+              ),
+            );
+          }
+        },
+      ),
+
+    //REMOVER
+    actionButton(
+      "Remover",
+      Colors.red,
+      () async {
+        await confirmarRemocao(doc.id);
+      },
+    ),
+  ],
+),
                                   ],
                                 ),
                               );

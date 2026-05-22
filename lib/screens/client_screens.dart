@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mana_lanche/notification_service.dart';
+
 
 
 import 'package:mana_lanche/screens/carrinho_screens.dart';
@@ -111,17 +111,54 @@ void initState() {
             ultimoStatus = status;
 
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: const Color(0xFF7A2323),
-                  content: Text(
-                    "Seu pedido agora está: $status",
-                  ),
-                ),
-              );
+
+ScaffoldMessenger.of(context).clearSnackBars();
+
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    behavior: SnackBarBehavior.floating,
+
+    margin: const EdgeInsets.only(
+      top: 20,
+      left: 12,
+      right: 12,
+      bottom: 700,
+    ),
+
+    backgroundColor: const Color.fromARGB(255, 230, 215, 0),
+
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+
+    duration: const Duration(seconds: 4),
+
+    content: Row(
+      children: [
+        const Icon(
+          Icons.notifications_active,
+          color: Colors.white,
+        ),
+
+        const SizedBox(width: 10),
+
+        Expanded(
+          child: Text(
+            "🍔 Seu pedido agora está: $status",
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
             }
           }
-        });
+        }); 
+        
   }
 
   // 🔥 FRASES

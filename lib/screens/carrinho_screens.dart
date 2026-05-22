@@ -434,8 +434,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         itensPedido.add({
           "nomeProduto":
               item["nomeProduto"],
-          "Preco": item["preco"],
-          "Quantidade":
+          "preco": item["preco"],
+          "quantidade":
               item["quantidade"],
           "imagem":
               item["imagem"] ?? "",

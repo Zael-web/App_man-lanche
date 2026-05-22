@@ -322,9 +322,10 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
                               double totalPedido = 0;
 
                               for (var item in itens) {
-                                totalPedido +=
-                                    (item["preco"] ?? 0) *
-                                    (item["quantidade"] ?? 1);
+                                final preco = item["preco"] ?? item["Preco"] ?? 0;
+                                final quantidade = item["quantidade"] ?? item["Quantidade"] ?? 1;
+
+                                totalPedido += (preco * quantidade);
                               }
 
                               final status = data["status"] ?? "Desconhecido";
@@ -428,14 +429,14 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
                                             const SizedBox(width: 8),
                                             Expanded(
                                               child: Text(
-                                                item["nomeProduto"] ?? "",
+                                                item["nomeProduto"] ?? item["nome"] ?? "Produto",
                                                 style: const TextStyle(
                                                   color: Colors.white70,
                                                 ),
                                               ),
                                             ),
                                             Text(
-                                              "x${item["quantidade"]}",
+                                              "x${item["quantidade"] ?? item["Quantidade"] ?? 1}",
                                               style: const TextStyle(
                                                 color: Colors.white,
                                               ),
@@ -523,4 +524,4 @@ class _PedidosAdminScreenState extends State<PedidosAdminScreen> {
       child: Text(text),
     );
   }
-}
+ }

@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mana_lanche/notification_service.dart';
 
 
 import 'package:mana_lanche/screens/carrinho_screens.dart';
 import 'package:mana_lanche/screens/perfil_screens.dart';
+
+
 
 class ClientScreen extends StatefulWidget {
   const ClientScreen({super.key});
@@ -41,6 +45,8 @@ class _ClientScreenState extends State<ClientScreen> {
 
   String? pedidoIdAtual;
 
+  bool _notificacoesIniciadas = false;
+
   final List<String> banners = [
     "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
     "https://images.unsplash.com/photo-1513104890138-7c749659a591",
@@ -56,14 +62,25 @@ class _ClientScreenState extends State<ClientScreen> {
     "🍟 Combos que valem a pena",
   ];
 
-  @override
-  void initState() {
-    super.initState();
+@override
+void initState() {
+  super.initState();
 
-    carregarNome();
-    iniciarFrases();
-    iniciarBanner();
-  }
+  carregarNome();
+  iniciarFrases();
+  iniciarBanner();
+
+  Future.microtask(() async {
+    if (_notificacoesIniciadas) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      _notificacoesIniciadas = true;
+      await _initNotificationsSafe(user.uid);
+    }
+  });
+}
 
   @override
   void dispose() {
@@ -168,7 +185,37 @@ class _ClientScreenState extends State<ClientScreen> {
       carregando = false;
     });
   }
+Future<void> _initNotificationsSafe(String uid) async {
+  try {
+    final messaging = FirebaseMessaging.instance;
 
+    // 🔥 NÃO trava se usuário recusar
+    final permission = await messaging.requestPermission();
+
+    if (permission.authorizationStatus ==
+        AuthorizationStatus.denied) {
+      debugPrint("Usuário negou notificações");
+      return;
+    }
+
+    final token = await messaging.getToken();
+
+    if (token == null) {
+      debugPrint("Token nulo");
+      return;
+    }
+
+    await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(uid)
+        .set({
+      "fcmToken": token,
+    }, SetOptions(merge: true));
+
+  } catch (e) {
+    debugPrint("FCM ignorado (seguro): $e");
+  }
+}
   // 🔥 ADICIONAR AO CARRINHO
   void adicionarAoCarrinho(
     String nome,

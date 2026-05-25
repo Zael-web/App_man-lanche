@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,6 +41,7 @@ class _RegisterScreenState
   // 🔥 CADASTRAR
   Future<void> cadastrar() async {
 
+    // VALIDAR SENHAS
     if (senhaController.text !=
         confirmarSenhaController.text) {
 
@@ -55,6 +58,7 @@ class _RegisterScreenState
       return;
     }
 
+    // VALIDAR TAMANHO SENHA
     if (senhaController.text.length < 6) {
 
       ScaffoldMessenger.of(context)
@@ -70,12 +74,33 @@ class _RegisterScreenState
       return;
     }
 
+    // VALIDAR CAMPOS
+    if (nomeController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        telefoneController.text.isEmpty ||
+        enderecoController.text.isEmpty ||
+        senhaController.text.isEmpty) {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+          content: Text(
+            "Preencha todos os campos",
+          ),
+        ),
+      );
+
+      return;
+    }
+
     try {
 
       setState(() {
         carregando = true;
       });
 
+      // 🔥 CRIAR USUÁRIO
       UserCredential userCredential =
           await FirebaseAuth.instance
               .createUserWithEmailAndPassword(
@@ -87,11 +112,21 @@ class _RegisterScreenState
             senhaController.text.trim(),
       );
 
+      // 🔥 ATUALIZAR NOME FIREBASE AUTH
+      await userCredential.user!
+          .updateDisplayName(
+
+        nomeController.text.trim(),
+      );
+
       // 🔥 SALVAR FIRESTORE
       await FirebaseFirestore.instance
           .collection("usuarios")
           .doc(userCredential.user!.uid)
           .set({
+
+        "uid":
+            userCredential.user!.uid,
 
         "nome":
             nomeController.text.trim(),
@@ -126,6 +161,7 @@ class _RegisterScreenState
 
       // 🔥 ENTRAR AUTOMATICAMENTE
       Navigator.pushReplacement(
+
         context,
 
         MaterialPageRoute(
@@ -148,12 +184,14 @@ class _RegisterScreenState
       } else if (e.code ==
           'invalid-email') {
 
-        mensagem = "Email inválido";
+        mensagem =
+            "Email inválido";
 
       } else if (e.code ==
           'weak-password') {
 
-        mensagem = "Senha muito fraca";
+        mensagem =
+            "Senha muito fraca";
       }
 
       if (!mounted) return;
@@ -173,9 +211,9 @@ class _RegisterScreenState
       ScaffoldMessenger.of(context)
           .showSnackBar(
 
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Erro inesperado",
+            "Erro inesperado: $e",
           ),
         ),
       );

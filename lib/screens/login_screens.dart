@@ -28,6 +28,8 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<double> _scaleAnimation;
   late Animation<Offset> _slideAnimation;
 
+  bool _animacaoJaRodou = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,8 +53,15 @@ class _LoginScreenState extends State<LoginScreen>
       begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
 
-    _controller.forward();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_animacaoJaRodou) {
+      _controller.forward();
+      _animacaoJaRodou = true; // ✅ Nunca mais roda
+    }
   }
 
   // 🔥 LOGIN
@@ -517,8 +526,9 @@ class _LoginScreenState extends State<LoginScreen>
                                         size: 26,
                                       ),
 
+                                      // Depois:
                                       onPressed: () {
-                                        MyApp.of(context)?.toggleTheme();
+                                        MyApp.toggleTheme();
                                       },
                                     ),
                                   ),

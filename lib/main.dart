@@ -8,6 +8,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'firebase_options.dart';
 import 'screens/login_screens.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'screens/client_screens.dart';
 
 // ✅ Handler global — OBRIGATÓRIO ficar aqui fora, antes do main()
 @pragma('vm:entry-point')
@@ -178,7 +180,32 @@ class MyAppState extends State<MyApp> {
           margin: const EdgeInsets.symmetric(vertical: 8),
         ),
       ),
-      home: const LoginScreen(),
+     home: StreamBuilder<User?>(
+  stream: FirebaseAuth.instance.authStateChanges(),
+
+  builder: (context, snapshot) {
+
+    // 🔥 CARREGANDO
+    if (snapshot.connectionState ==
+        ConnectionState.waiting) {
+
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // 🔥 USUÁRIO LOGADO
+    if (snapshot.hasData) {
+
+      return const ClientScreen();
+    }
+
+    // 🔥 NÃO LOGADO
+    return const LoginScreen();
+  },
+),
     );
   }
 }

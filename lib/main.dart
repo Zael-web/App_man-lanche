@@ -168,8 +168,7 @@ class MyApp extends StatelessWidget {
           home: child, // ✅ child fixo, não reconstrói
         );
       },
-      child: StreamBuilder<User?>(
-        // ✅ criado uma vez só
+      child: StreamBuilder<User?>( // ✅ criado uma vez só
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

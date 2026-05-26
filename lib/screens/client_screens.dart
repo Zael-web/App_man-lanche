@@ -48,9 +48,12 @@ class _ClientScreenState extends State<ClientScreen> {
   bool _notificacoesIniciadas = false;
 
   final List<String> banners = [
-    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
-    "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-    "https://images.unsplash.com/photo-1550547660-d9450f859349",
+    "https://i.ibb.co/N2xC55kG/lop3.jpg",
+    "https://i.ibb.co/9kqJgsky/Gemini-Generated-Image-fz327fz327fz327f.png",
+    "https://i.ibb.co/8nq7QqZg/lop2.jpg",
+    "https://i.ibb.co/xK7j105t/pizza-de-carne.jpg",
+    "https://i.ibb.co/1JGvsm7r/comb-terra.jpg",
+    "https://i.ibb.co/jP4JNd5G/Batata-frita-768x432.jpg",
   ];
 
   final List<String> frases = [
@@ -177,29 +180,25 @@ ScaffoldMessenger.of(context).showSnackBar(
   }
 
   // 🔥 BANNER
-  void iniciarBanner() {
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 4));
+void iniciarBanner() {
+  Future.doWhile(() async {
+    await Future.delayed(const Duration(seconds: 4));
 
-      if (!mounted) return false;
+    if (!mounted) return false;
 
-      if (!bannerController.hasClients) return false;
+    if (!bannerController.hasClients) return false;
 
-      bannerAtual++;
+    bannerAtual++;
 
-      if (bannerAtual >= banners.length) {
-        bannerAtual = 0;
-      }
+    await bannerController.animateToPage(
+      bannerAtual,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
 
-      await bannerController.animateToPage(
-        bannerAtual,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-      );
-
-      return mounted;
-    });
-  }
+    return mounted;
+  });
+}
 
   // 🔥 CARREGAR NOME
   Future<void> carregarNome() async {
@@ -479,7 +478,7 @@ Future<void> _initNotificationsSafe(String uid) async {
                   child: PageView.builder(
                     controller: bannerController,
 
-                    itemCount: banners.length,
+                    itemCount: null,
 
                     itemBuilder: (_, index) {
                       return Container(
@@ -514,7 +513,7 @@ Future<void> _initNotificationsSafe(String uid) async {
 
                             children: [
                               Image.network(
-                                banners[index],
+                                banners[index % banners.length],
                                 fit: BoxFit.cover,
                               ),
 

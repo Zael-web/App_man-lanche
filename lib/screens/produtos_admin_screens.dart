@@ -13,518 +13,366 @@ class ProdutosAdminScreen extends StatefulWidget {
 }
 
 class _ProdutosAdminScreenState extends State<ProdutosAdminScreen> {
-
   final nomeController = TextEditingController();
   final precoController = TextEditingController();
 
   // 🔥 ADICIONAR PRODUTO
   Future<void> adicionarProduto() async {
-
     try {
-
       if (nomeController.text.trim().isEmpty ||
           precoController.text.trim().isEmpty) {
         return;
       }
 
-      final preco = double.parse(
-        precoController.text.replaceAll(",", "."),
-      );
+      final preco = double.parse(precoController.text.replaceAll(",", "."));
 
-      await FirebaseFirestore.instance
-          .collection("produtos")
-          .add({
-
+      await FirebaseFirestore.instance.collection("produtos").add({
         "nome": nomeController.text.trim(),
         "preco": preco,
-
       });
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text("Produto adicionado!"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Produto adicionado!")));
 
       nomeController.clear();
       precoController.clear();
-
     } catch (e) {
-
       ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text("Erro ao adicionar produto"),
-        ),
+        const SnackBar(content: Text("Erro ao adicionar produto")),
       );
     }
   }
 
   // EXCLUIR PRODUTO
   Future<void> excluirProduto(String id) async {
-
-    await FirebaseFirestore.instance
-        .collection("produtos")
-        .doc(id)
-        .delete();
+    await FirebaseFirestore.instance.collection("produtos").doc(id).delete();
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-
-      const SnackBar(
-        content: Text("Produto removido"),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Produto removido")));
   }
 
-
   //EDITAR PRODUTO PREMIUM
-Future<void> editarProduto(
-  String id,
-  String nomeAtual,
-  String precoAtual,
-) async {
+  Future<void> editarProduto(
+    String id,
+    String nomeAtual,
+    String precoAtual,
+  ) async {
+    final nomeEditController = TextEditingController(text: nomeAtual);
 
-  final nomeEditController =
-      TextEditingController(text: nomeAtual);
+    final precoEditController = TextEditingController(text: precoAtual);
 
-  final precoEditController =
-      TextEditingController(text: precoAtual);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-  final isDark =
-      Theme.of(context).brightness ==
-          Brightness.dark;
+    showDialog(
+      context: context,
 
-  showDialog(
+      barrierColor: Colors.black54,
 
-    context: context,
+      builder: (_) {
+        return Dialog(
+          backgroundColor: const Color.fromARGB(0, 221, 4, 4),
+          insetPadding: const EdgeInsets.all(20),
 
-    barrierColor: Colors.black54,
+          child: Container(
+            padding: const EdgeInsets.all(28),
 
-    builder: (_) {
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [
+                        const Color(0xFF1A1A1A),
+                        const Color(0xFF232323),
+                        const Color(0xFF2B2B2B),
+                      ]
+                    : [
+                        const Color(0xFFFFFBF7),
+                        const Color(0xFFF8EFEA),
+                        const Color(0xFFF3E4DE),
+                      ],
 
-      return Dialog(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
 
-        backgroundColor: const Color.fromARGB(0, 221, 4, 4),
-        insetPadding: const EdgeInsets.all(20),
+              borderRadius: BorderRadius.circular(32),
 
-        child: Container(
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.white.withValues(alpha: 0.7),
+              ),
 
-          padding: const EdgeInsets.all(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
 
-          decoration: BoxDecoration(
+                  blurRadius: 30,
 
-            gradient: LinearGradient(
-
-              colors: isDark
-                  ? [
-
-                      const Color(0xFF1A1A1A),
-                      const Color(0xFF232323),
-                      const Color(0xFF2B2B2B),
-
-                    ]
-                  : [
-
-                      const Color(0xFFFFFBF7),
-                      const Color(0xFFF8EFEA),
-                      const Color(0xFFF3E4DE),
-
-                    ],
-
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+                  offset: const Offset(0, 15),
+                ),
+              ],
             ),
 
-            borderRadius:
-                BorderRadius.circular(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
 
-            border: Border.all(
+              children: [
+                // iCONE
+                Container(
+                  padding: const EdgeInsets.all(16),
 
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.white.withValues(alpha: 0.7),
-            ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B0000).withValues(alpha: 0.12),
 
-            boxShadow: [
-
-              BoxShadow(
-
-                color: Colors.black.withValues(alpha: 0.25),
-
-                blurRadius: 30,
-
-                offset: const Offset(0, 15),
-              ),
-            ],
-          ),
-
-          child: Column(
-
-            mainAxisSize: MainAxisSize.min,
-
-            children: [
-
-              // iCONE
-              Container(
-
-                padding: const EdgeInsets.all(16),
-
-                decoration: BoxDecoration(
-
-                  color: const Color(0xFF8B0000)
-                      .withValues(alpha: 0.12),
-
-                  borderRadius:
-                      BorderRadius.circular(22),
-                ),
-
-                child: const Icon(
-
-                  Icons.edit_rounded,
-
-                  color: Color(0xFF8B0000),
-
-                  size: 34,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // 🔥 TÍTULO
-              Text(
-
-                "Editar Produto",
-
-                style: TextStyle(
-
-                  color: isDark
-                      ? Colors.white
-                      : Colors.black87,
-
-                  fontSize: 24,
-
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-
-                "Atualize as informaçoes do produto",
-
-                style: TextStyle(
-
-                  color: isDark
-                      ? Colors.white60
-                      : Colors.black54,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // CAMPO NOME
-              TextField(
-
-                controller: nomeEditController,
-
-                style: TextStyle(
-                  color: isDark
-                      ? Colors.white
-                      : Colors.black,
-                ),
-
-                decoration: InputDecoration(
-
-                  hintText: "Nome do produto",
-
-                  hintStyle: TextStyle(
-
-                    color: isDark
-                        ? Colors.white38
-                        : Colors.grey.shade600,
+                    borderRadius: BorderRadius.circular(22),
                   ),
 
-                  prefixIcon: const Icon(
-
-                    Icons.fastfood_rounded,
+                  child: const Icon(
+                    Icons.edit_rounded,
 
                     color: Color(0xFF8B0000),
-                  ),
 
-                  filled: true,
-
-                  fillColor: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white,
-
-                  contentPadding:
-                      const EdgeInsets.symmetric(
-
-                    vertical: 20,
-                    horizontal: 18,
-                  ),
-
-                  border: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide.none,
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide(
-
-                      color: Colors.white
-                          .withValues(alpha: 0.08),
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: const BorderSide(
-
-                      color: Color(0xFFD2691E),
-                      width: 2,
-                    ),
+                    size: 34,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
-              // CAMPO PREÇO
-              TextField(
+                // 🔥 TÍTULO
+                Text(
+                  "Editar Produto",
 
-                controller: precoEditController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
 
-                keyboardType:
-                    TextInputType.number,
+                    fontSize: 24,
 
-                style: TextStyle(
-                  color: isDark
-                      ? Colors.white
-                      : Colors.black,
-                ),
-
-                decoration: InputDecoration(
-
-                  hintText: "Preço",
-
-                  hintStyle: TextStyle(
-
-                    color: isDark
-                        ? Colors.white38
-                        : Colors.grey.shade600,
-                  ),
-
-                  prefixIcon: const Icon(
-
-                    Icons.attach_money,
-
-                    color: Color(0xFFD2691E),
-                  ),
-
-                  filled: true,
-
-                  fillColor: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white,
-
-                  contentPadding:
-                      const EdgeInsets.symmetric(
-
-                    vertical: 20,
-                    horizontal: 18,
-                  ),
-
-                  border: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide.none,
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: BorderSide(
-
-                      color: Colors.white
-                          .withValues(alpha: 0.08),
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(22),
-
-                    borderSide: const BorderSide(
-
-                      color: Color(0xFFD2691E),
-                      width: 2,
-                    ),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 30),
+                const SizedBox(height: 8),
 
-              // BOTÕES
-              Row(
+                Text(
+                  "Atualize as informaçoes do produto",
 
-                children: [
+                  style: TextStyle(
+                    color: isDark ? Colors.white60 : Colors.black54,
+                  ),
+                ),
 
-                  Expanded(
+                const SizedBox(height: 30),
 
-                    child: SizedBox(
+                // CAMPO NOME
+                TextField(
+                  controller: nomeEditController,
 
-                      height: 50,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
 
-                      child: OutlinedButton(
+                  decoration: InputDecoration(
+                    hintText: "Nome do produto",
 
-                        onPressed: () {
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white38 : Colors.grey.shade600,
+                    ),
 
-                          Navigator.pop(context);
-                        },
+                    prefixIcon: const Icon(
+                      Icons.fastfood_rounded,
 
-                        style:
-                            OutlinedButton.styleFrom(
+                      color: Color(0xFF8B0000),
+                    ),
 
-                          shape:
-                              RoundedRectangleBorder(
+                    filled: true,
 
-                            borderRadius:
-                                BorderRadius
-                                    .circular(16),
-                          ),
-                        ),
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white,
 
-                        child: Text(
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 18,
+                    ),
 
-                          "Cancelar",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
 
-                          style: TextStyle(
+                      borderSide: BorderSide.none,
+                    ),
 
-                            color: isDark
-                                ? Colors.white
-                                : Colors.black87,
-                          ),
-                        ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD2691E),
+                        width: 2,
                       ),
                     ),
                   ),
+                ),
 
-                  const SizedBox(width: 12),
+                const SizedBox(height: 20),
 
-                  Expanded(
+                // CAMPO PREÇO
+                TextField(
+                  controller: precoEditController,
 
-                    child: SizedBox(
+                  keyboardType: TextInputType.number,
 
-                      height: 50,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
 
-                      child: ElevatedButton(
+                  decoration: InputDecoration(
+                    hintText: "Preço",
 
-                        style:
-                            ElevatedButton
-                                .styleFrom(
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white38 : Colors.grey.shade600,
+                    ),
 
-                          backgroundColor:
-                              const Color(
-                                  0xFFD2691E),
+                    prefixIcon: const Icon(
+                      Icons.attach_money,
 
-                          shape:
-                              RoundedRectangleBorder(
+                      color: Color(0xFFD2691E),
+                    ),
 
-                            borderRadius:
-                                BorderRadius
-                                    .circular(16),
-                          ),
-                        ),
+                    filled: true,
 
-                        onPressed: () async {
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white,
 
-                          final novoNome =
-                              nomeEditController
-                                  .text;
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 18,
+                    ),
 
-                          final novoPreco = double
-                              .parse(
-                            precoEditController
-                                .text
-                                .replaceAll(
-                                    ",", "."),
-                          );
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
 
-                          await FirebaseFirestore
-                              .instance
-                              .collection(
-                                  "produtos")
-                              .doc(id)
-                              .update({
-                            "nome": novoNome,
-                            "preco": novoPreco,
-                          });
+                      borderSide: BorderSide.none,
+                    ),
 
-                          if (!mounted) return;
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
 
-                          Navigator.pop(
-                              context);
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
 
-                          ScaffoldMessenger.of(
-                                  context)
-                              .showSnackBar(
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
 
-                            const SnackBar(
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD2691E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
 
-                              content: Text(
-                                "Produto atualizado!",
-                              ),
+                const SizedBox(height: 30),
+
+                // BOTÕES
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                          );
-                        },
+                          ),
 
-                        child: const Text(
+                          child: Text(
+                            "Cancelar",
 
-                          "Salvar",
-
-                          style: TextStyle(
-
-                            color: Colors.white,
-
-                            fontWeight:
-                                FontWeight.bold,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD2691E),
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+
+                          onPressed: () async {
+                            final novoNome = nomeEditController.text;
+
+                            final novoPreco = double.parse(
+                              precoEditController.text.replaceAll(",", "."),
+                            );
+
+                            await FirebaseFirestore.instance
+                                .collection("produtos")
+                                .doc(id)
+                                .update({"nome": novoNome, "preco": novoPreco});
+
+                            if (!mounted) return;
+
+                            Navigator.pop(context);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Produto atualizado!"),
+                              ),
+                            );
+                          },
+
+                          child: const Text(
+                            "Salvar",
+
+                            style: TextStyle(
+                              color: Colors.white,
+
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
   // LOGOUT
   Future<void> logout() async {
@@ -536,16 +384,11 @@ Future<void> editarProduto(
           backgroundColor: const Color(0xFF1A1A1A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: Colors.white.withValues(alpha: 0.1),
-            ),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           ),
           title: const Text(
             "Sair da conta",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: const Text(
             "Tem certeza que deseja sair de sua conta?",
@@ -567,25 +410,18 @@ Future<void> editarProduto(
                   if (!mounted) return;
 
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                     (route) => false,
                   );
                 } catch (e) {
                   if (!mounted) return;
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Erro ao fazer logout"),
-                    ),
+                    const SnackBar(content: Text("Erro ao fazer logout")),
                   );
                 }
               },
-              child: const Text(
-                "Sair",
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text("Sair", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -595,13 +431,9 @@ Future<void> editarProduto(
 
   @override
   Widget build(BuildContext context) {
-
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-
       extendBodyBehindAppBar: true,
 
       appBar: AppBar(
@@ -615,21 +447,13 @@ Future<void> editarProduto(
         centerTitle: true,
 
         title: const Text(
-
           "PRODUTOS",
 
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
 
         leading: IconButton(
-
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
 
           onPressed: () {
             Navigator.pop(context);
@@ -637,14 +461,9 @@ Future<void> editarProduto(
         ),
 
         actions: [
-
           // SAIR
           IconButton(
-
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.logout, color: Colors.white),
 
             onPressed: logout,
           ),
@@ -652,30 +471,23 @@ Future<void> editarProduto(
       ),
 
       body: Container(
-
         width: double.infinity,
         height: double.infinity,
 
         decoration: BoxDecoration(
-
           gradient: LinearGradient(
-
             colors: isDark
                 ? [
-
                     const Color(0xFF111111),
                     const Color(0xFF1A1A1A),
                     const Color(0xFF222222),
                     const Color(0xFF2C2C2C),
-
                   ]
                 : [
-
                     const Color(0xFF3E0F12),
                     const Color(0xFF5A171B),
                     const Color(0xFF7A2323),
                     const Color(0xFFA63A3A),
-
                   ],
 
             begin: Alignment.topLeft,
@@ -684,13 +496,9 @@ Future<void> editarProduto(
         ),
 
         child: SafeArea(
-
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 28,
-              vertical: 30,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 30),
             child: Column(
               children: [
                 const SizedBox(height: 10),
@@ -719,12 +527,10 @@ Future<void> editarProduto(
 
                 const SizedBox(height: 28),
 
-                
-
                 const SizedBox(height: 8),
 
                 Text(
-                  "Cadastre novos produtos e gerencie o estoque", 
+                  "Cadastre novos produtos e gerencie o estoque",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.78),
@@ -897,26 +703,17 @@ Future<void> editarProduto(
                       .orderBy("nome")
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (!snapshot.hasData ||
-                        snapshot.data!.docs.isEmpty) {
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 40,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 40),
                         alignment: Alignment.center,
                         child: const Text(
                           "Nenhum produto encontrado",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       );
                     }
@@ -943,7 +740,9 @@ Future<void> editarProduto(
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF000000).withValues(alpha: 0.12),
+                                color: const Color(
+                                  0xFF000000,
+                                ).withValues(alpha: 0.12),
                                 blurRadius: 14,
                                 offset: const Offset(0, 6),
                               ),
@@ -979,7 +778,12 @@ Future<void> editarProduto(
                                       style: TextStyle(
                                         color: isDark
                                             ? Colors.white
-                                            : const Color.fromARGB(255, 255, 255, 255),
+                                            : const Color.fromARGB(
+                                                255,
+                                                255,
+                                                255,
+                                                255,
+                                              ),
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -991,14 +795,23 @@ Future<void> editarProduto(
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color.fromARGB(255, 255, 255, 255)
-                                            .withValues(alpha: 0.12),
+                                        color: const Color.fromARGB(
+                                          255,
+                                          255,
+                                          255,
+                                          255,
+                                        ).withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         "R\$ ${data["preco"]}",
                                         style: const TextStyle(
-                                          color: Color.fromARGB(255, 202, 202, 202),
+                                          color: Color.fromARGB(
+                                            255,
+                                            202,
+                                            202,
+                                            202,
+                                          ),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
                                         ),
@@ -1013,7 +826,9 @@ Future<void> editarProduto(
                                     width: 44,
                                     height: 44,
                                     decoration: BoxDecoration(
-                                      color: Colors.orange.withValues(alpha: 0.12),
+                                      color: Colors.orange.withValues(
+                                        alpha: 0.12,
+                                      ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: IconButton(

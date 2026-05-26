@@ -22,16 +22,11 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
           backgroundColor: const Color(0xFF1A1A1A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: Colors.white.withValues(alpha: 0.1),
-            ),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           ),
           title: const Text(
             "Sair da conta",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: const Text(
             "Tem certeza que deseja sair de sua conta?",
@@ -51,16 +46,11 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                 if (mounted) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                   );
                 }
               },
-              child: const Text(
-                "Sair",
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text("Sair", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -127,7 +117,10 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               padding: const EdgeInsets.all(20),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                  minHeight:
+                      MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -136,17 +129,17 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
 
                     // 🔥 ÍCONE PRINCIPAL
                     Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white24),
                         image: const DecorationImage(
-                        image: AssetImage("assets/images/logo.png"),
-                        fit: BoxFit.cover,
+                          image: AssetImage("assets/images/logo.png"),
+                          fit: BoxFit.cover,
                         ),
-                       ),
-                  ),
+                      ),
+                    ),
 
                     const SizedBox(height: 25),
 
@@ -164,10 +157,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
 
                     const Text(
                       "Gerencie produtos e pedidos do seu lanche",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
 
@@ -196,7 +186,9 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFFB703).withValues(alpha: 0.2),
+                                color: const Color(
+                                  0xFFFFB703,
+                                ).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Icon(
@@ -264,7 +256,9 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFFD166).withValues(alpha: 0.2),
+                                color: const Color(
+                                  0xFFFFD166,
+                                ).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Icon(
@@ -312,16 +306,10 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                     // 🔥 BOTÃO SAIR
                     TextButton.icon(
                       onPressed: _logout,
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.white70,
-                      ),
+                      icon: const Icon(Icons.logout, color: Colors.white70),
                       label: const Text(
                         "Sair",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
                       ),
                     ),
                   ],

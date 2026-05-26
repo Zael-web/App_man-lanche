@@ -9,7 +9,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'firebase_options.dart';
 import 'screens/login_screens.dart';
 
-
 // ✅ Handler global — OBRIGATÓRIO ficar aqui fora, antes do main()
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {

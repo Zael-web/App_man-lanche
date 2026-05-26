@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 
 class CarrinhoScreen extends StatefulWidget {
   final List<Map<String, dynamic>> carrinho;
@@ -65,10 +66,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   double converterPreco(dynamic preco) {
     if (preco is String) {
-      return double.tryParse(
-            preco.replaceAll(",", "."),
-          ) ??
-          0;
+      return double.tryParse(preco.replaceAll(",", ".")) ?? 0;
     } else if (preco is num) {
       return preco.toDouble();
     }
@@ -78,9 +76,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   double get total {
     return widget.carrinho.fold(0.0, (total, item) {
-      return total +
-          (converterPreco(item["preco"]) *
-              item["quantidade"]);
+      return total + (converterPreco(item["preco"]) * item["quantidade"]);
     });
   }
 
@@ -109,14 +105,11 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
       backgroundColor: Colors.transparent,
 
       builder: (context) {
-
-        final isDark =
-            Theme.of(context).brightness ==
-                Brightness.dark;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return StatefulBuilder(
           builder: (context, setModalState) {
-
+            
             final theme = Theme.of(context);
 
             return Container(
@@ -124,20 +117,13 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                 left: 20,
                 right: 20,
                 top: 20,
-                bottom:
-                    MediaQuery.of(context)
-                            .viewInsets
-                            .bottom +
-                        20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
               ),
 
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1B1B1B)
-                    : Colors.white,
+                color: isDark ? const Color(0xFF1B1B1B) : Colors.white,
 
-                borderRadius:
-                    const BorderRadius.vertical(
+                borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(30),
                 ),
               ),
@@ -146,11 +132,9 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
 
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-
                     Center(
                       child: Container(
                         width: 60,
@@ -158,10 +142,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                         decoration: BoxDecoration(
                           color: Colors.grey,
-                          borderRadius:
-                              BorderRadius.circular(
-                            20,
-                          ),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                     ),
@@ -175,9 +156,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
 
-                        color: isDark
-                            ? Colors.white
-                            : Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
 
@@ -185,29 +164,22 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                     // 🔥 ENDEREÇO
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           "Endereço de entrega",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white
-                                : Colors.black,
+                            color: isDark ? Colors.white : Colors.black,
                           ),
                         ),
                         TextButton.icon(
                           onPressed: () {
                             enderecoController.clear();
                           },
-                          icon: const Icon(
-                            Icons.edit_location,
-                          ),
-                          label: const Text(
-                            "Trocar",
-                          ),
+                          icon: const Icon(Icons.edit_location),
+                          label: const Text("Trocar"),
                         ),
                       ],
                     ),
@@ -215,35 +187,24 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                     const SizedBox(height: 8),
 
                     TextField(
-                      controller:
-                          enderecoController,
+                      controller: enderecoController,
 
                       style: TextStyle(
-                        color: isDark
-                            ? Colors.white
-                            : Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
 
                       decoration: InputDecoration(
                         labelText: "Endereço",
-                        hintText:
-                            "Use o endereço cadastrado ou altere aqui",
+                        hintText: "Use o endereço cadastrado ou altere aqui",
 
                         labelStyle: TextStyle(
-                          color: isDark
-                              ? Colors.white70
-                              : Colors.black54,
+                          color: isDark ? Colors.white70 : Colors.black54,
                         ),
 
-                        prefixIcon: const Icon(
-                          Icons.location_on,
-                        ),
+                        prefixIcon: const Icon(Icons.location_on),
 
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
@@ -259,25 +220,17 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                           : Colors.white,
 
                       style: TextStyle(
-                        color: isDark
-                            ? Colors.white
-                            : Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
 
                       decoration: InputDecoration(
-                        labelText:
-                            "Forma de pagamento",
+                        labelText: "Forma de pagamento",
 
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
 
-                        prefixIcon: const Icon(
-                          Icons.payment,
-                        ),
+                        prefixIcon: const Icon(Icons.payment),
                       ),
 
                       items: const [
@@ -285,10 +238,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                           value: "Dinheiro",
                           child: Text("Dinheiro"),
                         ),
-                        DropdownMenuItem(
-                          value: "Pix",
-                          child: Text("Pix"),
-                        ),
+                        DropdownMenuItem(value: "Pix", child: Text("Pix")),
                         DropdownMenuItem(
                           value: "Cartão",
                           child: Text("Cartão"),
@@ -297,8 +247,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                       onChanged: (value) {
                         setModalState(() {
-                          formaPagamento =
-                              value!;
+                          formaPagamento = value!;
                         });
                       },
                     ),
@@ -307,37 +256,26 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                     // 🔥 OBS
                     TextField(
-                      controller:
-                          observacaoController,
+                      controller: observacaoController,
 
                       maxLines: 4,
 
                       style: TextStyle(
-                        color: isDark
-                            ? Colors.white
-                            : Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
 
                       decoration: InputDecoration(
                         labelText: "Observação",
 
-                        hintText:
-                            "Ex: sem cebola, troco para 50...",
+                        hintText: "Ex: sem cebola, troco para 50...",
 
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
 
                         prefixIcon: const Padding(
-                          padding: EdgeInsets.only(
-                            bottom: 70,
-                          ),
-                          child: Icon(
-                            Icons.edit_note,
-                          ),
+                          padding: EdgeInsets.only(bottom: 70),
+                          child: Icon(Icons.edit_note),
                         ),
                       ),
                     ),
@@ -349,24 +287,16 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                       height: 55,
 
                       child: ElevatedButton.icon(
-                        style:
-                            ElevatedButton.styleFrom(
-                          backgroundColor:
-                              theme.colorScheme.primary,
-                          foregroundColor:
-                              theme.colorScheme.onPrimary,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
 
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              16,
-                            ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
 
                         onPressed: () async {
-
                           Navigator.pop(context);
 
                           await finalizar();
@@ -383,8 +313,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -401,9 +330,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   // 🔥 FINALIZAR PEDIDO
   Future<void> finalizar() async {
-
-    final user =
-        FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
     if (widget.carrinho.isEmpty) return;
 
@@ -421,81 +348,56 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
     }
 
     try {
-
-      List<Map<String, dynamic>>
-          itensPedido = [];
+      List<Map<String, dynamic>> itensPedido = [];
 
       // 🔥 TEXTO WHATSAPP
-      String mensagem =
-          "🍔 NOVO PEDIDO - MANÁ LANCHES \n\n";
+      String mensagem = "🍔 NOVO PEDIDO - MANÁ LANCHES \n\n";
 
       for (var item in widget.carrinho) {
-
         itensPedido.add({
-          "nomeProduto":
-              item["nomeProduto"],
+          "nomeProduto": item["nomeProduto"],
           "preco": item["preco"],
-          "quantidade":
-              item["quantidade"],
-          "imagem":
-              item["imagem"] ?? "",
+          "quantidade": item["quantidade"],
+          "imagem": item["imagem"] ?? "",
         });
 
-        mensagem +=
-            "• ${item["nomeProduto"]} ${item["quantidade"]}\n";
+        mensagem += "• ${item["nomeProduto"]} ${item["quantidade"]}\n";
       }
 
-      mensagem +=
-          "\n💰 Total: R\$ ${total.toStringAsFixed(2)}";
+      mensagem += "\n💰 Total: R\$ ${total.toStringAsFixed(2)}";
 
-      mensagem +=
-          "\n\n👤 Cliente: ${widget.nomeCliente}";
+      mensagem += "\n\n👤 Cliente: ${widget.nomeCliente}";
 
-      mensagem +=
-          "\n📍 Endereço: ${enderecoController.text}";
+      mensagem += "\n📍 Endereço: ${enderecoController.text}";
 
-      mensagem +=
-          "\n💳 Pagamento: $formaPagamento";
+      mensagem += "\n💳 Pagamento: $formaPagamento";
 
-      if (observacaoController
-          .text
-          .trim()
-          .isNotEmpty) {
-
-        mensagem +=
-            "\n📝 Observação: ${observacaoController.text}";
+      if (observacaoController.text.trim().isNotEmpty) {
+        mensagem += "\n📝 Observação: ${observacaoController.text}";
       }
 
       // 🔥 SALVAR FIREBASE
-      final pedidoRef =
-          await FirebaseFirestore.instance
-              .collection("pedidos")
-              .add({
+      final pedidoRef = await FirebaseFirestore.instance
+          .collection("pedidos")
+          .add({
+            "itens": itensPedido,
+            "usuarioId": user!.uid,
+            "telefone": user.phoneNumber ?? "",
 
-        "itens": itensPedido,
-        "usuarioId": user!.uid,
-        "telefone":
-            user.phoneNumber ?? "",
+            "nomeCliente": widget.nomeCliente,
 
-        "nomeCliente":
-            widget.nomeCliente,
+            "endereco": enderecoController.text,
 
-        "endereco":
-            enderecoController.text,
+            "formaPagamento": formaPagamento,
 
-        "formaPagamento":
-            formaPagamento,
+            "observacao": observacaoController.text,
 
-        "observacao":
-            observacaoController.text,
+            "status": "Pendente",
 
-        "status": "Pendente",
+            "total": total,
 
-        "total": total,
-
-        "data":
-            FieldValue.serverTimestamp(),
-      });
+            "data": FieldValue.serverTimestamp(),
+          });
 
       final pedidoId = pedidoRef.id;
 
@@ -514,27 +416,32 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
       bool abriuWhatsapp = false;
 
-      // 🔥 ABRIR APP
-      if (await canLaunchUrl(
-        whatsappUrl,
-      )) {
-
-        abriuWhatsapp =
-            await launchUrl(
-          whatsappUrl,
-          mode:
-              LaunchMode.externalApplication,
+      // 🌐 WEB
+      if (kIsWeb) {
+        abriuWhatsapp = await launchUrl(
+          webUrl,
+          mode: LaunchMode.platformDefault,
         );
+      } else {
+        // 📱 ANDROID
+        if (await canLaunchUrl(whatsappUrl)) {
+          abriuWhatsapp = await launchUrl(
+            whatsappUrl,
+            mode: LaunchMode.externalApplication,
+          );
+        } else {
+          abriuWhatsapp = await launchUrl(
+            webUrl,
+            mode: LaunchMode.externalApplication,
+          );
+        }
       }
 
       // 🔥 FALLBACK WEB
       if (!abriuWhatsapp) {
-
-        abriuWhatsapp =
-            await launchUrl(
+        abriuWhatsapp = await launchUrl(
           webUrl,
-          mode:
-              LaunchMode.externalApplication,
+          mode: LaunchMode.externalApplication,
         );
       }
 
@@ -542,55 +449,34 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
       // 🔥 FEEDBACK
       if (abriuWhatsapp) {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            backgroundColor:
-                Colors.green,
+            backgroundColor: Colors.green,
 
-            content: Text(
-              "WhatsApp aberto com sucesso!",
-            ),
+            content: Text("WhatsApp aberto com sucesso!"),
           ),
         );
-
       } else {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            backgroundColor:
-                Colors.red,
+            backgroundColor: Colors.red,
 
-            content: Text(
-              "Não foi possível abrir o WhatsApp",
-            ),
+            content: Text("Não foi possível abrir o WhatsApp"),
           ),
         );
       }
 
-      
       setState(() {
         widget.carrinho.clear();
       });
 
-      Navigator.pop(
-        context,
-        pedidoId,
-      );
-
+      Navigator.pop(context, pedidoId);
     } catch (e) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor:
-              Colors.red,
+          backgroundColor: Colors.red,
 
-          content: Text(
-            "Erro ao finalizar pedido: $e",
-          ),
+          content: Text("Erro ao finalizar pedido: $e"),
         ),
       );
     }
@@ -598,36 +484,27 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final theme = Theme.of(context);
 
-    final isDark =
-        theme.brightness ==
-            Brightness.dark;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Seu carrinho",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
 
-                      appBar: AppBar(
-                      title: const Text(
-                      "Seu carrinho",
-                      style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                     ),
+        centerTitle: true,
 
-                      centerTitle: true,
+        elevation: 0,
 
-                      elevation: 0,
+        backgroundColor: isDark
+            ? const Color(0xFF141414)
+            : const Color(0xFFB33939),
 
-                      backgroundColor: isDark
-                      ? const Color(0xFF141414)
-                      : const Color(0xFFB33939),
-
-                        iconTheme: const IconThemeData(
-                    color: Colors.white,
-                    ),
-                  ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
 
       body: Container(
         width: double.infinity,
@@ -651,216 +528,147 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
         ),
 
         child: SafeArea(
-
           child: widget.carrinho.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
 
-          ? Center(
-    child: Column(
-      mainAxisAlignment:
-          MainAxisAlignment.center,
+                    children: [
+                      // 🔥 IMAGEM
+                      Image.asset("assets/images/vazio.png", height: 180),
 
-      children: [
+                      const SizedBox(height: 20),
 
-        // 🔥 IMAGEM
-        Image.asset(
-          "assets/images/vazio.png",
-          height: 180,
-        ),
+                      // 🔥 TEXTO
+                      Text(
+                        "Carrinho vazio..",
 
-        const SizedBox(height: 20),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
 
-        // 🔥 TEXTO
-        Text(
-          "Carrinho vazio..",
+                      const SizedBox(height: 10),
 
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+                      Text(
+                        "Adicione produtos para continuar",
 
-        const SizedBox(height: 10),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontSize: 15,
+                        ),
+                      ),
 
-        Text(
-          "Adicione produtos para continuar",
+                      const SizedBox(height: 30),
 
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
-            fontSize: 15,
-          ),
-        ),
+                      // 🔥 BOTÃO VER CARDÁPIO
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFD166),
+                          foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 14,
+                          ),
 
-        const SizedBox(height: 30),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
 
-        // 🔥 BOTÃO VER CARDÁPIO
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFFD166),
-            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 14,
-            ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
 
-            shape:
-                RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(
-                14,
-              ),
-            ),
-          ),
+                        icon: const Icon(Icons.restaurant_menu),
 
-          onPressed: () {
-
-            Navigator.pop(context);
-
-          },
-
-          icon: const Icon(
-            Icons.restaurant_menu,
-          ),
-
-          label: const Text(
-            "Ver cardápio",
-          ),
-        ),
-      ],
-    ),
-  )
-
+                        label: const Text("Ver cardápio"),
+                      ),
+                    ],
+                  ),
+                )
               : Column(
                   children: [
-
                     // 🔥 LISTA
                     Expanded(
                       child: ListView.builder(
-                        padding:
-                            const EdgeInsets.all(
-                          10,
-                        ),
+                        padding: const EdgeInsets.all(10),
 
-                        itemCount:
-                            widget.carrinho.length,
+                        itemCount: widget.carrinho.length,
 
-                        itemBuilder:
-                            (context, i) {
+                        itemBuilder: (context, i) {
+                          final item = widget.carrinho[i];
 
-                          final item =
-                              widget.carrinho[i];
-
-                          final preco =
-                              converterPreco(
-                            item["preco"],
-                          );
+                          final preco = converterPreco(item["preco"]);
 
                           return Container(
-                            margin:
-                                const EdgeInsets.only(
-                              bottom: 10,
-                            ),
+                            margin: const EdgeInsets.only(bottom: 10),
 
-                            padding:
-                                const EdgeInsets.all(
-                              14,
-                            ),
+                            padding: const EdgeInsets.all(14),
 
-                            decoration:
-                                BoxDecoration(
-                              color:
-                                  theme.cardColor,
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
 
-                              borderRadius:
-                                  BorderRadius.circular(
-                                16,
-                              ),
+                              borderRadius: BorderRadius.circular(16),
                             ),
 
                             child: Row(
                               children: [
-
                                 // 🔥 IMAGEM
                                 ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    12,
-                                  ),
+                                  borderRadius: BorderRadius.circular(12),
 
-                                  child:
-                                      Image.network(
-                                    item["imagem"] ??
-                                        "",
+                                  child: Image.network(
+                                    item["imagem"] ?? "",
 
                                     width: 70,
                                     height: 70,
 
-                                    fit:
-                                        BoxFit.cover,
+                                    fit: BoxFit.cover,
 
-                                    errorBuilder:
-                                        (_, __,
-                                            ___) {
-
+                                    errorBuilder: (_, __, ___) {
                                       return Container(
                                         width: 70,
                                         height: 70,
 
-                                        color: Colors
-                                            .grey,
+                                        color: Colors.grey,
 
-                                        child:
-                                            const Icon(
-                                          Icons
-                                              .fastfood,
+                                        child: const Icon(
+                                          Icons.fastfood,
 
-                                          color: Colors
-                                              .white,
+                                          color: Colors.white,
                                         ),
                                       );
                                     },
                                   ),
                                 ),
 
-                                const SizedBox(
-                                  width: 12,
-                                ),
+                                const SizedBox(width: 12),
 
                                 // 🔥 INFO
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment
-                                            .start,
+                                        CrossAxisAlignment.start,
 
                                     children: [
-
                                       Text(
-                                        item[
-                                                "nomeProduto"]
-                                            .toString(),
+                                        item["nomeProduto"].toString(),
 
-                                        style:
-                                            const TextStyle(
-                                          fontWeight:
-                                              FontWeight
-                                                  .bold,
-                                          fontSize:
-                                              16,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
                                         ),
                                       ),
 
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
+                                      const SizedBox(height: 4),
 
                                       Text(
                                         "R\$ ${preco.toStringAsFixed(2)}",
 
-                                        style:
-                                            const TextStyle(
-                                          color:
-                                              Colors.grey,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
                                         ),
                                       ),
                                     ],
@@ -869,59 +677,35 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                                 // 🔥 QUANTIDADE
                                 Container(
-                                  decoration:
-                                      BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: isDark
-                                        ? Colors.grey[
-                                            800]
-                                        : Colors.grey[
-                                            200],
+                                        ? Colors.grey[800]
+                                        : Colors.grey[200],
 
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      20,
-                                    ),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
 
                                   child: Row(
                                     children: [
-
                                       IconButton(
-                                        icon:
-                                            const Icon(
-                                          Icons
-                                              .remove,
-                                        ),
+                                        icon: const Icon(Icons.remove),
 
-                                        onPressed:
-                                            () {
-                                          diminuir(
-                                              i);
+                                        onPressed: () {
+                                          diminuir(i);
                                         },
                                       ),
 
                                       Text(
-                                        item[
-                                                "quantidade"]
-                                            .toString(),
+                                        item["quantidade"].toString(),
 
-                                        style:
-                                            const TextStyle(
-                                          fontSize:
-                                              16,
-                                        ),
+                                        style: const TextStyle(fontSize: 16),
                                       ),
 
                                       IconButton(
-                                        icon:
-                                            const Icon(
-                                          Icons.add,
-                                        ),
+                                        icon: const Icon(Icons.add),
 
-                                        onPressed:
-                                            () {
-                                          aumentar(
-                                              i);
+                                        onPressed: () {
+                                          aumentar(i);
                                         },
                                       ),
                                     ],
@@ -936,39 +720,26 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                     // 🔥 TOTAL
                     Container(
-                      padding:
-                          const EdgeInsets.all(
-                        18,
-                      ),
+                      padding: const EdgeInsets.all(18),
 
-                      decoration:
-                          BoxDecoration(
+                      decoration: BoxDecoration(
                         color: theme.cardColor,
 
-                        borderRadius:
-                            const BorderRadius.vertical(
-                          top: Radius.circular(
-                            24,
-                          ),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(24),
                         ),
                       ),
 
                       child: Column(
                         children: [
-
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment
-                                    .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                             children: [
-
                               const Text(
                                 "Total",
 
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
+                                style: TextStyle(fontSize: 18),
                               ),
 
                               Text(
@@ -977,53 +748,34 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                 style: TextStyle(
                                   fontSize: 20,
 
-                                  fontWeight:
-                                      FontWeight
-                                          .bold,
+                                  fontWeight: FontWeight.bold,
 
-                                  color: theme
-                                      .colorScheme
-                                      .primary,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                             ],
                           ),
 
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
 
                           SizedBox(
-                            width:
-                                double.infinity,
+                            width: double.infinity,
                             height: 52,
 
-                            child:
-                                ElevatedButton.icon(
-
-                              style:
-                                  ElevatedButton
-                                      .styleFrom(
-                                backgroundColor:
-                                    theme.colorScheme.primary,
-                                foregroundColor:
-                                    theme.colorScheme.onPrimary,
-                                shape:
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    14,
-                                  ),
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
 
-                              onPressed:
-                                  abrirFormularioPedido,
+                              onPressed: abrirFormularioPedido,
 
                               icon: const Icon(
                                 Icons.shopping_bag,
-                                color:
-                                    Colors.white,
+                                color: Colors.white,
                               ),
 
                               label: const Text(
@@ -1031,11 +783,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
                                 style: TextStyle(
                                   fontSize: 18,
-                                  color:
-                                      Colors.white,
-                                  fontWeight:
-                                      FontWeight
-                                          .bold,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),

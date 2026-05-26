@@ -11,64 +11,39 @@ class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() =>
-      _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState
-    extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final nomeController = TextEditingController();
 
-  final nomeController =
-      TextEditingController();
+  final emailController = TextEditingController();
 
-  final emailController =
-      TextEditingController();
+  final telefoneController = TextEditingController();
 
-  final telefoneController =
-      TextEditingController();
+  final enderecoController = TextEditingController();
 
-  final enderecoController =
-      TextEditingController();
+  final senhaController = TextEditingController();
 
-  final senhaController =
-      TextEditingController();
-
-  final confirmarSenhaController =
-      TextEditingController();
+  final confirmarSenhaController = TextEditingController();
 
   bool carregando = false;
 
   // 🔥 CADASTRAR
   Future<void> cadastrar() async {
-
     // VALIDAR SENHAS
-    if (senhaController.text !=
-        confirmarSenhaController.text) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            "As senhas não coincidem",
-          ),
-        ),
-      );
+    if (senhaController.text != confirmarSenhaController.text) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("As senhas não coincidem")));
 
       return;
     }
 
     // VALIDAR TAMANHO SENHA
     if (senhaController.text.length < 6) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            "Senha deve ter no mínimo 6 caracteres",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Senha deve ter no mínimo 6 caracteres")),
       );
 
       return;
@@ -80,148 +55,85 @@ class _RegisterScreenState
         telefoneController.text.isEmpty ||
         enderecoController.text.isEmpty ||
         senhaController.text.isEmpty) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            "Preencha todos os campos",
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Preencha todos os campos")));
 
       return;
     }
 
     try {
-
       setState(() {
         carregando = true;
       });
 
       // 🔥 CRIAR USUÁRIO
-      UserCredential userCredential =
-          await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
 
-        email:
-            emailController.text.trim(),
-
-        password:
-            senhaController.text.trim(),
-      );
+            password: senhaController.text.trim(),
+          );
 
       // 🔥 ATUALIZAR NOME FIREBASE AUTH
-      await userCredential.user!
-          .updateDisplayName(
-
-        nomeController.text.trim(),
-      );
+      await userCredential.user!.updateDisplayName(nomeController.text.trim());
 
       // 🔥 SALVAR FIRESTORE
       await FirebaseFirestore.instance
           .collection("usuarios")
           .doc(userCredential.user!.uid)
           .set({
+            "uid": userCredential.user!.uid,
 
-        "uid":
-            userCredential.user!.uid,
+            "nome": nomeController.text.trim(),
 
-        "nome":
-            nomeController.text.trim(),
+            "email": emailController.text.trim(),
 
-        "email":
-            emailController.text.trim(),
+            "telefone": telefoneController.text.trim(),
 
-        "telefone":
-            telefoneController.text.trim(),
+            "endereco": enderecoController.text.trim(),
 
-        "endereco":
-            enderecoController.text.trim(),
+            "tipo": "cliente",
 
-        "tipo": "cliente",
-
-        "createdAt":
-            Timestamp.now(),
-
-      }, SetOptions(merge: true));
+            "createdAt": Timestamp.now(),
+          }, SetOptions(merge: true));
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            "Cadastro realizado com sucesso!",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Cadastro realizado com sucesso!")),
       );
 
       // 🔥 ENTRAR AUTOMATICAMENTE
       Navigator.pushReplacement(
-
         context,
 
-        MaterialPageRoute(
-          builder: (_) =>
-              const ClientScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const ClientScreen()),
       );
-
     } on FirebaseAuthException catch (e) {
+      String mensagem = "Erro ao cadastrar";
 
-      String mensagem =
-          "Erro ao cadastrar";
-
-      if (e.code ==
-          'email-already-in-use') {
-
-        mensagem =
-            "Email já está em uso";
-
-      } else if (e.code ==
-          'invalid-email') {
-
-        mensagem =
-            "Email inválido";
-
-      } else if (e.code ==
-          'weak-password') {
-
-        mensagem =
-            "Senha muito fraca";
+      if (e.code == 'email-already-in-use') {
+        mensagem = "Email já está em uso";
+      } else if (e.code == 'invalid-email') {
+        mensagem = "Email inválido";
+      } else if (e.code == 'weak-password') {
+        mensagem = "Senha muito fraca";
       }
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content: Text(mensagem),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(mensagem)));
     } catch (e) {
-
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content: Text(
-            "Erro inesperado: $e",
-          ),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erro inesperado: $e")));
     } finally {
-
       if (mounted) {
-
         setState(() {
           carregando = false;
         });
@@ -231,7 +143,6 @@ class _RegisterScreenState
 
   @override
   void dispose() {
-
     nomeController.dispose();
 
     emailController.dispose();
@@ -249,47 +160,33 @@ class _RegisterScreenState
 
   @override
   Widget build(BuildContext context) {
-
-    final isDark =
-        Theme.of(context)
-                .brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-
       body: Container(
         width: double.infinity,
         height: double.infinity,
 
         decoration: BoxDecoration(
           gradient: LinearGradient(
-
             colors: isDark
                 ? [
-                    const Color(
-                        0xFF111111),
+                    const Color(0xFF111111),
 
-                    const Color(
-                        0xFF1A1A1A),
+                    const Color(0xFF1A1A1A),
 
-                    const Color(
-                        0xFF222222),
+                    const Color(0xFF222222),
 
-                    const Color(
-                        0xFF2C2C2C),
+                    const Color(0xFF2C2C2C),
                   ]
                 : [
-                    const Color(
-                        0xFF3E0F12),
+                    const Color(0xFF3E0F12),
 
-                    const Color(
-                        0xFF5A171B),
+                    const Color(0xFF5A171B),
 
-                    const Color(
-                        0xFF7A2323),
+                    const Color(0xFF7A2323),
 
-                    const Color(
-                        0xFFA63A3A),
+                    const Color(0xFFA63A3A),
                   ],
 
             begin: Alignment.topLeft,
@@ -298,21 +195,13 @@ class _RegisterScreenState
         ),
 
         child: SafeArea(
-
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
 
-            physics:
-                const BouncingScrollPhysics(),
-
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 28,
-              vertical: 30,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 30),
 
             child: Column(
               children: [
-
                 const SizedBox(height: 20),
 
                 const Text(
@@ -321,8 +210,7 @@ class _RegisterScreenState
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 30,
-                    fontWeight:
-                        FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
 
@@ -334,10 +222,7 @@ class _RegisterScreenState
                   textAlign: TextAlign.center,
 
                   style: TextStyle(
-                    color:
-                        Colors.white.withValues(
-                      alpha: 0.78,
-                    ),
+                    color: Colors.white.withValues(alpha: 0.78),
 
                     fontSize: 15,
                   ),
@@ -351,11 +236,9 @@ class _RegisterScreenState
                   Icons.person,
                   isDark,
 
-                  keyboardType:
-                      TextInputType.name,
+                  keyboardType: TextInputType.name,
 
-                  textCapitalization:
-                      TextCapitalization.words,
+                  textCapitalization: TextCapitalization.words,
                 ),
 
                 const SizedBox(height: 18),
@@ -366,8 +249,7 @@ class _RegisterScreenState
                   Icons.email,
                   isDark,
 
-                  keyboardType:
-                      TextInputType.emailAddress,
+                  keyboardType: TextInputType.emailAddress,
                 ),
 
                 const SizedBox(height: 18),
@@ -378,16 +260,12 @@ class _RegisterScreenState
                   Icons.phone,
                   isDark,
 
-                  keyboardType:
-                      TextInputType.phone,
+                  keyboardType: TextInputType.phone,
 
                   inputFormatters: [
-                    FilteringTextInputFormatter
-                        .digitsOnly,
+                    FilteringTextInputFormatter.digitsOnly,
 
-                    LengthLimitingTextInputFormatter(
-                      11,
-                    ),
+                    LengthLimitingTextInputFormatter(11),
                   ],
                 ),
 
@@ -399,8 +277,7 @@ class _RegisterScreenState
                   Icons.location_on,
                   isDark,
 
-                  textCapitalization:
-                      TextCapitalization.sentences,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
 
                 const SizedBox(height: 18),
@@ -432,42 +309,24 @@ class _RegisterScreenState
                   height: 60,
 
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD4A017),
 
-                    style:
-                        ElevatedButton.styleFrom(
-
-                      backgroundColor:
-                          const Color(
-                              0xFFD4A017),
-
-                      shape:
-                          RoundedRectangleBorder(
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          18,
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
                       ),
                     ),
 
-                    onPressed:
-                        carregando
-                            ? null
-                            : cadastrar,
+                    onPressed: carregando ? null : cadastrar,
 
                     child: carregando
-
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             "Cadastrar",
 
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight:
-                                  FontWeight.bold,
+                              fontWeight: FontWeight.bold,
 
                               color: Colors.white,
                             ),
@@ -478,40 +337,29 @@ class _RegisterScreenState
                 const SizedBox(height: 25),
 
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
 
                   children: [
-
                     Text(
                       "Já possui conta? ",
 
                       style: TextStyle(
-                        color:
-                            Colors.white.withValues(
-                          alpha: 0.85,
-                        ),
+                        color: Colors.white.withValues(alpha: 0.85),
 
                         fontSize: 15,
-                        fontWeight:
-                            FontWeight.w500,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
 
                     InkWell(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        6,
-                      ),
+                      borderRadius: BorderRadius.circular(6),
 
                       onTap: () {
                         Navigator.pop(context);
                       },
 
                       child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 6,
                           vertical: 2,
                         ),
@@ -520,13 +368,11 @@ class _RegisterScreenState
                           "ENTRAR",
 
                           style: TextStyle(
-                            color:
-                                Color(0xFFFFD166),
+                            color: Color(0xFFFFD166),
 
                             fontSize: 15,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
 
                             letterSpacing: 0.5,
                           ),
@@ -547,7 +393,6 @@ class _RegisterScreenState
 
   // 🔥 CAMPO INPUT
   Widget campoInput(
-
     TextEditingController controller,
 
     String hint,
@@ -558,93 +403,50 @@ class _RegisterScreenState
 
     bool obscure = false,
 
-    TextInputType keyboardType =
-        TextInputType.text,
+    TextInputType keyboardType = TextInputType.text,
 
-    TextCapitalization
-        textCapitalization =
-        TextCapitalization.none,
+    TextCapitalization textCapitalization = TextCapitalization.none,
 
-    List<TextInputFormatter>?
-        inputFormatters,
+    List<TextInputFormatter>? inputFormatters,
   }) {
-
     return TextField(
-
       controller: controller,
 
       obscureText: obscure,
 
       keyboardType: keyboardType,
 
-      textCapitalization:
-          textCapitalization,
+      textCapitalization: textCapitalization,
 
-      inputFormatters:
-          inputFormatters,
+      inputFormatters: inputFormatters,
 
-      style: const TextStyle(
-        color: Colors.white,
-      ),
+      style: const TextStyle(color: Colors.white),
 
       decoration: InputDecoration(
-
         hintText: hint,
 
-        hintStyle: TextStyle(
-          color:
-              Colors.white.withValues(
-            alpha: 0.6,
-          ),
-        ),
+        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
 
-        prefixIcon: Icon(
-          icon,
-          color:
-              const Color(0xFFFFD166),
-        ),
+        prefixIcon: Icon(icon, color: const Color(0xFFFFD166)),
 
         filled: true,
 
         fillColor: isDark
-
             ? const Color(0xFF1B1B1B)
+            : Colors.white.withValues(alpha: 0.12),
 
-            : Colors.white.withValues(
-                alpha: 0.12,
-              ),
-
-        contentPadding:
-            const EdgeInsets.symmetric(
-          vertical: 20,
-        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20),
 
         border: OutlineInputBorder(
-
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
+          borderRadius: BorderRadius.circular(18),
 
           borderSide: BorderSide.none,
         ),
 
-        focusedBorder:
-            OutlineInputBorder(
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
 
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-
-          borderSide:
-              const BorderSide(
-
-            color:
-                Color(0xFFFFD166),
-
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: Color(0xFFFFD166), width: 1.5),
         ),
       ),
     );

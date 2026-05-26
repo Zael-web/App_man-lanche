@@ -40,32 +40,17 @@ class _LoginScreenState extends State<LoginScreen>
     _fadeAnimation = Tween<double>(
       begin: 0,
       end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _scaleAnimation = Tween<double>(
       begin: 0.8,
       end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _controller.forward();
   }
@@ -106,9 +91,8 @@ class _LoginScreenState extends State<LoginScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => tipo == "admin"
-              ? const AdminMenuScreen()
-              : const ClientScreen(),
+          builder: (_) =>
+              tipo == "admin" ? const AdminMenuScreen() : const ClientScreen(),
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -122,367 +106,242 @@ class _LoginScreenState extends State<LoginScreen>
         erro = "Email inválido";
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(erro)));
     }
   }
 
   // 🔐 RECUPERAR SENHA
-Future<void> abrirRecuperarSenha() async {
+  Future<void> abrirRecuperarSenha() async {
+    final emailResetController = TextEditingController();
 
-  final emailResetController =
-      TextEditingController();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-  final isDark =
-      Theme.of(context).brightness ==
-          Brightness.dark;
+    await showDialog(
+      context: context,
 
-  await showDialog(
-    context: context,
+      barrierDismissible: true,
 
-    barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
 
-    builder: (context) {
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
 
-      return Dialog(
-        backgroundColor:
-            Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(26),
 
-        insetPadding:
-            const EdgeInsets.symmetric(
-          horizontal: 24,
-        ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
 
-        child: Container(
-          padding:
-              const EdgeInsets.all(26),
-
-          decoration: BoxDecoration(
-
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-
-              colors: isDark
-                  ? const [
-                      Color(0xFF111111),
-                      Color(0xFF1B1B1B),
-                      Color(0xFF222222),
-                    ]
-                  : const [
-                      Color(0xFF4A0E0F),
-                      Color(0xFF7A2323),
-                      Color(0xFFB33939),
-                    ],
-            ),
-
-            borderRadius:
-                BorderRadius.circular(
-              30,
-            ),
-
-            border: Border.all(
-              color: Colors.white24,
-            ),
-
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black
-                    .withValues(
-                  alpha: 0.35,
-                ),
-
-                blurRadius: 25,
-                spreadRadius: 2,
+                colors: isDark
+                    ? const [
+                        Color(0xFF111111),
+                        Color(0xFF1B1B1B),
+                        Color(0xFF222222),
+                      ]
+                    : const [
+                        Color(0xFF4A0E0F),
+                        Color(0xFF7A2323),
+                        Color(0xFFB33939),
+                      ],
               ),
-            ],
-          ),
 
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize:
-                  MainAxisSize.min,
+              borderRadius: BorderRadius.circular(30),
 
-              children: [
+              border: Border.all(color: Colors.white24),
 
-                // 🔥 ÍCONE
-                Container(
-                  width: 90,
-                  height: 90,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.35),
 
-                  decoration:
-                      BoxDecoration(
-                    shape:
-                        BoxShape.circle,
-
-                    color: Colors.white
-                        .withValues(
-                      alpha: 0.12,
-                    ),
-                  ),
-
-                  child: const Icon(
-                    Icons.lock_reset,
-                    size: 45,
-                    color: Colors.white,
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 20,
-                ),
-
-                // 🔥 TÍTULO
-                const Text(
-                  "Recuperar senha",
-
-                  textAlign:
-                      TextAlign.center,
-
-                  style: TextStyle(
-                    color: Colors.white,
-
-                    fontSize: 26,
-
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 10,
-                ),
-
-                Text(
-                  "Digite seu email para receber o link de recuperação.",
-
-                  textAlign:
-                      TextAlign.center,
-
-                  style: TextStyle(
-                    color: Colors.white
-                        .withValues(
-                      alpha: 0.85,
-                    ),
-
-                    fontSize: 15,
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 28,
-                ),
-
-                // 🔥 CAMPO EMAIL
-                TextField(
-                  controller:
-                      emailResetController,
-
-                  keyboardType:
-                      TextInputType
-                          .emailAddress,
-
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
-
-                  decoration:
-                      InputDecoration(
-                    hintText:
-                        "Digite seu email",
-
-                    hintStyle:
-                        TextStyle(
-                      color: Colors.white
-                          .withValues(
-                        alpha: 0.65,
-                      ),
-                    ),
-
-                    prefixIcon:
-                        const Icon(
-                      Icons.email,
-                      color: Colors.white,
-                    ),
-
-                    filled: true,
-
-                    fillColor: Colors.white
-                        .withValues(
-                      alpha: 0.10,
-                    ),
-
-                    border:
-                        OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius
-                              .circular(
-                        18,
-                      ),
-
-                      borderSide:
-                          BorderSide
-                              .none,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 28,
-                ),
-
-                // 🔥 BOTÃO
-                SizedBox(
-                  width:
-                      double.infinity,
-
-                  height: 56,
-
-                  child:
-                      ElevatedButton.icon(
-
-                    style:
-                        ElevatedButton
-                            .styleFrom(
-                      backgroundColor:
-                          const Color(
-                        0xFFFFC107,
-                      ),
-
-                      foregroundColor:
-                          Colors.white,
-
-                      elevation: 0,
-
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius
-                                .circular(
-                          18,
-                        ),
-                      ),
-                    ),
-
-                    onPressed:
-                        () async {
-
-                      final email =
-                          emailResetController
-                              .text
-                              .trim();
-
-                      if (email
-                          .isEmpty) {
-
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text(
-                              "Digite um email",
-                            ),
-                          ),
-                        );
-
-                        return;
-                      }
-
-                      try {
-
-                        await FirebaseAuth
-                            .instance
-                            .sendPasswordResetEmail(
-                          email:
-                              email,
-                        );
-
-                        if (!mounted)
-                          return;
-
-                        Navigator.pop(
-                          context,
-                        );
-
-                        ScaffoldMessenger.of(
-                          this.context,
-                        ).showSnackBar(
-                          const SnackBar(
-                            backgroundColor:
-                                Colors.green,
-
-                            content:
-                                Text(
-                              "Email enviado com sucesso!",
-                            ),
-                          ),
-                        );
-
-                      } catch (e) {
-
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(
-                          SnackBar(
-                            backgroundColor:
-                                Colors.red,
-
-                            content:
-                                Text(
-                              "Erro: $e",
-                            ),
-                          ),
-                        );
-                      }
-                    },
-
-                    icon: const Icon(
-                      Icons.send,
-                    ),
-
-                    label: const Text(
-                      "Enviar link",
-
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 14,
-                ),
-
-                // 🔥 CANCELAR
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-
-                  child: const Text(
-                    "Cancelar",
-
-                    style: TextStyle(
-                      color:
-                          Colors.white70,
-                    ),
-                  ),
+                  blurRadius: 25,
+                  spreadRadius: 2,
                 ),
               ],
             ),
+
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+
+                children: [
+                  // 🔥 ÍCONE
+                  Container(
+                    width: 90,
+                    height: 90,
+
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
+
+                    child: const Icon(
+                      Icons.lock_reset,
+                      size: 45,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 🔥 TÍTULO
+                  const Text(
+                    "Recuperar senha",
+
+                    textAlign: TextAlign.center,
+
+                    style: TextStyle(
+                      color: Colors.white,
+
+                      fontSize: 26,
+
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Text(
+                    "Digite seu email para receber o link de recuperação.",
+
+                    textAlign: TextAlign.center,
+
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.85),
+
+                      fontSize: 15,
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // 🔥 CAMPO EMAIL
+                  TextField(
+                    controller: emailResetController,
+
+                    keyboardType: TextInputType.emailAddress,
+
+                    style: const TextStyle(color: Colors.white),
+
+                    decoration: InputDecoration(
+                      hintText: "Digite seu email",
+
+                      hintStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.65),
+                      ),
+
+                      prefixIcon: const Icon(Icons.email, color: Colors.white),
+
+                      filled: true,
+
+                      fillColor: Colors.white.withValues(alpha: 0.10),
+
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // 🔥 BOTÃO
+                  SizedBox(
+                    width: double.infinity,
+
+                    height: 56,
+
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFC107),
+
+                        foregroundColor: Colors.white,
+
+                        elevation: 0,
+
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+
+                      onPressed: () async {
+                        final email = emailResetController.text.trim();
+
+                        if (email.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Digite um email")),
+                          );
+
+                          return;
+                        }
+
+                        try {
+                          await FirebaseAuth.instance.sendPasswordResetEmail(
+                            email: email,
+                          );
+
+                          if (!mounted) return;
+
+                          Navigator.pop(context);
+
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            const SnackBar(
+                              backgroundColor: Colors.green,
+
+                              content: Text("Email enviado com sucesso!"),
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+
+                              content: Text("Erro: $e"),
+                            ),
+                          );
+                        }
+                      },
+
+                      icon: const Icon(Icons.send),
+
+                      label: const Text(
+                        "Enviar link",
+
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // 🔥 CANCELAR
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+
+                    child: const Text(
+                      "Cancelar",
+
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
+
   // 🔥 LOGIN GOOGLE
   Future<void> loginGoogle() async {
     try {
@@ -491,23 +350,20 @@ Future<void> abrirRecuperarSenha() async {
             "962981084599-isekijibn1be2rsk1cerhsoq204dmml4.apps.googleusercontent.com",
       );
 
-      final GoogleSignInAccount? googleUser =
-          await googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) return;
 
-      final googleAuth =
-          await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
-      final credential =
-          GoogleAuthProvider.credential(
+      final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final userCredential =
-          await FirebaseAuth.instance
-              .signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
 
       final user = userCredential.user!;
 
@@ -531,16 +387,12 @@ Future<void> abrirRecuperarSenha() async {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const ClientScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const ClientScreen()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Erro Google Login: $e"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erro Google Login: $e")));
     }
   }
 
@@ -554,9 +406,7 @@ Future<void> abrirRecuperarSenha() async {
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final size = MediaQuery.of(context).size;
 
@@ -617,10 +467,7 @@ Future<void> abrirRecuperarSenha() async {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight:
-                          size.height -
-                              MediaQuery.of(context)
-                                  .padding
-                                  .top,
+                          size.height - MediaQuery.of(context).padding.top,
                     ),
                     child: FadeTransition(
                       opacity: _fadeAnimation,
@@ -629,53 +476,54 @@ Future<void> abrirRecuperarSenha() async {
                         child: ScaleTransition(
                           scale: _scaleAnimation,
                           child: Column(
-                            mainAxisAlignment:
-                                MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-Align(
-  alignment: Alignment.topRight,
+                              Align(
+                                alignment: Alignment.topRight,
 
-  child: Padding(
-    padding: EdgeInsets.only(
-      top: MediaQuery.of(context).padding.top + 8,
-      right: 4,
-    ),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).padding.top + 8,
+                                    right: 4,
+                                  ),
 
-    child: Container(
-      width: 50,
-      height: 50,
+                                  child: Container(
+                                    width: 50,
+                                    height: 50,
 
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.10,
+                                      ),
 
-        borderRadius:
-            BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(16),
 
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.15),
-        ),
-      ),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                      ),
+                                    ),
 
-      child: IconButton(
-        splashRadius: 24,
+                                    child: IconButton(
+                                      splashRadius: 24,
 
-        icon: Icon(
-          isDark
-              ? Icons.light_mode
-              : Icons.dark_mode,
+                                      icon: Icon(
+                                        isDark
+                                            ? Icons.light_mode
+                                            : Icons.dark_mode,
 
-          color: Colors.white,
-          size: 26,
-        ),
+                                        color: Colors.white,
+                                        size: 26,
+                                      ),
 
-        onPressed: () {
-          MyApp.of(context)
-              ?.toggleTheme();
-        },
-      ),
-    ),
-  ),
-),
+                                      onPressed: () {
+                                        MyApp.of(context)?.toggleTheme();
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
 
                               const SizedBox(height: 12),
 
@@ -687,10 +535,8 @@ Align(
                                 "Bem-vindo de volta!",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize:
-                                      isSmall ? 22 : 26,
-                                  fontWeight:
-                                      FontWeight.bold,
+                                  fontSize: isSmall ? 22 : 26,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
 
@@ -699,8 +545,7 @@ Align(
                               Text(
                                 "Entre para continuar",
                                 style: TextStyle(
-                                  color: Colors.white
-                                      .withValues(alpha: 0.85),
+                                  color: Colors.white.withValues(alpha: 0.85),
                                   fontSize: 15,
                                 ),
                               ),
@@ -708,52 +553,42 @@ Align(
                               const SizedBox(height: 22),
 
                               Container(
-                                padding: EdgeInsets.all(
-                                  isSmall ? 16 : 24,
-                                ),
+                                padding: EdgeInsets.all(isSmall ? 16 : 24),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.white
-                                          .withValues(alpha: 0.06)
-                                      : Colors.white
-                                          .withValues(alpha: 0.18),
-                                  borderRadius:
-                                      BorderRadius.circular(30),
-                                  border: Border.all(
-                                    color: Colors.white24,
-                                  ),
+                                      ? Colors.white.withValues(alpha: 0.06)
+                                      : Colors.white.withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: Colors.white24),
                                 ),
                                 child: Column(
                                   children: [
                                     TextField(
-                                      controller:
-                                          emailController,
+                                      controller: emailController,
                                       style: TextStyle(
                                         color: isDark
                                             ? Colors.white
                                             : Colors.black,
                                       ),
-                                      decoration:
-                                          InputDecoration(
-                                        hintText:
-                                            "E-mail",
-                                        prefixIcon:
-                                            const Icon(
+                                      decoration: InputDecoration(
+                                        hintText: "E-mail",
+                                        prefixIcon: const Icon(
                                           Icons.email,
                                           color: Color(0xFF7D2035),
                                         ),
                                         filled: true,
                                         fillColor: isDark
-                                            ? Colors.white
-                                                .withValues(alpha: 0.08)
-                                            : Colors.white
-                                                .withValues(alpha: 0.9),
-                                        border:
-                                            OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18),
-                                          borderSide:
-                                              BorderSide.none,
+                                            ? Colors.white.withValues(
+                                                alpha: 0.08,
+                                              )
+                                            : Colors.white.withValues(
+                                                alpha: 0.9,
+                                              ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                          borderSide: BorderSide.none,
                                         ),
                                       ),
                                     ),
@@ -761,27 +596,21 @@ Align(
                                     const SizedBox(height: 16),
 
                                     TextField(
-                                      controller:
-                                          senhaController,
-                                      obscureText:
-                                          !mostrarSenha,
+                                      controller: senhaController,
+                                      obscureText: !mostrarSenha,
                                       style: TextStyle(
                                         color: isDark
                                             ? Colors.white
                                             : Colors.black,
                                       ),
-                                      decoration:
-                                          InputDecoration(
-                                        hintText:
-                                            "Senha",
-                                        prefixIcon:
-                                            const Icon(
+                                      decoration: InputDecoration(
+                                        hintText: "Senha",
+                                        prefixIcon: const Icon(
                                           Icons.lock,
                                           color: Color(0xFFB8860B),
                                         ),
                                         suffixIcon: Row(
-                                          mainAxisSize:
-                                              MainAxisSize.min,
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
                                             IconButton(
                                               icon: Icon(
@@ -791,40 +620,36 @@ Align(
                                               ),
                                               onPressed: () {
                                                 setState(() {
-                                                  mostrarSenha =
-                                                      !mostrarSenha;
+                                                  mostrarSenha = !mostrarSenha;
                                                 });
                                               },
                                             ),
                                             TextButton(
-                                              onPressed:
-                                                  abrirRecuperarSenha,
+                                              onPressed: abrirRecuperarSenha,
                                               style: TextButton.styleFrom(
-                                                foregroundColor:
-                                                    isDark
-                                                        ? Theme.of(context)
-                                                            .hintColor
-                                                        : Colors.red,
+                                                foregroundColor: isDark
+                                                    ? Theme.of(
+                                                        context,
+                                                      ).hintColor
+                                                    : Colors.red,
                                               ),
-                                              child:
-                                                  const Text(
-                                                "Esqueceu?",
-                                              ),
+                                              child: const Text("Esqueceu?"),
                                             ),
                                           ],
                                         ),
                                         filled: true,
                                         fillColor: isDark
-                                            ? Colors.white
-                                                .withValues(alpha: 0.08)
-                                            : Colors.white
-                                                .withValues(alpha: 0.9),
-                                        border:
-                                            OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18),
-                                          borderSide:
-                                              BorderSide.none,
+                                            ? Colors.white.withValues(
+                                                alpha: 0.08,
+                                              )
+                                            : Colors.white.withValues(
+                                                alpha: 0.9,
+                                              ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                          borderSide: BorderSide.none,
                                         ),
                                       ),
                                     ),
@@ -833,19 +658,17 @@ Align(
 
                                     SizedBox(
                                       width: double.infinity,
-                                      height:
-                                          isSmall ? 50 : 56,
+                                      height: isSmall ? 50 : 56,
                                       child: ElevatedButton(
-                                        style:
-                                            ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFFFFC107),
-                                          foregroundColor:
-                                              Colors.white,
-                                          shape:
-                                              RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(18),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFFFFC107,
+                                          ),
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              18,
+                                            ),
                                           ),
                                         ),
                                         onPressed: login,
@@ -853,8 +676,7 @@ Align(
                                           'Entrar',
                                           style: TextStyle(
                                             fontSize: 18,
-                                            fontWeight:
-                                                FontWeight.bold,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
@@ -866,14 +688,11 @@ Align(
                               const SizedBox(height: 20),
 
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Text(
                                     "Não tem uma conta?",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                   TextButton(
                                     onPressed: () {
@@ -888,10 +707,8 @@ Align(
                                     child: const Text(
                                       "Cadastre-se",
                                       style: TextStyle(
-                                        color:
-                                            Color(0xFFFFE082),
-                                        fontWeight:
-                                            FontWeight.bold,
+                                        color: Color(0xFFFFE082),
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -899,49 +716,50 @@ Align(
                               ),
 
                               const SizedBox(height: 15),
-                             SizedBox(
-  width: double.infinity,
-  height: 56,
+                              SizedBox(
+                                width: double.infinity,
+                                height: 56,
 
-  child: ElevatedButton.icon(
-    style: ElevatedButton.styleFrom(
-      backgroundColor:
-          Colors.white.withValues(alpha: 0.10),
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white.withValues(
+                                      alpha: 0.10,
+                                    ),
 
-      foregroundColor: Colors.white,
+                                    foregroundColor: Colors.white,
 
-      elevation: 0,
+                                    elevation: 0,
 
-      side: BorderSide(
-        color: Colors.white.withValues(alpha: 0.15),
-      ),
+                                    side: BorderSide(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                    ),
 
-      shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(18),
-      ),
-    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                  ),
 
-    onPressed: loginGoogle,
+                                  onPressed: loginGoogle,
 
-    icon: Image.asset(
-      "assets/images/google.png",
-      width: 30,
-      height: 30,
-    ),
+                                  icon: Image.asset(
+                                    "assets/images/google.png",
+                                    width: 30,
+                                    height: 30,
+                                  ),
 
-    label: const Text(
-      "Entrar com o Google",
+                                  label: const Text(
+                                    "Entrar com o Google",
 
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  ),
-),
-                              
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
 
                               const SizedBox(height: 20),
                             ],
@@ -959,11 +777,7 @@ Align(
     );
   }
 
-  Widget socialButton(
-    IconData icon,
-    Color color, {
-    VoidCallback? onTap,
-  }) {
+  Widget socialButton(IconData icon, Color color, {VoidCallback? onTap}) {
     final size = MediaQuery.of(context).size;
 
     final isSmall = size.height < 700;
@@ -975,16 +789,10 @@ Align(
         height: isSmall ? 50 : 58,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.10),
-          borderRadius:
-              BorderRadius.circular(18),
-          border:
-              Border.all(color: Colors.white24),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white24),
         ),
-        child: Icon(
-          icon,
-          color: color,
-          size: isSmall ? 28 : 34,
-        ),
+        child: Icon(icon, color: color, size: isSmall ? 28 : 34),
       ),
     );
   }
@@ -995,12 +803,10 @@ class AnimatedBackground extends StatefulWidget {
   const AnimatedBackground({super.key});
 
   @override
-  State<AnimatedBackground> createState() =>
-      _AnimatedBackgroundState();
+  State<AnimatedBackground> createState() => _AnimatedBackgroundState();
 }
 
-class _AnimatedBackgroundState
-    extends State<AnimatedBackground>
+class _AnimatedBackgroundState extends State<AnimatedBackground>
     with SingleTickerProviderStateMixin {
   late AnimationController controller;
 
@@ -1022,9 +828,7 @@ class _AnimatedBackgroundState
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedBuilder(
       animation: controller,
@@ -1032,14 +836,8 @@ class _AnimatedBackgroundState
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment(
-                -1 + controller.value,
-                -1,
-              ),
-              end: Alignment(
-                1,
-                1 - controller.value,
-              ),
+              begin: Alignment(-1 + controller.value, -1),
+              end: Alignment(1, 1 - controller.value),
               colors: isDark
                   ? const [
                       Color(0xFF050505),
@@ -1079,12 +877,10 @@ class FloatingFood extends StatefulWidget {
   });
 
   @override
-  State<FloatingFood> createState() =>
-      _FloatingFoodState();
+  State<FloatingFood> createState() => _FloatingFoodState();
 }
 
-class _FloatingFoodState
-    extends State<FloatingFood>
+class _FloatingFoodState extends State<FloatingFood>
     with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<double> animation;
@@ -1093,20 +889,13 @@ class _FloatingFoodState
   void initState() {
     super.initState();
 
-    controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    )..repeat(reverse: true);
+    controller = AnimationController(vsync: this, duration: widget.duration)
+      ..repeat(reverse: true);
 
     animation = Tween<double>(
       begin: -20,
       end: 20,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -1143,12 +932,10 @@ class FloatingLogo extends StatefulWidget {
   const FloatingLogo({super.key});
 
   @override
-  State<FloatingLogo> createState() =>
-      _FloatingLogoState();
+  State<FloatingLogo> createState() => _FloatingLogoState();
 }
 
-class _FloatingLogoState
-    extends State<FloatingLogo>
+class _FloatingLogoState extends State<FloatingLogo>
     with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<double> animation;
@@ -1165,12 +952,7 @@ class _FloatingLogoState
     animation = Tween<double>(
       begin: -8,
       end: 8,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -1196,16 +978,13 @@ class _FloatingLogoState
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color:
-                  Colors.red.withValues(alpha: 0.35),
+              color: Colors.red.withValues(alpha: 0.35),
               blurRadius: 35,
               spreadRadius: 5,
             ),
           ],
           image: const DecorationImage(
-            image: AssetImage(
-              "assets/images/logo.png",
-            ),
+            image: AssetImage("assets/images/logo.png"),
             fit: BoxFit.cover,
           ),
         ),

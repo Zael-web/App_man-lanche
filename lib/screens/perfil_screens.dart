@@ -36,76 +36,60 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     if (user == null) return;
 
-    final doc =
-        await _firestore.collection("usuarios").doc(user.uid).get();
+    final doc = await _firestore.collection("usuarios").doc(user.uid).get();
 
     if (!mounted) return;
 
     final dados = doc.data();
 
     setState(() {
-      nome =
-          dados?['nome']?.toString() ??
-          user.displayName ??
-          'Cliente';
+      nome = dados?['nome']?.toString() ?? user.displayName ?? 'Cliente';
 
-      email =
-          dados?['email']?.toString() ??
-          user.email ??
-          '';
+      email = dados?['email']?.toString() ?? user.email ?? '';
 
       telefone =
-          dados?['telefone']?.toString() ??
-          user.phoneNumber ??
-          'Não informado';
+          dados?['telefone']?.toString() ?? user.phoneNumber ?? 'Não informado';
 
-      endereco =
-          dados?['endereco']?.toString() ??
-          'Não informado';
+      endereco = dados?['endereco']?.toString() ?? 'Não informado';
 
       fotoUrl = user.photoURL ?? '';
 
-      tipoUsuario =
-          dados?['tipo']?.toString() ?? 'cliente';
+      tipoUsuario = dados?['tipo']?.toString() ?? 'cliente';
 
       _carregando = false;
     });
   }
 
   Future<void> sair() async {
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Sair da conta"),
-          content: const Text(
-            "Deseja sair da sua conta?",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-              child: const Text("Cancelar"),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: const Text(
-                "Sair",
-                style: TextStyle(
-                  color: Colors.white,
+    final confirmar =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Sair da conta"),
+              content: const Text("Deseja sair da sua conta?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: const Text("Cancelar"),
                 ),
-              ),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text(
+                    "Sair",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
 
     if (!confirmar) return;
 
@@ -115,9 +99,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (_) => const LoginScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
     );
   }
@@ -128,14 +110,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
       MaterialPageRoute(
         builder: (_) => EditProfileScreen(
           nome: nome,
-          telefone:
-              telefone == 'Não informado'
-                  ? ''
-                  : telefone,
-          endereco:
-              endereco == 'Não informado'
-                  ? ''
-                  : endereco,
+          telefone: telefone == 'Não informado' ? '' : telefone,
+          endereco: endereco == 'Não informado' ? '' : endereco,
         ),
       ),
     );
@@ -149,8 +125,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final isDark =
-        theme.brightness == Brightness.dark;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -163,10 +138,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
         elevation: 0,
 
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
 
           style: IconButton.styleFrom(
             backgroundColor: Colors.transparent,
@@ -207,75 +179,55 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
         child: SafeArea(
           child: _carregando
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-
+              ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
 
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
 
                     children: [
-
+                      
                       const SizedBox(height: 10),
 
                       // 🔥 CARD PERFIL
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(
-                            alpha: 0.08,
-                          ),
+                          color: Colors.white.withValues(alpha: 0.08),
 
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
 
                           border: Border.all(
-                            color: Colors.white.withValues(
-                              alpha: 0.08,
-                            ),
+                            color: Colors.white.withValues(alpha: 0.08),
                           ),
                         ),
 
                         child: Padding(
-                          padding:
-                              const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
 
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
 
                             children: [
 
                               CircleAvatar(
                                 radius: 52,
 
-                                backgroundColor:
-                                    theme
-                                        .colorScheme
-                                        .primary,
+                                backgroundColor: theme.colorScheme.primary,
 
-                                backgroundImage:
-                                    fotoUrl.isNotEmpty
-                                        ? NetworkImage(
-                                            fotoUrl,
-                                          )
-                                        : null,
+                                backgroundImage: fotoUrl.isNotEmpty
+                                    ? NetworkImage(fotoUrl)
+                                    : null,
 
                                 child: fotoUrl.isEmpty
                                     ? Text(
                                         nome.isNotEmpty
-                                            ? nome[0]
-                                                .toUpperCase()
+                                            ? nome[0].toUpperCase()
                                             : 'U',
 
-                                        style:
-                                            const TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 36,
-                                          color:
-                                              Colors.white,
+                                          color: Colors.white,
                                         ),
                                       )
                                     : null,
@@ -288,8 +240,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                                 style: const TextStyle(
                                   fontSize: 22,
-                                  fontWeight:
-                                      FontWeight.bold,
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
@@ -300,32 +251,24 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                 email,
 
                                 style: TextStyle(
-                                  color: Colors.white
-                                      .withValues(
-                                    alpha: 0.7,
-                                  ),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                 ),
                               ),
 
                               const SizedBox(height: 10),
 
                               Container(
-                                padding:
-                                    const EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   horizontal: 14,
                                   vertical: 8,
                                 ),
 
                                 decoration: BoxDecoration(
-                                  color:
-                                      tipoUsuario == "admin"
-                                          ? Colors.orange
-                                          : Colors.green,
+                                  color: tipoUsuario == "admin"
+                                      ? Colors.orange
+                                      : Colors.green,
 
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    20,
-                                  ),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
 
                                 child: Text(
@@ -333,11 +276,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                       ? "Administrador"
                                       : "Cliente",
 
-                                  style:
-                                      const TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
-                                    fontWeight:
-                                        FontWeight.bold,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -345,11 +286,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               const SizedBox(height: 18),
 
                               ElevatedButton.icon(
-                                style:
-                                    ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Colors.white
-                                          .withValues(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white.withValues(
                                     alpha: 0.12,
                                   ),
                                 ),
@@ -364,9 +302,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                 label: const Text(
                                   'Editar perfil',
 
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
                             ],
@@ -379,27 +315,20 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       // 🔥 DADOS
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(
-                            alpha: 0.08,
-                          ),
+                          color: Colors.white.withValues(alpha: 0.08),
 
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
 
                           border: Border.all(
-                            color: Colors.white.withValues(
-                              alpha: 0.08,
-                            ),
+                            color: Colors.white.withValues(alpha: 0.08),
                           ),
                         ),
 
                         child: Padding(
-                          padding:
-                              const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
 
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
 
                             children: [
 
@@ -408,19 +337,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                                 style: TextStyle(
                                   fontSize: 18,
-                                  fontWeight:
-                                      FontWeight.bold,
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
 
                               const SizedBox(height: 14),
 
-                              _infoLinha(
-                                Icons.phone,
-                                'Telefone',
-                                telefone,
-                              ),
+                              _infoLinha(Icons.phone, 'Telefone', telefone),
 
                               const SizedBox(height: 12),
 
@@ -441,17 +365,13 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                           Expanded(
                             child: ElevatedButton.icon(
-                              style:
-                                  ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Colors.white
-                                        .withValues(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white.withValues(
                                   alpha: 0.12,
                                 ),
                               ),
 
-                              onPressed:
-                                  abrirEdicao,
+                              onPressed: abrirEdicao,
 
                               icon: const Icon(
                                 Icons.edit_location,
@@ -461,9 +381,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               label: const Text(
                                 'Editar perfil',
 
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
@@ -474,9 +392,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                             child: OutlinedButton.icon(
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(
-                                  color: Colors.white.withValues(
-                                    alpha: 0.4,
-                                  ),
+                                  color: Colors.white.withValues(alpha: 0.4),
                                 ),
                               ),
                               onPressed: sair,
@@ -486,9 +402,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               ),
                               label: const Text(
                                 'Sair',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
@@ -502,30 +416,18 @@ class _PerfilScreenState extends State<PerfilScreen> {
     );
   }
 
-  Widget _infoLinha(
-    IconData icon,
-    String titulo,
-    String valor,
-  ) {
-
+  Widget _infoLinha(IconData icon, String titulo, String valor) {
     return Row(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
 
       children: [
-
-        Icon(
-          icon,
-          size: 22,
-          color: Colors.white,
-        ),
+        Icon(icon, size: 22, color: Colors.white),
 
         const SizedBox(width: 12),
 
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
 
@@ -533,8 +435,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 titulo,
 
                 style: const TextStyle(
-                  fontWeight:
-                      FontWeight.bold,
+                  fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
@@ -544,10 +445,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               Text(
                 valor,
 
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.white70,
-                ),
+                style: const TextStyle(fontSize: 15, color: Colors.white70),
               ),
             ],
           ),
@@ -572,25 +470,18 @@ class EditProfileScreen extends StatefulWidget {
   });
 
   @override
-  State<EditProfileScreen> createState() =>
-      _EditProfileScreenState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState
-    extends State<EditProfileScreen> {
-
+class _EditProfileScreenState extends State<EditProfileScreen> {
   final _auth = FirebaseAuth.instance;
-  final _firestore =
-      FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 
-  final nomeController =
-      TextEditingController();
+  final nomeController = TextEditingController();
 
-  final telefoneController =
-      TextEditingController();
+  final telefoneController = TextEditingController();
 
-  final enderecoController =
-      TextEditingController();
+  final enderecoController = TextEditingController();
 
   bool _salvando = false;
 
@@ -600,11 +491,9 @@ class _EditProfileScreenState
 
     nomeController.text = widget.nome;
 
-    telefoneController.text =
-        widget.telefone;
+    telefoneController.text = widget.telefone;
 
-    enderecoController.text =
-        widget.endereco;
+    enderecoController.text = widget.endereco;
   }
 
   Future<void> salvar() async {
@@ -617,19 +506,12 @@ class _EditProfileScreenState
       _salvando = true;
     });
 
-    await _firestore
-        .collection('usuarios')
-        .doc(user.uid)
-        .update({
+    await _firestore.collection('usuarios').doc(user.uid).update({
+      'nome': nomeController.text.trim(),
 
-      'nome':
-          nomeController.text.trim(),
+      'telefone': telefoneController.text.trim(),
 
-      'telefone':
-          telefoneController.text.trim(),
-
-      'endereco':
-          enderecoController.text.trim(),
+      'endereco': enderecoController.text.trim(),
     });
 
     if (!mounted) return;
@@ -644,9 +526,7 @@ class _EditProfileScreenState
       extendBodyBehindAppBar: true,
 
       appBar: AppBar(
-        title: const Text(
-          'Editar perfil',
-        ),
+        title: const Text('Editar perfil'),
 
         centerTitle: true,
 
@@ -654,10 +534,7 @@ class _EditProfileScreenState
         elevation: 0,
 
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
 
           style: IconButton.styleFrom(
             backgroundColor: Colors.transparent,
@@ -691,8 +568,7 @@ class _EditProfileScreenState
 
         child: SafeArea(
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
 
             child: Column(
               children: [
@@ -700,36 +576,23 @@ class _EditProfileScreenState
                 TextField(
                   controller: nomeController,
 
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(color: Colors.white),
 
                   decoration: InputDecoration(
                     labelText: 'Nome',
 
-                    labelStyle:
-                        const TextStyle(
-                      color: Colors.white70,
-                    ),
+                    labelStyle: const TextStyle(color: Colors.white70),
 
-                    prefixIcon: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                    ),
+                    prefixIcon: const Icon(Icons.person, color: Colors.white),
 
                     filled: true,
 
-                    fillColor:
-                        Colors.white.withValues(
-                      alpha: 0.08,
-                    ),
+                    fillColor: Colors.white.withValues(alpha: 0.08),
 
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16),
 
-                      borderSide:
-                          BorderSide.none,
+                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
@@ -737,54 +600,35 @@ class _EditProfileScreenState
                 const SizedBox(height: 16),
 
                 TextField(
-                  controller:
-                      telefoneController,
+                  controller: telefoneController,
 
-                  keyboardType:
-                      TextInputType.phone,
+                  keyboardType: TextInputType.phone,
 
                   inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
 
-                    FilteringTextInputFormatter
-                        .digitsOnly,
-
-                    LengthLimitingTextInputFormatter(
-                      11,
-                    ),
+                    LengthLimitingTextInputFormatter(11),
 
                     _TelefoneInputFormatter(),
                   ],
 
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(color: Colors.white),
 
                   decoration: InputDecoration(
                     labelText: 'Telefone',
 
-                    labelStyle:
-                        const TextStyle(
-                      color: Colors.white70,
-                    ),
+                    labelStyle: const TextStyle(color: Colors.white70),
 
-                    prefixIcon: const Icon(
-                      Icons.phone,
-                      color: Colors.white,
-                    ),
+                    prefixIcon: const Icon(Icons.phone, color: Colors.white),
 
                     filled: true,
 
-                    fillColor:
-                        Colors.white.withValues(
-                      alpha: 0.08,
-                    ),
+                    fillColor: Colors.white.withValues(alpha: 0.08),
 
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16),
 
-                      borderSide:
-                          BorderSide.none,
+                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
@@ -792,20 +636,14 @@ class _EditProfileScreenState
                 const SizedBox(height: 16),
 
                 TextField(
-                  controller:
-                      enderecoController,
+                  controller: enderecoController,
 
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(color: Colors.white),
 
                   decoration: InputDecoration(
                     labelText: 'Endereço',
 
-                    labelStyle:
-                        const TextStyle(
-                      color: Colors.white70,
-                    ),
+                    labelStyle: const TextStyle(color: Colors.white70),
 
                     prefixIcon: const Icon(
                       Icons.location_on,
@@ -814,17 +652,12 @@ class _EditProfileScreenState
 
                     filled: true,
 
-                    fillColor:
-                        Colors.white.withValues(
-                      alpha: 0.08,
-                    ),
+                    fillColor: Colors.white.withValues(alpha: 0.08),
 
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16),
 
-                      borderSide:
-                          BorderSide.none,
+                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
@@ -836,25 +669,15 @@ class _EditProfileScreenState
                   height: 52,
 
                   child: ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.orange,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
                     ),
 
-                    onPressed:
-                        _salvando
-                            ? null
-                            : salvar,
+                    onPressed: _salvando ? null : salvar,
 
                     child: _salvando
-                        ? const CircularProgressIndicator(
-                            color:
-                                Colors.white,
-                          )
-                        : const Text(
-                            'Salvar alterações',
-                          ),
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Salvar alterações'),
                   ),
                 ),
               ],
@@ -867,20 +690,13 @@ class _EditProfileScreenState
 }
 
 // 🔥 FORMATADOR TELEFONE
-class _TelefoneInputFormatter
-    extends TextInputFormatter {
-
+class _TelefoneInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-
-    String text =
-        newValue.text.replaceAll(
-      RegExp(r'\D'),
-      '',
-    );
+    String text = newValue.text.replaceAll(RegExp(r'\D'), '');
 
     if (text.length > 11) {
       text = text.substring(0, 11);
@@ -889,25 +705,18 @@ class _TelefoneInputFormatter
     String formatted = '';
 
     if (text.isNotEmpty) {
-
-      formatted +=
-          '(${text.substring(0, text.length >= 2 ? 2 : text.length)}';
+      formatted += '(${text.substring(0, text.length >= 2 ? 2 : text.length)}';
     }
 
     if (text.length >= 3) {
 
       formatted += ') ';
 
-      formatted += text.substring(
-        2,
-        text.length >= 7
-            ? 7
-            : text.length,
-      );
+      formatted += text.substring(2, text.length >= 7 ? 7 : text.length);
     }
 
     if (text.length >= 8) {
-
+      
       formatted += '-';
 
       formatted += text.substring(7);
@@ -916,10 +725,7 @@ class _TelefoneInputFormatter
     return TextEditingValue(
       text: formatted,
 
-      selection:
-          TextSelection.collapsed(
-        offset: formatted.length,
-      ),
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

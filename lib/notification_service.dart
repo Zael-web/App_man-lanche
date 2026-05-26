@@ -24,13 +24,14 @@ class NotificationService {
         playSound: true,
 
         enableVibration: true,
-        sound: RawResourceAndroidNotificationSound('notificacao')
+        sound: RawResourceAndroidNotificationSound('notificacao'),
       );
 
       await flutterLocalNotificationsPlugin
-    .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
-    ?.createNotificationChannel(channel);
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(channel);
 
       // ✅ Mostra notificação mesmo com app aberto
       await _messaging.setForegroundNotificationPresentationOptions(
@@ -42,25 +43,20 @@ class NotificationService {
       String? token = await _messaging.getToken();
 
       if (token != null) {
-        await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(userId)
-            .set({
-              "fcmToken": token,
-            }, SetOptions(merge: true));
+        await FirebaseFirestore.instance.collection("usuarios").doc(userId).set(
+          {"fcmToken": token},
+          SetOptions(merge: true),
+        );
       }
 
       _messaging.onTokenRefresh.listen((newToken) {
-        FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(userId)
-            .set({
-              "fcmToken": newToken,
-            }, SetOptions(merge: true));
+        FirebaseFirestore.instance.collection("usuarios").doc(userId).set({
+          "fcmToken": newToken,
+        }, SetOptions(merge: true));
       });
 
       // ✅ App aberto
-      FirebaseMessaging.onMessage.listen((RemoteMessage message){
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         final notification = message.notification;
         final android = message.notification?.android;
 
@@ -77,13 +73,12 @@ class NotificationService {
                 priority: Priority.high,
                 playSound: true,
                 enableVibration: true,
-                sound: RawResourceAndroidNotificationSound('notificacao')
+                sound: RawResourceAndroidNotificationSound('notificacao'),
               ),
             ),
           );
         }
       });
-
     } catch (e) {
       print("Erro FCM: $e");
     }

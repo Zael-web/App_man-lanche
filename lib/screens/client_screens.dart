@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 
@@ -65,25 +66,25 @@ class _ClientScreenState extends State<ClientScreen> {
     "🍟 Combos que valem a pena",
   ];
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  carregarNome();
-  iniciarFrases();
-  iniciarBanner();
+    carregarNome();
+    iniciarFrases();
+    iniciarBanner();
 
-  Future.microtask(() async {
-    if (_notificacoesIniciadas) return;
+    Future.microtask(() async {
+      if (_notificacoesIniciadas) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+      final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      _notificacoesIniciadas = true;
-      await _initNotificationsSafe(user.uid);
-    }
-  });
-}
+      if (user != null) {
+        _notificacoesIniciadas = true;
+        await _initNotificationsSafe(user.uid);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -114,54 +115,109 @@ void initState() {
             ultimoStatus = status;
 
             if (mounted) {
+              ScaffoldMessenger.of(context).clearSnackBars();
 
-ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
 
-ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(
-    behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(
+                    top: 20,
+                    left: 12,
+                    right: 12,
+                    bottom: 700,
+                  ),
 
-    margin: const EdgeInsets.only(
-      top: 20,
-      left: 12,
-      right: 12,
-      bottom: 700,
-    ),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
 
-    backgroundColor: const Color.fromARGB(255, 230, 215, 0),
+                  duration: const Duration(seconds: 4),
 
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
+                  content: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
 
-    duration: const Duration(seconds: 4),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1A1A1A), Color(0xFF2C2C2C)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
 
-    content: Row(
-      children: [
-        const Icon(
-          Icons.notifications_active,
-          color: Colors.white,
-        ),
+                      borderRadius: BorderRadius.circular(18),
 
-        const SizedBox(width: 10),
+                      border: Border.all(
+                        color: Color(0xFFE53935).withValues(alpha: 0.6),
+                        width: 1.2,
+                      ),
 
-        Expanded(
-          child: Text(
-            "🍔 Seu pedido agora está: $status",
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
-    ),
-  ),
-);
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFFE53935).withValues(alpha: 0.25),
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+
+                          decoration: BoxDecoration(
+                            color: Color(0xFFE53935).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+
+                          child: const Icon(
+                            Icons.notifications_active_rounded,
+                            color: Color(0xFFE53935),
+                            size: 22,
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+
+                            children: [
+                              const Text(
+                                "Atualização do pedido",
+                                style: TextStyle(
+                                  color: Color(0xFFE53935),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+
+                              const SizedBox(height: 2),
+
+                              Text(
+                                "🍔 Agora está: $status",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
             }
           }
-        }); 
-        
+        });
   }
 
   // 🔥 FRASES
@@ -180,25 +236,25 @@ ScaffoldMessenger.of(context).showSnackBar(
   }
 
   // 🔥 BANNER
-void iniciarBanner() {
-  Future.doWhile(() async {
-    await Future.delayed(const Duration(seconds: 4));
+  void iniciarBanner() {
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 4));
 
-    if (!mounted) return false;
+      if (!mounted) return false;
 
-    if (!bannerController.hasClients) return false;
+      if (!bannerController.hasClients) return false;
 
-    bannerAtual++;
+      bannerAtual++;
 
-    await bannerController.animateToPage(
-      bannerAtual,
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-    );
+      await bannerController.animateToPage(
+        bannerAtual,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
 
-    return mounted;
-  });
-}
+      return mounted;
+    });
+  }
 
   // 🔥 CARREGAR NOME
   Future<void> carregarNome() async {
@@ -214,44 +270,39 @@ void iniciarBanner() {
     if (!mounted) return;
 
     setState(() {
-      nomeCliente = doc.exists
-          ? doc["nome"] ?? "Cliente"
-          : "Cliente";
+      nomeCliente = doc.exists ? doc["nome"] ?? "Cliente" : "Cliente";
 
       carregando = false;
     });
   }
-Future<void> _initNotificationsSafe(String uid) async {
-  try {
-    final messaging = FirebaseMessaging.instance;
 
-    // 🔥 NÃO trava se usuário recusar
-    final permission = await messaging.requestPermission();
+  Future<void> _initNotificationsSafe(String uid) async {
+    try {
+      final messaging = FirebaseMessaging.instance;
 
-    if (permission.authorizationStatus ==
-        AuthorizationStatus.denied) {
-      debugPrint("Usuário negou notificações");
-      return;
+      // 🔥 NÃO trava se usuário recusar
+      final permission = await messaging.requestPermission();
+
+      if (permission.authorizationStatus == AuthorizationStatus.denied) {
+        debugPrint("Usuário negou notificações");
+        return;
+      }
+
+      final token = await messaging.getToken();
+
+      if (token == null) {
+        debugPrint("Token nulo");
+        return;
+      }
+
+      await FirebaseFirestore.instance.collection("usuarios").doc(uid).set({
+        "fcmToken": token,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint("FCM ignorado (seguro): $e");
     }
-
-    final token = await messaging.getToken();
-
-    if (token == null) {
-      debugPrint("Token nulo");
-      return;
-    }
-
-    await FirebaseFirestore.instance
-        .collection("usuarios")
-        .doc(uid)
-        .set({
-      "fcmToken": token,
-    }, SetOptions(merge: true));
-
-  } catch (e) {
-    debugPrint("FCM ignorado (seguro): $e");
   }
-}
+
   // 🔥 ADICIONAR AO CARRINHO
   void adicionarAoCarrinho(
     String nome,
@@ -263,14 +314,10 @@ Future<void> _initNotificationsSafe(String uid) async {
       animatingIndex = index;
     });
 
-    await Future.delayed(
-      const Duration(milliseconds: 200),
-    );
+    await Future.delayed(const Duration(milliseconds: 200));
 
     setState(() {
-      final i = carrinho.indexWhere(
-        (item) => item["nomeProduto"] == nome,
-      );
+      final i = carrinho.indexWhere((item) => item["nomeProduto"] == nome);
 
       if (i >= 0) {
         carrinho[i]["quantidade"]++;
@@ -296,8 +343,7 @@ Future<void> _initNotificationsSafe(String uid) async {
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -318,16 +364,11 @@ Future<void> _initNotificationsSafe(String uid) async {
 
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.person,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const PerfilScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const PerfilScreen()),
               );
             },
           ),
@@ -337,14 +378,10 @@ Future<void> _initNotificationsSafe(String uid) async {
             child: Stack(
               children: [
                 IconButton(
-                  icon: const Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.shopping_cart, color: Colors.white),
 
                   onPressed: () async {
-                    final pedidoId =
-                        await Navigator.push(
+                    final pedidoId = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => CarrinhoScreen(
@@ -372,8 +409,7 @@ Future<void> _initNotificationsSafe(String uid) async {
 
                       decoration: BoxDecoration(
                         color: Colors.red,
-                        borderRadius:
-                            BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
 
                       child: Text(
@@ -426,14 +462,11 @@ Future<void> _initNotificationsSafe(String uid) async {
                   padding: const EdgeInsets.all(20),
 
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
                       Text(
-                        carregando
-                            ? "Carregando..."
-                            : "Olá, $nomeCliente 👋",
+                        carregando ? "Carregando..." : "Olá, $nomeCliente 👋",
 
                         style: const TextStyle(
                           fontSize: 30,
@@ -445,16 +478,12 @@ Future<void> _initNotificationsSafe(String uid) async {
                       const SizedBox(height: 8),
 
                       AnimatedSwitcher(
-                        duration: const Duration(
-                          milliseconds: 500,
-                        ),
+                        duration: const Duration(milliseconds: 500),
 
                         child: Text(
                           frases[fraseIndex],
 
-                          key: ValueKey(
-                            frases[fraseIndex],
-                          ),
+                          key: ValueKey(frases[fraseIndex]),
 
                           style: const TextStyle(
                             color: Colors.white70,
@@ -482,31 +511,24 @@ Future<void> _initNotificationsSafe(String uid) async {
 
                     itemBuilder: (_, index) {
                       return Container(
-                        margin:
-                            const EdgeInsets.symmetric(
-                          horizontal: 16,
-                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
 
                         decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(30),
 
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black
-                                  .withValues(alpha: 0.30),
+                              color: Colors.black.withValues(alpha: 0.30),
 
                               blurRadius: 20,
 
-                              offset:
-                                  const Offset(0, 10),
+                              offset: const Offset(0, 10),
                             ),
                           ],
                         ),
 
                         child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(30),
 
                           child: Stack(
                             fit: StackFit.expand,
@@ -519,20 +541,15 @@ Future<void> _initNotificationsSafe(String uid) async {
 
                               Container(
                                 decoration: BoxDecoration(
-                                  gradient:
-                                      LinearGradient(
-                                    begin:
-                                        Alignment.topCenter,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
 
-                                    end:
-                                        Alignment.bottomCenter,
+                                    end: Alignment.bottomCenter,
 
                                     colors: [
-                                      Colors.black
-                                          .withValues(alpha: 0.15),
+                                      Colors.black.withValues(alpha: 0.15),
 
-                                      Colors.black
-                                          .withValues(alpha: 0.80),
+                                      Colors.black.withValues(alpha: 0.80),
                                     ],
                                   ),
                                 ),
@@ -543,23 +560,18 @@ Future<void> _initNotificationsSafe(String uid) async {
                                 bottom: 20,
 
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment
-                                          .start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
 
                                   children: [
                                     Text(
                                       "MANÁ LANCHES 🍔",
 
                                       style: TextStyle(
-                                        color:
-                                            Colors.white,
+                                        color: Colors.white,
 
                                         fontSize: 24,
 
-                                        fontWeight:
-                                            FontWeight
-                                                .bold,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
 
@@ -568,10 +580,7 @@ Future<void> _initNotificationsSafe(String uid) async {
                                     Text(
                                       "Peça agora e receba rápido",
 
-                                      style: TextStyle(
-                                        color:
-                                            Colors.white70,
-                                      ),
+                                      style: TextStyle(color: Colors.white70),
                                     ),
                                   ],
                                 ),
@@ -585,73 +594,68 @@ Future<void> _initNotificationsSafe(String uid) async {
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 20),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
               // 🔥 PESQUISA
               SliverToBoxAdapter(
                 child: Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
 
-  child: Container(
-    decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: 0.10), // 🔥 transparência
-      borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(
+                        alpha: 0.10,
+                      ), // 🔥 transparência
+                      borderRadius: BorderRadius.circular(18),
 
-      border: Border.all(
-        color: Colors.white.withValues(alpha: 0.15),
-      ),
-    ),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.15),
+                      ),
+                    ),
 
-    child: TextField(
-      controller: pesquisaController,
+                    child: TextField(
+                      controller: pesquisaController,
 
-      onChanged: (value) {
-        setState(() {
-          pesquisa = value.toLowerCase();
-        });
-      },
+                      onChanged: (value) {
+                        setState(() {
+                          pesquisa = value.toLowerCase();
+                        });
+                      },
 
-      style: const TextStyle(
-        color: Colors.white,
-      ),
+                      style: const TextStyle(color: Colors.white),
 
-      cursorColor: Colors.white,
+                      cursorColor: Colors.white,
 
-      decoration: InputDecoration(
-        hintText: "Pesquisar produto...",
+                      decoration: InputDecoration(
+                        hintText: "Pesquisar produto...",
 
-        hintStyle: TextStyle(
-          color: Colors.white.withValues(alpha: 0.55),
-        ),
+                        hintStyle: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.55),
+                        ),
 
-        prefixIcon: Icon(
-          Icons.search,
-          color: Colors.white.withValues(alpha: 0.55),
-        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.white.withValues(alpha: 0.55),
+                        ),
 
-        filled: true,
+                        filled: true,
 
-        
-        fillColor: Colors.transparent,
+                        fillColor: Colors.transparent,
 
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
 
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-        ),
-      ),
-    ),
-  ),
-),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 18),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
               // 🔥 CATEGORIAS
               SliverToBoxAdapter(
@@ -659,13 +663,9 @@ Future<void> _initNotificationsSafe(String uid) async {
                   height: 45,
 
                   child: ListView(
-                    scrollDirection:
-                        Axis.horizontal,
+                    scrollDirection: Axis.horizontal,
 
-                    padding:
-                        const EdgeInsets.symmetric(
-                      horizontal: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
 
                     children: [
                       categoriaChip("todos"),
@@ -679,39 +679,30 @@ Future<void> _initNotificationsSafe(String uid) async {
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 18),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
               // 🔥 TÍTULO
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding:
-                      EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
 
                   child: Text(
                     "Produtos",
 
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight:
-                          FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 10),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 10)),
 
               // 🔥 PRODUTOS
               StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore
-                    .instance
+                stream: FirebaseFirestore.instance
                     .collection("produtos")
                     .orderBy("nome")
                     .snapshots(),
@@ -719,78 +710,51 @@ Future<void> _initNotificationsSafe(String uid) async {
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const SliverToBoxAdapter(
-                      child: Center(
-                        child:
-                            CircularProgressIndicator(),
-                      ),
+                      child: Center(child: CircularProgressIndicator()),
                     );
                   }
 
-                  final docs =
-                      snapshot.data!.docs;
+                  final docs = snapshot.data!.docs;
 
-                  final filtrados =
-                      docs.where((doc) {
-                    final data =
-                        doc.data()
-                            as Map<String, dynamic>;
+                  final filtrados = docs.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
 
-                    final categoria =
-                        (data["categoria"] ?? "")
-                            .toString()
-                            .toLowerCase();
+                    final categoria = (data["categoria"] ?? "")
+                        .toString()
+                        .toLowerCase();
 
-                    final nome =
-                        (data["nome"] ?? "")
-                            .toString()
-                            .toLowerCase();
+                    final nome = (data["nome"] ?? "").toString().toLowerCase();
 
-                    final categoriaOk =
-                        categoriaSelecionada ==
-                                "todos"
-                            ? true
-                            : categoria ==
-                                categoriaSelecionada;
+                    final categoriaOk = categoriaSelecionada == "todos"
+                        ? true
+                        : categoria == categoriaSelecionada;
 
-                    final pesquisaOk =
-                        nome.contains(pesquisa);
+                    final pesquisaOk = nome.contains(pesquisa);
 
-                    return categoriaOk &&
-                        pesquisaOk;
+                    return categoriaOk && pesquisaOk;
                   }).toList();
 
                   return SliverList(
-                    delegate:
-                        SliverChildBuilderDelegate(
-                      (context, index) {
-                        final data =
-                            filtrados[index].data()
-                                as Map<
-                                  String,
-                                  dynamic
-                                >;
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final data =
+                          filtrados[index].data() as Map<String, dynamic>;
 
-                        return Padding(
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
 
-child: foodItem(
-  data["nome"] ?? "",
-  data["preco"] ?? 0,
-  data["imagem"] ?? "",
-  index,
-  data["descricao"] ?? "",
-  data["ingredientes"] ?.toString() ?? "",
-),
-                        );
-                      },
-
-                      childCount:
-                          filtrados.length,
-                    ),
+                        child: foodItem(
+                          data["nome"] ?? "",
+                          data["preco"] ?? 0,
+                          data["imagem"] ?? "",
+                          index,
+                          data["descricao"] ?? "",
+                          data["ingredientes"]?.toString() ?? "",
+                        ),
+                      );
+                    }, childCount: filtrados.length),
                   );
                 },
               ),
@@ -803,8 +767,7 @@ child: foodItem(
 
   // 🔥 CATEGORIAS
   Widget categoriaChip(String titulo) {
-    final selecionado =
-        categoriaSelecionada == titulo;
+    final selecionado = categoriaSelecionada == titulo;
 
     return GestureDetector(
       onTap: () {
@@ -814,47 +777,31 @@ child: foodItem(
       },
 
       child: AnimatedContainer(
-        duration:
-            const Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 250),
 
-        margin:
-            const EdgeInsets.only(right: 12),
+        margin: const EdgeInsets.only(right: 12),
 
-        padding:
-            const EdgeInsets.symmetric(
-          horizontal: 22,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
 
         decoration: BoxDecoration(
           gradient: selecionado
               ? const LinearGradient(
-                  colors: [
-                    Color(0xFFFFD166),
-                    Color(0xFFFFB703),
-                  ],
+                  colors: [Color(0xFFFFD166), Color(0xFFFFB703)],
                 )
               : null,
 
-          color: selecionado
-              ? null
-              : Colors.white.withValues(alpha: 0.10),
+          color: selecionado ? null : Colors.white.withValues(alpha: 0.10),
 
-          borderRadius:
-              BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20),
 
-          border: Border.all(
-            color: Colors.white24,
-          ),
+          border: Border.all(color: Colors.white24),
         ),
 
         child: Text(
           titulo,
 
           style: TextStyle(
-            color: selecionado
-                ? Colors.black
-                : Colors.white,
+            color: selecionado ? Colors.black : Colors.white,
 
             fontWeight: FontWeight.bold,
           ),
@@ -863,329 +810,289 @@ child: foodItem(
     );
   }
 
-// 🔥 CARD PRODUTO
-Widget foodItem(
-  String nome,
-  dynamic preco,
-  String imagem,
-  int index,
-  String descricao,
-  String ingredientes,
-) {
-  final isAnimating =
-      animatingIndex == index;
+  // 🔥 CARD PRODUTO
+  Widget foodItem(
+    String nome,
+    dynamic preco,
+    String imagem,
+    int index,
+    String descricao,
+    String ingredientes,
+  ) {
+    final isAnimating = animatingIndex == index;
 
-  return AnimatedScale(
-    duration:
-        const Duration(milliseconds: 180),
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 180),
 
-    scale: isAnimating ? 0.97 : 1,
+      scale: isAnimating ? 0.97 : 1,
 
-    child: Container(
-      margin:
-          const EdgeInsets.only(bottom: 14),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
 
-      decoration: BoxDecoration(
-        color:
-            Colors.white.withValues(alpha: 0.10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.10),
 
-        borderRadius:
-            BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(22),
 
-        border: Border.all(
-          color: Colors.white24,
-        ),
-      ),
-
-      child: Column(
-        children: [
-
-          // 🔥 CONTEÚDO PRINCIPAL
-          Row(
-            children: [
-
-              // 🔥 IMAGEM
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.only(
-                  topLeft: Radius.circular(22),
-                  bottomLeft:
-                      Radius.circular(22),
-                ),
-
-                child: Image.network(
-                  imagem,
-
-                  width: 95,
-                  height: 120,
-
-                  fit: BoxFit.cover,
-
-                  errorBuilder:
-                      (_, __, ___) {
-                    return Container(
-                      width: 95,
-                      height: 120,
-
-                      color: Colors.black12,
-
-                      child: const Icon(
-                        Icons.fastfood,
-                        color: Colors.white,
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              // 🔥 TEXTO
-              Expanded(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.all(12),
-
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                    children: [
-
-                      // 🔥 NOME
-                      Text(
-                        nome,
-
-                        maxLines: 1,
-
-                        overflow:
-                            TextOverflow.ellipsis,
-
-                        style:
-                            const TextStyle(
-                          color: Colors.white,
-                          fontWeight:
-                              FontWeight.bold,
-                          fontSize: 17,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      // 🔥 DESCRIÇÃO
-                      Text(
-                        descricao,
-
-                        maxLines: 2,
-
-                        overflow:
-                            TextOverflow.ellipsis,
-
-                        style:
-                            TextStyle(
-                          color: Colors.white
-                              .withValues(alpha: 0.75),
-
-                          fontSize: 13,
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // 🔥 PREÇO
-                      Text(
-                        "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
-
-                        style:
-                            const TextStyle(
-                          color:
-                              Color(0xFFFFD166),
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                          fontSize: 16,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // 🔥 BOTÕES
-                      Row(
-                        children: [
-
-                          // 🔥 VER INGREDIENTES
-                          Expanded(
-  child: OutlinedButton(
-    style: OutlinedButton.styleFrom(
-      side: BorderSide(
-        color: Colors.white.withValues(alpha: 0.30),
-      ),
-
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-      ),
-    ),
-
-    onPressed: () {
-      showModalBottomSheet(
-        context: context,
-
-        backgroundColor: const Color(
-          0xFF1E1E1E,
+          border: Border.all(color: Colors.white24),
         ),
 
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(26),
-          ),
-        ),
-
-        builder: (_) {
-          return Padding(
-            padding: const EdgeInsets.all(20),
-
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-
+        child: Column(
+          children: [
+            // 🔥 CONTEÚDO PRINCIPAL
+            Row(
               children: [
+                // 🔥 IMAGEM
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(22),
+                    bottomLeft: Radius.circular(22),
+                  ),
 
-                Text(
-                  "Ingredientes de $nome",
+                  child: Image.network(
+                    imagem,
 
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    width: 95,
+                    height: 120,
+
+                    fit: BoxFit.cover,
+
+                    errorBuilder: (_, __, ___) {
+                      return Container(
+                        width: 95,
+                        height: 120,
+
+                        color: Colors.black12,
+
+                        child: const Icon(Icons.fastfood, color: Colors.white),
+                      );
+                    },
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                // 🔥 TEXTO
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
 
-                ...ingredientes.split(",").map(
-                  (item) {
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(
-                        bottom: 10,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
-                      child: Row(
-                        children: [
+                      children: [
+                        // 🔥 NOME
+                        Text(
+                          nome,
 
-                          const Icon(
-                            Icons.check_circle,
+                          maxLines: 1,
 
-                            color: Color(
-                              0xFFFFD166,
-                            ),
+                          overflow: TextOverflow.ellipsis,
 
-                            size: 20,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17,
                           ),
+                        ),
 
-                          const SizedBox(width: 10),
+                        const SizedBox(height: 6),
 
-                          Expanded(
-                            child: Text(
-                              item.toString(),
+                        // 🔥 DESCRIÇÃO
+                        Text(
+                          descricao,
 
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
+                          maxLines: 2,
+
+                          overflow: TextOverflow.ellipsis,
+
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.75),
+
+                            fontSize: 13,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // 🔥 PREÇO
+                        Text(
+                          "R\$ ${double.parse(preco.toString()).toStringAsFixed(2)}",
+
+                          style: const TextStyle(
+                            color: Color(0xFFFFD166),
+
+                            fontWeight: FontWeight.bold,
+
+                            fontSize: 16,
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // 🔥 BOTÕES
+                        Row(
+                          children: [
+                            // 🔥 VER INGREDIENTES
+                            Expanded(
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: Colors.white.withValues(alpha: 0.30),
+                                  ),
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                ),
+
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+
+                                    backgroundColor: const Color(0xFF1E1E1E),
+
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(26),
+                                      ),
+                                    ),
+
+                                    builder: (_) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(20),
+
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+
+                                          children: [
+                                            Text(
+                                              "Ingredientes de $nome",
+
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 18),
+
+                                            ...ingredientes.split(",").map((
+                                              item,
+                                            ) {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 10,
+                                                ),
+
+                                                child: Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.check_circle,
+
+                                                      color: Color(0xFFFFD166),
+
+                                                      size: 20,
+                                                    ),
+
+                                                    const SizedBox(width: 10),
+
+                                                    Expanded(
+                                                      child: Text(
+                                                        item.toString(),
+
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+
+                                            const SizedBox(height: 12),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+
+                                child: const Icon(
+                                  Icons.menu_book,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
 
-                const SizedBox(height: 12),
-              ],
-            ),
-          );
-        },
-      );
-    },
+                            const SizedBox(width: 10),
 
-    child: const Icon(
-      Icons.menu_book,
-      color: Colors.white,
-      size: 22,
-    ),
-  ),
-),
+                            // 🔥 ADICIONAR
+                            Expanded(
+                              child: SizedBox(
+                                height: 45,
 
-                          const SizedBox(width: 10),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromARGB(
+                                      144,
+                                      16,
+                                      155,
+                                      11,
+                                    ),
 
-                          // 🔥 ADICIONAR
-Expanded(
-  child: SizedBox(
-    height: 45,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
 
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor:
-            const Color.fromARGB(
-          144,
-          16,
-          155,
-          11,
-        ),
+                                  onPressed: () {
+                                    adicionarAoCarrinho(
+                                      nome,
+                                      preco,
+                                      index,
+                                      imagem,
+                                    );
+                                  },
 
-        shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(12),
-        ),
-      ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
 
-      onPressed: () {
-        adicionarAoCarrinho(
-          nome,
-          preco,
-          index,
-          imagem,
-        );
-      },
+                                    child: Text(
+                                      isAnimating ? "✔" : "Adicionar",
 
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
+                                      maxLines: 1,
 
-        child: Text(
-          isAnimating
-              ? "✔"
-              : "Adicionar",
-
-          maxLines: 1,
-
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight:
-                FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-      ),
-    ),
-  ),
-)
-                        ],
-                      ),
-                    ],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
- }
+    );
+  }
 }
